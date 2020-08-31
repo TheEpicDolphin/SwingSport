@@ -16,6 +16,8 @@ public class HookGun : MonoBehaviour
     HookState state;
     Transform hookSlot;
     Hook hook;
+
+    //TODO: use spring joint instead
     Rope rope;
     FixedJoint fixedJoint;
     float maxRopeLength = 20.0f;
