@@ -59,13 +59,10 @@ public class HookGun : MonoBehaviour
                     hook = hookGO.GetComponent<Hook>();
                     Rigidbody hookRb = hook.GetComponent<Rigidbody>();
                     rope.load = hookRb;
-                    //rope.tautLength = 20.0f;
+                    rope.restLength = 20.0f;
                     //Add launching force
                     hookRb.AddForce(10.0f * launchDir, ForceMode.Impulse);
                     state = HookState.Launching;
-                    //Action hookAttachedAction = new Action(HookAttached);
-                    //Action hookMissedAction = new Action(HookMissed);
-                    //hook.Launch(launchDir, hookAttachedAction, hookMissedAction);
                 }
                 break;
             case HookState.Launching:

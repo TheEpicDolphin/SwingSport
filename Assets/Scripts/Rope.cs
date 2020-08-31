@@ -8,8 +8,10 @@ public class Rope : MonoBehaviour
     public Rigidbody anchor;
     public Rigidbody load;
     public float restLength;
-    public float frac;
-    public float lastLength;
+    float frac;
+    float lastLength;
+    bool pullIn = false;
+    bool release = false;
     
     // Start is called before the first frame update
     void Start()
@@ -32,10 +34,9 @@ public class Rope : MonoBehaviour
     {
         if (load)
         {
-            Vector3 disp = anchor.transform.position - load.transform.position;
-            float length = disp.magnitude;
-            bool isTaut = length >= frac * restLength;
-            //Debug.Log("Taut length: " + length.ToString("F4") + "|| Length: " + length.ToString("F4"));
+            Vector3 load2Anchor = anchor.transform.position - load.transform.position;
+            float length = load2Anchor.magnitude;
+            bool isTaut = (length >= frac * restLength);
             if (isTaut)
             {
                 float delta = (lastLength - length)/ lastLength;
@@ -45,39 +46,41 @@ public class Rope : MonoBehaviour
                 frac *= 1 - delta;
                 lastLength = length;
 
-                Vector3 ropeDir = disp.normalized;
-                Vector3 loadVelAlongRopeDir = Vector3.Project(load.velocity, ropeDir);
-                Vector3 anchorVelAlongRopeDir = Vector3.Project(anchor.velocity, ropeDir);
+                Vector3 load2AnchorDir = load2Anchor.normalized;
+                Vector3 loadVelAlongRopeDir = Vector3.Project(load.velocity, load2AnchorDir);
+                Vector3 anchorVelAlongRopeDir = Vector3.Project(anchor.velocity, load2AnchorDir);
                 float k = 200.0f * frac;
                 //float b = 20.0f;
                 //float b = Mathf.Sqrt(4 * load.mass * k);
                 
-                Vector3 f1 = k * (length - frac * restLength) * ropeDir;// + b * (Vector3.zero - loadVelAlongRopeDir);
-                Vector3 f2 = -k * (length - frac * restLength) * ropeDir;// + b * (Vector3.zero - anchorVelAlongRopeDir);
+                Vector3 fLoad = k * (length - frac * restLength) * load2AnchorDir;// + b * (Vector3.zero - loadVelAlongRopeDir);
+                Vector3 fAnchor = -k * (length - frac * restLength) * load2AnchorDir;// + b * (Vector3.zero - anchorVelAlongRopeDir);
 
                 if (pullIn)
                 {
-                    Vector3 fPull = -1000.0f * ropeDir;
-                    f1 += fPull;
-                    f2 += -fPull;
+                    Vector3 fPull = 1000.0f * load2AnchorDir;
+                    fLoad += fPull;
+                    fAnchor += -fPull;
                 }
                 else if (release)
                 {
-                    Vector3 fPull = -1000.0f * ropeDir;
-                    f1 = Mathf.Max(0.0f, f1.magnitude - fPull.magnitude) * ropeDir;
-                    f2 = Mathf.Max(0.0f, f2.magnitude + fPull.magnitude) * ropeDir;
+                    Vector3 fPull = 1000.0f * load2AnchorDir;
+                    fLoad = Mathf.Max(0.0f, Vector3.Dot(fLoad - fPull, load2AnchorDir)) * load2AnchorDir;
+                    fAnchor = Mathf.Max(0.0f, Vector3.Dot(fAnchor + fPull, load2AnchorDir)) * load2AnchorDir;
                 }
-                load.AddForce(f1, ForceMode.Force);
-                anchor.AddForce(f2, ForceMode.Force);
+                load.AddForce(fLoad, ForceMode.Force);
+                anchor.AddForce(fAnchor, ForceMode.Force);
             }
             else
             {
-                //Do inverse kinematics maybe
                 if (pullIn)
                 {
                     frac = Mathf.Max(0.0f, frac - Time.deltaTime);
                 }
+                //Do inverse kinematics maybe
             }
+            pullIn = false;
+            release = false;
         }
     }
 
@@ -95,40 +98,12 @@ public class Rope : MonoBehaviour
 
     public void PullIn()
     {
-        if (load)
-        {
-            Vector3 disp = anchor.transform.position - load.transform.position;
-            float length = disp.magnitude;
-            if (length >= frac * restLength)
-            {
-                Vector3 ropeDir = disp.normalized;
-                float b = 1.0f;
-                Vector3 fPull = -1000.0f * ropeDir;// - b * ;
-                anchor.AddForce(fPull, ForceMode.Force);
-                load.AddForce(-fPull, ForceMode.Force);
-            }
-            else
-            {
-                //If the rope is not taught, simply shorten length of rope
-                tautLength = Mathf.Max(0.0f, tautLength - 10.0f * Time.deltaTime);
-            }
-        }
+        pullIn = true;
     }
 
     public void Release()
     {
-        if (load)
-        {
-            Vector3 disp = anchor.transform.position - load.transform.position;
-            float length = disp.magnitude;
-
-            Vector3 f1 = k * (length - frac * restLength) * ropeDir;
-            Vector3 fRelease = 40
-            Mathf.Min(f1.magnitude, fRelease.magnitude);
-            
-            tautLength = Mathf.Max(tautLength, length);
-            tautLength = 15.0f;
-        }
+        release = true;
     }
 
     public float CurrentLength()

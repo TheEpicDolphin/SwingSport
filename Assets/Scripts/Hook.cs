@@ -37,7 +37,7 @@ public class Hook : MonoBehaviour
         FixedJoint fixedJoint = GetComponent<FixedJoint>();
         if (fixedJoint)
         {
-            Debug.Log("DESTROYED");
+            Debug.Log("Detached");
             Destroy(fixedJoint);
         }
     }
