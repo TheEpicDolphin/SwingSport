@@ -14,7 +14,8 @@ public class PlayerController : MonoBehaviour
     float movementSpeed = 8.0f;
     float cameraRigidness = 10.0f;
     Vector3 movement = Vector3.zero;
-    public bool isGrounded;
+    public bool isGrounded = false;
+    public bool isPlayerLockedToCamera = true;
     // Start is called before the first frame update
     void Start()
     {
@@ -41,6 +42,11 @@ public class PlayerController : MonoBehaviour
         float moveVertical = Input.GetAxisRaw("Vertical");
         movement = moveVertical * Vector3.ProjectOnPlane(mainCamera.transform.forward, Vector3.up) + 
                             moveHorizontal * mainCamera.transform.right;
+
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
+        {
+            rb.AddForce(300.0f * Vector3.up, ForceMode.Impulse);
+        }
     }
 
     private void FixedUpdate()
@@ -56,7 +62,19 @@ public class PlayerController : MonoBehaviour
             f = Mathf.Clamp(f.magnitude, 0, 250.0f) * f.normalized;
             rb.AddForce(f, ForceMode.Acceleration);
         }
-        view.rotation = Quaternion.Euler(-mouseY, mouseX, 0);
+        else
+        {
+            rb.AddForce(10.0f * movement.normalized, ForceMode.Acceleration);
+        }
+
+        if (isPlayerLockedToCamera)
+        {
+            transform.rotation = Quaternion.Euler(-mouseY, mouseX, 0);
+        }
+        else
+        {
+            view.rotation = Quaternion.Euler(-mouseY, mouseX, 0);
+        }
         SmoothCameraMovement();
     }
 
