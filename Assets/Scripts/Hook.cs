@@ -18,27 +18,4 @@ public class Hook : MonoBehaviour
     {
 
     }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        if (!Attached())
-        {
-            gameObject.AddComponent<FixedJoint>().connectedBody = other.GetComponent<Rigidbody>();
-        }
-    }
-
-    public bool Attached()
-    {
-        return GetComponent<FixedJoint>() != null;
-    }
-
-    public void Detach()
-    {
-        FixedJoint fixedJoint = GetComponent<FixedJoint>();
-        if (fixedJoint)
-        {
-            Debug.Log("Detached");
-            Destroy(fixedJoint);
-        }
-    }
 }

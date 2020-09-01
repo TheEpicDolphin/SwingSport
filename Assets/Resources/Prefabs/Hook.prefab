@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 179343469892414072}
   - component: {fileID: 179343469892414071}
   - component: {fileID: 8207423216914417435}
-  - component: {fileID: 2150681148990632938}
   m_Layer: 10
   m_Name: Hook
   m_TagString: Untagged
@@ -108,16 +107,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7e7c9d3b61d32a43802cf02fe9d9d53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!135 &2150681148990632938
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 179343469892414077}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Center: {x: 0, y: 0, z: 0}

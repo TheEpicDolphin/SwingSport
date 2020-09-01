@@ -27,9 +27,7 @@ public class PlayerController : MonoBehaviour
         mainCamera.transform.rotation = camTarget.transform.rotation;
 
         //Instantiate hook gun in player's hand
-        GameObject hookGunGO = (GameObject) Instantiate(Resources.Load("Prefabs/HookGun"), hand.position, hand.rotation);
-        HookGun hookGun = hookGunGO.GetComponent<HookGun>();
-        hookGun.GetComponent<FixedJoint>().connectedBody = rb;
+        GameObject hookGunGO = (GameObject) Instantiate(Resources.Load("Prefabs/HookGun"), hand.position, hand.rotation, transform);
     }
 
     // Update is called once per frame
