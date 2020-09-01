@@ -66,13 +66,14 @@ public class HookGun : MonoBehaviour
                 }
                 break;
             case HookState.Launching:
-                if(rope.CurrentLength() > maxRopeLength)
+                if(rope.CurrentLength() > rope.restLength)
                 {
                     //Player missed, rope didnt hit anything
                     state = HookState.Retracting;
                 }
                 else if (hook.Attached())
                 {
+                    rope.SetCurrentSegmentLength();
                     state = HookState.Attached;
                 }
                 else

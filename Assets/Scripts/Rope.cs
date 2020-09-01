@@ -7,9 +7,9 @@ public class Rope : MonoBehaviour
     LineRenderer ropeRenderer;
     public Rigidbody anchor;
     public Rigidbody load;
-    public float restLength;
-    float frac;
-    float lastLength;
+    public float restLength = 20.0f;
+    float frac = 1.0f;
+    float lastLength = 20.0f;
     bool pullIn = false;
     bool release = false;
     
@@ -39,12 +39,11 @@ public class Rope : MonoBehaviour
             bool isTaut = (length >= frac * restLength);
             if (isTaut)
             {
-                float delta = (lastLength - length)/ lastLength;
+                float delta = (length - lastLength)/ lastLength;
                 /* updatedSegmentRestLength = frac * restLength - delta * frac * restLength */
                 /*                          = frac * restLength * (1 - delta)               */
                 /* frac = updatedSegmentRestLength / restLength = frac * (1 - delta)        */
-                frac *= 1 - delta;
-                lastLength = length;
+                frac *= (1 - delta);
 
                 Vector3 load2AnchorDir = load2Anchor.normalized;
                 Vector3 loadVelAlongRopeDir = Vector3.Project(load.velocity, load2AnchorDir);
@@ -52,7 +51,7 @@ public class Rope : MonoBehaviour
                 float k = 200.0f * frac;
                 //float b = 20.0f;
                 //float b = Mathf.Sqrt(4 * load.mass * k);
-                
+                //Debug.Log(frac);
                 Vector3 fLoad = k * (length - frac * restLength) * load2AnchorDir;// + b * (Vector3.zero - loadVelAlongRopeDir);
                 Vector3 fAnchor = -k * (length - frac * restLength) * load2AnchorDir;// + b * (Vector3.zero - anchorVelAlongRopeDir);
 
@@ -79,6 +78,7 @@ public class Rope : MonoBehaviour
                 }
                 //Do inverse kinematics maybe
             }
+            lastLength = length;
             pullIn = false;
             release = false;
         }
@@ -109,5 +109,10 @@ public class Rope : MonoBehaviour
     public float CurrentLength()
     {
         return Vector3.Distance(anchor.transform.position, load.transform.position);
+    }
+
+    public void SetCurrentSegmentLength()
+    {
+        frac = CurrentLength() / restLength;
     }
 }
