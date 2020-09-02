@@ -75,7 +75,6 @@ public class HookGun : MonoBehaviour
             case HookState.Attached:
                 if (!Input.GetMouseButton(0))
                 {
-                    //playerRb.isKinematic = false;
                     isGrappled = false;
                     hook.transform.parent = null;
                     state = HookState.Retracting;
@@ -107,8 +106,14 @@ public class HookGun : MonoBehaviour
                 hook.GetComponent<Rigidbody>().isKinematic = true;
                 hook.transform.parent = colliders[0].transform;
 
-                //playerRb.isKinematic = true;
                 isGrappled = true;
+
+                Vector3 toHookVector = hook.transform.position - playerRb.transform.position;
+                Vector3 directionToHook = toHookVector.normalized;
+                //Conservation of momentum. Apply impulse
+                Vector3 impulse = playerRb.mass * (Vector3.zero - Vector3.Project(playerRb.velocity, directionToHook));
+                playerRb.AddForce(impulse, ForceMode.Impulse);
+
                 state = HookState.Attached;
                 yield break;
             }
@@ -138,7 +143,42 @@ public class HookGun : MonoBehaviour
 
     private void FixedUpdate()
     {
-        
+        if (isGrappled)
+        {
+            //Maybe add force to this guy?
+            Rigidbody connectedTo = hook.GetComponentInParent<Rigidbody>();
+
+            Vector3 toHookVector = hook.transform.position - playerRb.transform.position;
+            Vector3 directionToHook = toHookVector.normalized;
+            float distanceToHook = directionToHook.magnitude;
+            Vector3 customGravity = Physics.gravity * playerRb.mass;
+
+            if (retract)
+            {
+                Vector3 retractForce = Mathf.Max(300.0f - Vector3.Dot(customGravity, directionToHook), 0.0f) * directionToHook;
+                playerRb.AddForce(retractForce);
+                retract = false;
+            }
+            else if (release)
+            {
+                Vector3 tension = Vector3.Project(customGravity, directionToHook);
+                Vector3 releaseForce = Mathf.Min(0.0f, 
+                    Mathf.Max(Vector3.Dot(customGravity, directionToHook), -100.0f)) * directionToHook;
+                playerRb.AddForce(releaseForce);
+                release = false;
+            }
+            else
+            {
+                //Remove all velocities along direction of connection between rigidbodies
+                //to keep rope stiff
+                Vector3 ropeTension = playerRb.mass * (Vector3.zero - Vector3.Project(playerRb.velocity, directionToHook)) / Time.fixedDeltaTime;
+                playerRb.AddForce(ropeTension, ForceMode.Force);
+            }
+            
+            playerRb.AddForce(Vector3.ProjectOnPlane(customGravity, directionToHook));
+            /* Also apply force to where hook is attached to */
+        }
+        /*
         if (isGrappled)
         {
             //Maybe add force to this guy?
@@ -168,7 +208,8 @@ public class HookGun : MonoBehaviour
             //Debug.Log(Vector3.Dot(playerRb.velocity, Vector3.down));
             
         }
-        
+        */
+
     }
 
     void DrawRope()

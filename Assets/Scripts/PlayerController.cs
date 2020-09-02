@@ -39,7 +39,7 @@ public class PlayerController : MonoBehaviour
     {
         mouseX += Input.GetAxis("Mouse X") * viewRotationSpeed;
         mouseY += Input.GetAxis("Mouse Y") * viewRotationSpeed;
-        mouseY = Mathf.Clamp(mouseY, -35, 60);
+        mouseY = Mathf.Clamp(mouseY, -50, 60);
 
         float moveHorizontal = Input.GetAxisRaw("Horizontal");
         float moveVertical = Input.GetAxisRaw("Vertical");
