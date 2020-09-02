@@ -65,7 +65,7 @@ public class HookGun : MonoBehaviour
                     hook = hookGO.GetComponent<Hook>();
                     Rigidbody hookRb = hook.GetComponent<Rigidbody>();
                     //Add launching force
-                    hookRb.AddForce(20.0f * launchDir, ForceMode.Impulse);
+                    hookRb.AddForce(30.0f * launchDir, ForceMode.Impulse);
                     state = HookState.Launching;
                     StartCoroutine(LaunchHookCoroutine());
                 }
@@ -122,7 +122,7 @@ public class HookGun : MonoBehaviour
     IEnumerator RetractHookCoroutine()
     {
         float t = 0.0f;
-        float animDuration = 1.0f;
+        float animDuration = 0.3f;
         Vector3 initialHookPos = hook.transform.position;
         while (t < animDuration)
         {
@@ -144,14 +144,13 @@ public class HookGun : MonoBehaviour
             //Maybe add force to this guy?
             Rigidbody connectedTo = hook.GetComponentInParent<Rigidbody>();
 
-            Vector3 newVelocity = Vector3.zero;
-
             Vector3 toHookVector = hook.transform.position - playerRb.transform.position;
             Vector3 directionToHook = toHookVector.normalized;
             float distanceToHook = directionToHook.magnitude;
 
-            Vector3 badVelocity = playerRb.velocity - Vector3.ProjectOnPlane(playerRb.velocity, directionToHook);
-            playerRb.velocity -= badVelocity;
+            Vector3 velTowardsHook = Vector3.Project(playerRb.velocity, directionToHook);
+            playerRb.velocity = playerRb.velocity - velTowardsHook;
+            
             if (retract)
             {
                 playerRb.velocity += 8.0f * directionToHook;
@@ -162,6 +161,12 @@ public class HookGun : MonoBehaviour
                 playerRb.velocity += -8.0f * directionToHook;
                 release = false;
             }
+
+            Vector3 customGravity = Physics.gravity * playerRb.mass;
+            Vector3 ropeTension = -Vector3.Project(customGravity, directionToHook);
+            playerRb.AddForce(ropeTension);
+            //Debug.Log(Vector3.Dot(playerRb.velocity, Vector3.down));
+            
         }
         
     }
