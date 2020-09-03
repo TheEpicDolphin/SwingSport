@@ -124,9 +124,9 @@ GameObject:
   - component: {fileID: 34021735}
   - component: {fileID: 34021734}
   - component: {fileID: 34021733}
-  m_Layer: 10
+  m_Layer: 0
   m_Name: Block
-  m_TagString: Untagged
+  m_TagString: Hookable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -284,9 +284,9 @@ GameObject:
   - component: {fileID: 290689206}
   - component: {fileID: 290689205}
   - component: {fileID: 290689204}
-  m_Layer: 10
+  m_Layer: 0
   m_Name: Building
-  m_TagString: Untagged
+  m_TagString: Hookable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -457,9 +457,9 @@ GameObject:
   - component: {fileID: 603697234}
   - component: {fileID: 603697233}
   - component: {fileID: 603697232}
-  m_Layer: 10
+  m_Layer: 0
   m_Name: Building (1)
-  m_TagString: Untagged
+  m_TagString: Hookable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -578,9 +578,9 @@ GameObject:
   - component: {fileID: 675483930}
   - component: {fileID: 675483929}
   - component: {fileID: 675483928}
-  m_Layer: 10
+  m_Layer: 0
   m_Name: Building (2)
-  m_TagString: Untagged
+  m_TagString: Hookable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1035,7 +1035,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1547645974}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.5, y: 0, z: -3}
+  m_LocalPosition: {x: 1.5, y: 0, z: -3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 944376152}

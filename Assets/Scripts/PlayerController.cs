@@ -16,7 +16,7 @@ public class PlayerController : MonoBehaviour
 
     /* sensitivity of camera */
 
-    float viewRotationSpeed = 10.0f;
+    float cameraSensitivity = 5.0f;
 
     /* how fast player can move */
     float movementSpeed = 8.0f;
@@ -31,7 +31,7 @@ public class PlayerController : MonoBehaviour
     public bool rocketUp = false;
 
     /* how rigid the camera movement feels */
-    float cameraRigidness = 10.0f;
+    float cameraRigidness = 15.0f;
 
     /* determines whether the player will look in the direction of the camera or not */
     public bool isPlayerLockedToCamera = true;
@@ -58,9 +58,9 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        mouseX += Input.GetAxis("Mouse X") * viewRotationSpeed;
-        mouseY += Input.GetAxis("Mouse Y") * viewRotationSpeed;
-        mouseY = Mathf.Clamp(mouseY, -50, 60);
+        mouseX += Input.GetAxis("Mouse X") * cameraSensitivity;
+        mouseY += Input.GetAxis("Mouse Y") * cameraSensitivity;
+        mouseY = Mathf.Clamp(mouseY, -80, 80);
 
         float moveHorizontal = Input.GetAxisRaw("Horizontal");
         float moveVertical = Input.GetAxisRaw("Vertical");
@@ -78,7 +78,7 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        isGrounded = Physics.Raycast(transform.position, Vector3.down, 0.1f);
+        isGrounded = Physics.Raycast(transform.position + 0.05f * Vector3.up, Vector3.down, 0.1f);
 
         if (isGrounded)
         {
@@ -116,8 +116,8 @@ public class PlayerController : MonoBehaviour
     {
         Vector3 camPosition = mainCamera.transform.position;
         Quaternion camRotation = mainCamera.transform.rotation;
-        mainCamera.transform.position = Vector3.Lerp(camPosition, camTarget.transform.position, cameraRigidness * Time.deltaTime);
-        mainCamera.transform.rotation = Quaternion.Lerp(camRotation, camTarget.transform.rotation, cameraRigidness * Time.deltaTime);
+        mainCamera.transform.position = Vector3.Slerp(camPosition, camTarget.transform.position, cameraRigidness * Time.deltaTime);
+        mainCamera.transform.rotation = Quaternion.Slerp(camRotation, camTarget.transform.rotation, cameraRigidness * Time.deltaTime);
     }
 
 }

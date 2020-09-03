@@ -52,9 +52,11 @@ public class HookGun : MonoBehaviour
                 {
                     /* The hookGun has been fired */
                     Vector3 targetPos;
-                    Ray camRay = new Ray(Camera.main.transform.position, Camera.main.transform.forward);
+                    Ray camRay = Camera.main.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0));
+                    /* Prevent raycast from hitting something in front of camera but behind gun */
+                    float startT = Vector3.Dot(transform.position - camRay.origin, camRay.direction);
                     RaycastHit hit;
-                    if (Physics.Raycast(camRay, out hit, 20.0f, 1 << 10))
+                    if (Physics.Raycast(new Ray(camRay.GetPoint(startT), camRay.direction), out hit, 20.0f))
                     {
                         targetPos = hit.point;
                     }
@@ -67,7 +69,7 @@ public class HookGun : MonoBehaviour
                     hook = hookGO.GetComponent<Hook>();
                     Rigidbody hookRb = hook.GetComponent<Rigidbody>();
                     //Add launching force to hook
-                    hookRb.AddForce(30.0f * launchDir, ForceMode.Impulse);
+                    hookRb.AddForce(50.0f * launchDir, ForceMode.Impulse);
                     state = HookState.Launching;
                     StartCoroutine(LaunchHookCoroutine());
                 }
@@ -107,14 +109,22 @@ public class HookGun : MonoBehaviour
         while (Vector3.Distance(transform.position, hook.transform.position) < maxRopeLength)
         {
             Collider[] colliders = new Collider[1];
-            if (Physics.OverlapSphereNonAlloc(hook.transform.position, 0.1f, colliders, 1 << 10) > 0)
+            if (Physics.OverlapSphereNonAlloc(hook.transform.position, 0.1f, colliders) > 0)
             {
-                hook.GetComponent<Rigidbody>().isKinematic = true;
-                hook.transform.parent = colliders[0].transform;
+                if(colliders[0].tag == "Hookable")
+                {
+                    hook.GetComponent<Rigidbody>().isKinematic = true;
+                    hook.transform.parent = colliders[0].transform;
 
-                isGrappled = true;
-                restRopeLength = Vector3.Distance(playerRb.transform.position, hook.transform.position);
-                state = HookState.Attached;
+                    isGrappled = true;
+                    restRopeLength = Vector3.Distance(playerRb.transform.position, hook.transform.position);
+                    state = HookState.Attached;
+                }
+                else
+                {
+                    state = HookState.Retracting;
+                    StartCoroutine(RetractHookCoroutine());
+                }
                 yield break;
             }
             yield return null;
