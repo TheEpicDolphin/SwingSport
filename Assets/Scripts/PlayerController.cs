@@ -10,16 +10,35 @@ public class PlayerController : MonoBehaviour
     Transform hand;
     Transform character;
     Camera mainCamera;
+
+    /* mouse position on screen */ 
     float mouseX, mouseY;
+
+    /* sensitivity of camera */
+
     float viewRotationSpeed = 10.0f;
+
+    /* how fast player can move */
     float movementSpeed = 8.0f;
-    float cameraRigidness = 10.0f;
+
+    /* movement vector of the player*/
     Vector3 movement = Vector3.zero;
+
+    /* determines whether the player is touching the ground */
     public bool isGrounded = false;
+
+    /* if true, player is rocketing up */
+    public bool rocketUp = false;
+
+    /* how rigid the camera movement feels */
+    float cameraRigidness = 10.0f;
+
+    /* determines whether the player will look in the direction of the camera or not */
     public bool isPlayerLockedToCamera = true;
     // Start is called before the first frame update
     void Start()
     {
+        /* removes mouse cursor and locks cursor to center of the screen */
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
@@ -50,8 +69,11 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
+            /* jump */
             rb.AddForce(300.0f * Vector3.up, ForceMode.Impulse);
         }
+
+        rocketUp = Input.GetKey(KeyCode.Space) && !isGrounded;
     }
 
     private void FixedUpdate()
@@ -60,20 +82,26 @@ public class PlayerController : MonoBehaviour
 
         if (isGrounded)
         {
+            /* Player is on the ground */
             Vector3 vDesired = movementSpeed * movement.normalized;
             float k = (1 / Time.deltaTime) * 0.4f;
             Vector3 f = k * (vDesired - rb.velocity);
-            //Prevent unrealistic forces by clamping to range
-            f = Mathf.Clamp(f.magnitude, 0, 250.0f) * f.normalized;
             rb.AddForce(f, ForceMode.Acceleration);
         }
         else
         {
+            if (rocketUp)
+            {
+                rb.AddForce(-1.10f * Physics.gravity, ForceMode.Acceleration);
+                rocketUp = false;
+            }
+            /* Player is in the air. Allow jetpack-like movement */
             rb.AddForce(10.0f * movement.normalized, ForceMode.Acceleration);
         }
 
         if (isPlayerLockedToCamera)
         {
+            /*  */
             character.rotation = Quaternion.Euler(-mouseY, mouseX, 0);
             view.rotation = Quaternion.Euler(-mouseY, mouseX, 0);
         }
