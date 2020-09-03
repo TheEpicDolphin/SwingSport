@@ -18,11 +18,12 @@ public class HookGun : MonoBehaviour
     Hook hook;
 
     LineRenderer ropeRenderer;
-    float maxRopeLength = 20.0f;
     Rigidbody playerRb;
     bool isGrappled = false;
     bool retract = false;
     bool release = false;
+    float restRopeLength = 20.0f;
+    const float maxRopeLength = 30.0f;
 
     private void Awake()
     {
@@ -107,12 +108,12 @@ public class HookGun : MonoBehaviour
                 hook.transform.parent = colliders[0].transform;
 
                 isGrappled = true;
-
-                Vector3 toHookVector = hook.transform.position - playerRb.transform.position;
-                Vector3 directionToHook = toHookVector.normalized;
+                restRopeLength = Vector3.Distance(playerRb.transform.position, hook.transform.position);
+                //Vector3 toHookVector = hook.transform.position - playerRb.transform.position;
+                //Vector3 directionToHook = toHookVector.normalized;
                 //Conservation of momentum. Apply impulse
-                Vector3 impulse = playerRb.mass * (Vector3.zero - Vector3.Project(playerRb.velocity, directionToHook));
-                playerRb.AddForce(impulse, ForceMode.Impulse);
+                //Vector3 impulse = playerRb.mass * (Vector3.zero - Vector3.Project(playerRb.velocity, directionToHook));
+                //playerRb.AddForce(impulse, ForceMode.Impulse);
 
                 state = HookState.Attached;
                 yield break;
@@ -150,6 +151,35 @@ public class HookGun : MonoBehaviour
 
             Vector3 toHookVector = hook.transform.position - playerRb.transform.position;
             Vector3 directionToHook = toHookVector.normalized;
+
+            if (retract)
+            {
+                restRopeLength = Mathf.Max(restRopeLength - 20.0f * Time.fixedDeltaTime, 0.0f);
+                retract = false;
+            }
+            else if (release)
+            {
+                restRopeLength = Mathf.Min(restRopeLength + 10.0f * Time.fixedDeltaTime, maxRopeLength);
+                release = false;
+            }
+            //Critically damp
+            float k = 500.0f;
+            float b = Mathf.Sqrt(4 * playerRb.mass * k);
+            Debug.Log((5.0f * directionToHook - toHookVector).magnitude);
+            Vector3 fSpring = -k * (restRopeLength * directionToHook - toHookVector)
+                                + b * (Vector3.zero - Vector3.Project(playerRb.velocity, directionToHook));
+            playerRb.AddForce(fSpring);
+
+        }
+
+        /*
+        if (isGrappled)
+        {
+            //Maybe add force to this guy?
+            Rigidbody connectedTo = hook.GetComponentInParent<Rigidbody>();
+
+            Vector3 toHookVector = hook.transform.position - playerRb.transform.position;
+            Vector3 directionToHook = toHookVector.normalized;
             float distanceToHook = directionToHook.magnitude;
             Vector3 customGravity = Physics.gravity * playerRb.mass;
 
@@ -162,8 +192,7 @@ public class HookGun : MonoBehaviour
             else if (release)
             {
                 Vector3 tension = Vector3.Project(customGravity, directionToHook);
-                Vector3 releaseForce = Mathf.Min(0.0f, 
-                    Mathf.Max(Vector3.Dot(customGravity, directionToHook), -100.0f)) * directionToHook;
+                Vector3 releaseForce = Mathf.Min(0.0f, Mathf.Max(Vector3.Dot(customGravity, directionToHook), -100.0f)) * directionToHook;
                 playerRb.AddForce(releaseForce);
                 release = false;
             }
@@ -173,43 +202,12 @@ public class HookGun : MonoBehaviour
                 //to keep rope stiff
                 Vector3 ropeTension = playerRb.mass * (Vector3.zero - Vector3.Project(playerRb.velocity, directionToHook)) / Time.fixedDeltaTime;
                 playerRb.AddForce(ropeTension, ForceMode.Force);
+                //Add force to object that hook is connected to
             }
-            
+
             playerRb.AddForce(Vector3.ProjectOnPlane(customGravity, directionToHook));
-            /* Also apply force to where hook is attached to */
-        }
-        /*
-        if (isGrappled)
-        {
-            //Maybe add force to this guy?
-            Rigidbody connectedTo = hook.GetComponentInParent<Rigidbody>();
-
-            Vector3 toHookVector = hook.transform.position - playerRb.transform.position;
-            Vector3 directionToHook = toHookVector.normalized;
-            float distanceToHook = directionToHook.magnitude;
-
-            Vector3 velTowardsHook = Vector3.Project(playerRb.velocity, directionToHook);
-            playerRb.velocity = playerRb.velocity - velTowardsHook;
-            
-            if (retract)
-            {
-                playerRb.velocity += 8.0f * directionToHook;
-                retract = false;
-            }
-            else if (release)
-            {
-                playerRb.velocity += -8.0f * directionToHook;
-                release = false;
-            }
-
-            Vector3 customGravity = Physics.gravity * playerRb.mass;
-            Vector3 ropeTension = -Vector3.Project(customGravity, directionToHook);
-            playerRb.AddForce(ropeTension);
-            //Debug.Log(Vector3.Dot(playerRb.velocity, Vector3.down));
-            
         }
         */
-
     }
 
     void DrawRope()

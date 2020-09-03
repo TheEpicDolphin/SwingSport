@@ -8,6 +8,7 @@ public class PlayerController : MonoBehaviour
     Transform view;
     Transform camTarget;
     Transform hand;
+    Transform character;
     Camera mainCamera;
     float mouseX, mouseY;
     float viewRotationSpeed = 10.0f;
@@ -24,14 +25,15 @@ public class PlayerController : MonoBehaviour
 
         rb = GetComponent<Rigidbody>();
         view = transform.Find("View");
-        hand = transform.Find("Hand");
+        character = transform.Find("Character");
+        hand = character.Find("Hand");
         camTarget = view.GetChild(0);
         mainCamera = Camera.main;
         mainCamera.transform.position = camTarget.transform.position;
         mainCamera.transform.rotation = camTarget.transform.rotation;
 
         //Instantiate hook gun in player's hand
-        GameObject hookGunGO = (GameObject) Instantiate(Resources.Load("Prefabs/HookGun"), hand.position, hand.rotation, transform);
+        GameObject hookGunGO = (GameObject) Instantiate(Resources.Load("Prefabs/HookGun"), hand.position, hand.rotation, hand);
     }
 
     // Update is called once per frame
@@ -43,7 +45,7 @@ public class PlayerController : MonoBehaviour
 
         float moveHorizontal = Input.GetAxisRaw("Horizontal");
         float moveVertical = Input.GetAxisRaw("Vertical");
-        movement = moveVertical * Vector3.ProjectOnPlane(mainCamera.transform.forward, Vector3.up) + 
+        movement = moveVertical * Vector3.ProjectOnPlane(mainCamera.transform.forward, Vector3.up).normalized + 
                             moveHorizontal * mainCamera.transform.right;
 
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
@@ -72,7 +74,8 @@ public class PlayerController : MonoBehaviour
 
         if (isPlayerLockedToCamera)
         {
-            transform.rotation = Quaternion.Euler(-mouseY, mouseX, 0);
+            character.rotation = Quaternion.Euler(-mouseY, mouseX, 0);
+            view.rotation = Quaternion.Euler(-mouseY, mouseX, 0);
         }
         else
         {
