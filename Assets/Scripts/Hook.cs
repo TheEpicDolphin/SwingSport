@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-//Is listener to HookGun
 public class Hook : MonoBehaviour
 {
     Rigidbody rb;
