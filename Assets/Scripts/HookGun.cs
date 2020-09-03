@@ -50,6 +50,7 @@ public class HookGun : MonoBehaviour
             case HookState.Retracted:
                 if (Input.GetMouseButtonDown(0))
                 {
+                    /* The hookGun has been fired */
                     Vector3 targetPos;
                     Ray camRay = new Ray(Camera.main.transform.position, Camera.main.transform.forward);
                     RaycastHit hit;
@@ -65,17 +66,19 @@ public class HookGun : MonoBehaviour
                     GameObject hookGO = (GameObject)Instantiate(Resources.Load("Prefabs/Hook"), hookSlot.position, hookSlot.rotation);
                     hook = hookGO.GetComponent<Hook>();
                     Rigidbody hookRb = hook.GetComponent<Rigidbody>();
-                    //Add launching force
+                    //Add launching force to hook
                     hookRb.AddForce(30.0f * launchDir, ForceMode.Impulse);
                     state = HookState.Launching;
                     StartCoroutine(LaunchHookCoroutine());
                 }
                 break;
             case HookState.Launching:
+                /* The hook is currently being launched (controlled by coroutine) */
                 break;
             case HookState.Attached:
                 if (!Input.GetMouseButton(0))
                 {
+                    /* The hook has been detached */
                     isGrappled = false;
                     hook.transform.parent = null;
                     state = HookState.Retracting;
@@ -83,10 +86,12 @@ public class HookGun : MonoBehaviour
                 }
                 else if (Input.GetKey(KeyCode.CapsLock))
                 {
+                    /* Hook will be retracted */
                     retract = true;
                 }
                 else if (Input.GetKey(KeyCode.LeftShift))
                 {
+                    /* Hook will be released */
                     release = true;
                 }
                 break;

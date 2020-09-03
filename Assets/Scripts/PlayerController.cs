@@ -101,7 +101,6 @@ public class PlayerController : MonoBehaviour
 
         if (isPlayerLockedToCamera)
         {
-            /*  */
             character.rotation = Quaternion.Euler(-mouseY, mouseX, 0);
             view.rotation = Quaternion.Euler(-mouseY, mouseX, 0);
         }
@@ -112,6 +111,7 @@ public class PlayerController : MonoBehaviour
         SmoothCameraMovement();
     }
 
+    /* Makes the camera move slowly by interpolating between its current position and target position */
     void SmoothCameraMovement()
     {
         Vector3 camPosition = mainCamera.transform.position;
