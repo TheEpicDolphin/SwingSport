@@ -23,7 +23,13 @@ public class HookGun : MonoBehaviour
     bool retract = false;
     bool release = false;
     float restRopeLength = 20.0f;
-    const float maxRopeLength = 30.0f;
+    const float maxRopeLength = 100.0f;
+
+    float hookLaunchForce = 200.0f;
+
+    float hookZoomForceMultiplier = 20.0f;
+
+    public CameraShake cameraShaker;
 
     private void Awake()
     {
@@ -48,6 +54,9 @@ public class HookGun : MonoBehaviour
         switch (state)
         {
             case HookState.Retracted:
+
+                cameraShaker.setShouldShake(false);
+
                 if (Input.GetMouseButtonDown(0))
                 {
                     /* The hookGun has been fired */
@@ -62,22 +71,24 @@ public class HookGun : MonoBehaviour
                     }
                     else
                     {
-                        targetPos = camRay.GetPoint(20.0f);
+                        targetPos = camRay.GetPoint(maxRopeLength);
                     }
                     Vector3 launchDir = (targetPos - hookSlot.position).normalized;
                     GameObject hookGO = (GameObject)Instantiate(Resources.Load("Prefabs/Hook"), hookSlot.position, hookSlot.rotation);
                     hook = hookGO.GetComponent<Hook>();
                     Rigidbody hookRb = hook.GetComponent<Rigidbody>();
                     //Add launching force to hook
-                    hookRb.AddForce(50.0f * launchDir, ForceMode.Impulse);
+                    hookRb.AddForce(hookLaunchForce * launchDir, ForceMode.Impulse);
                     state = HookState.Launching;
                     StartCoroutine(LaunchHookCoroutine());
                 }
                 break;
             case HookState.Launching:
                 /* The hook is currently being launched (controlled by coroutine) */
+
                 break;
             case HookState.Attached:
+
                 if (!Input.GetMouseButton(0))
                 {
                     /* The hook has been detached */
@@ -85,19 +96,25 @@ public class HookGun : MonoBehaviour
                     hook.transform.parent = null;
                     state = HookState.Retracting;
                     StartCoroutine(RetractHookCoroutine());
-                }
-                else if (Input.GetKey(KeyCode.CapsLock))
-                {
-                    /* Hook will be retracted */
-                    retract = true;
+
                 }
                 else if (Input.GetKey(KeyCode.LeftShift))
                 {
+                    /* Hook will be retracted */
+                    retract = true;
+
+                    cameraShaker.setShouldShake(true);
+
+                }
+                else if (Input.GetKey("q"))
+                {
                     /* Hook will be released */
                     release = true;
+
                 }
                 break;
             case HookState.Retracting:
+
                 break;
         }
 
@@ -164,7 +181,7 @@ public class HookGun : MonoBehaviour
             if (retract)
             {
                 /* Reduce rope length so that player zooms to hook point*/
-                restRopeLength = Mathf.Max(restRopeLength - 20.0f * Time.fixedDeltaTime, 0.0f);
+                restRopeLength = Mathf.Max(restRopeLength - 20.0f * Time.fixedDeltaTime * hookZoomForceMultiplier, 0.0f);
                 retract = false;
             }
             else if (release)

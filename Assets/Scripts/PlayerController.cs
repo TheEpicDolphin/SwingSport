@@ -9,7 +9,7 @@ public class PlayerController : MonoBehaviour
     Transform camTarget;
     Transform hand;
     Transform character;
-    Camera mainCamera;
+    public Transform mainCamera;
 
     /* mouse position on screen */ 
     float mouseX, mouseY;
@@ -35,6 +35,9 @@ public class PlayerController : MonoBehaviour
 
     /* determines whether the player will look in the direction of the camera or not */
     public bool isPlayerLockedToCamera = true;
+
+    public CameraShake cameraShaker;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -47,12 +50,13 @@ public class PlayerController : MonoBehaviour
         character = transform.Find("Character");
         hand = character.Find("Hand");
         camTarget = view.GetChild(0);
-        mainCamera = Camera.main;
         mainCamera.transform.position = camTarget.transform.position;
         mainCamera.transform.rotation = camTarget.transform.rotation;
 
         //Instantiate hook gun in player's hand
         GameObject hookGunGO = (GameObject) Instantiate(Resources.Load("Prefabs/HookGun"), hand.position, hand.rotation, hand);
+        HookGun hookGun = hookGunGO.GetComponent<HookGun>();
+        hookGun.cameraShaker = cameraShaker;
     }
 
     // Update is called once per frame
