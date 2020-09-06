@@ -18623,6 +18623,7 @@ MonoBehaviour:
   rocketUp: 0
   isPlayerLockedToCamera: 1
   bDrag: 1
+  cursorImage: {fileID: 1579430425}
 --- !u!1 &1040212086
 GameObject:
   m_ObjectHideFlags: 0
@@ -26953,7 +26954,7 @@ GameObject:
   - component: {fileID: 1579430426}
   - component: {fileID: 1579430425}
   m_Layer: 5
-  m_Name: Image
+  m_Name: CursorImage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
