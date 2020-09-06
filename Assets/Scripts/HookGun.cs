@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System;
 
 public class HookGun : MonoBehaviour
 {
@@ -23,13 +22,14 @@ public class HookGun : MonoBehaviour
     bool retract = false;
     bool release = false;
     float restRopeLength = 20.0f;
-    const float maxRopeLength = 100.0f;
+    const float maxRopeLength = 150.0f;
 
     float hookLaunchForce = 200.0f;
 
-    float hookZoomForceMultiplier = 20.0f;
+    float hookZoomRateMultiplier = 100.0f;
 
-    public CameraShake cameraShaker;
+    public CameraWobbleDelegate camWobbleDelegate;
+
 
     private void Awake()
     {
@@ -54,9 +54,6 @@ public class HookGun : MonoBehaviour
         switch (state)
         {
             case HookState.Retracted:
-
-                cameraShaker.setShouldShake(false);
-
                 if (Input.GetMouseButtonDown(0))
                 {
                     /* The hookGun has been fired */
@@ -100,11 +97,9 @@ public class HookGun : MonoBehaviour
                 }
                 else if (Input.GetKey(KeyCode.LeftShift))
                 {
+                    camWobbleDelegate(Mathf.Max(Mathf.Min(playerRb.velocity.magnitude, 90.0f) - 30.0f, 0.0f) / 60.0f);
                     /* Hook will be retracted */
                     retract = true;
-
-                    cameraShaker.setShouldShake(true);
-
                 }
                 else if (Input.GetKey("q"))
                 {
@@ -114,7 +109,7 @@ public class HookGun : MonoBehaviour
                 }
                 break;
             case HookState.Retracting:
-
+                
                 break;
         }
 
@@ -181,7 +176,8 @@ public class HookGun : MonoBehaviour
             if (retract)
             {
                 /* Reduce rope length so that player zooms to hook point*/
-                restRopeLength = Mathf.Max(restRopeLength - 20.0f * Time.fixedDeltaTime * hookZoomForceMultiplier, 0.0f);
+                Debug.Log(hookZoomRateMultiplier * Time.fixedDeltaTime);
+                restRopeLength = Mathf.Max(restRopeLength - hookZoomRateMultiplier * Time.fixedDeltaTime, 0.0f);
                 retract = false;
             }
             else if (release)
@@ -198,7 +194,6 @@ public class HookGun : MonoBehaviour
             Vector3 fSpring = -k * (restRopeLength * directionToHook - toHookVector)
                                 + b * (Vector3.zero - Vector3.Project(playerRb.velocity, directionToHook));
             playerRb.AddForce(fSpring);
-
         }
     }
 

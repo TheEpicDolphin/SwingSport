@@ -14,9 +14,8 @@ public class PlayerController : MonoBehaviour
     /* mouse position on screen */ 
     float mouseX, mouseY;
 
-    /* sensitivity of camera */
-
-    float cameraSensitivity = 5.0f;
+    /* mouse sensitivity */
+    float mouseSensitivity = 5.0f;
 
     /* how fast player can move */
     float movementSpeed = 8.0f;
@@ -30,13 +29,10 @@ public class PlayerController : MonoBehaviour
     /* if true, player is rocketing up */
     public bool rocketUp = false;
 
-    /* how rigid the camera movement feels */
-    float cameraRigidness = 15.0f;
-
     /* determines whether the player will look in the direction of the camera or not */
     public bool isPlayerLockedToCamera = true;
 
-    public CameraShake cameraShaker;
+    public float bDrag = 2.0f;
 
     // Start is called before the first frame update
     void Start()
@@ -50,20 +46,18 @@ public class PlayerController : MonoBehaviour
         character = transform.Find("Character");
         hand = character.Find("Hand");
         camTarget = view.GetChild(0);
-        mainCamera.transform.position = camTarget.transform.position;
-        mainCamera.transform.rotation = camTarget.transform.rotation;
 
         //Instantiate hook gun in player's hand
         GameObject hookGunGO = (GameObject) Instantiate(Resources.Load("Prefabs/HookGun"), hand.position, hand.rotation, hand);
         HookGun hookGun = hookGunGO.GetComponent<HookGun>();
-        hookGun.cameraShaker = cameraShaker;
+        hookGun.camWobbleDelegate = mainCamera.GetComponent<CameraController>().AddWobble;
     }
 
     // Update is called once per frame
     void Update()
     {
-        mouseX += Input.GetAxis("Mouse X") * cameraSensitivity;
-        mouseY += Input.GetAxis("Mouse Y") * cameraSensitivity;
+        mouseX += Input.GetAxis("Mouse X") * mouseSensitivity;
+        mouseY += Input.GetAxis("Mouse Y") * mouseSensitivity;
         mouseY = Mathf.Clamp(mouseY, -80, 80);
 
         float moveHorizontal = Input.GetAxisRaw("Horizontal");
@@ -101,6 +95,9 @@ public class PlayerController : MonoBehaviour
             }
             /* Player is in the air. Allow jetpack-like movement */
             rb.AddForce(10.0f * movement.normalized, ForceMode.Acceleration);
+
+            /* Add drag to player */
+            rb.AddForce(-bDrag * rb.velocity);
         }
 
         if (isPlayerLockedToCamera)
@@ -112,16 +109,5 @@ public class PlayerController : MonoBehaviour
         {
             view.rotation = Quaternion.Euler(-mouseY, mouseX, 0);
         }
-        SmoothCameraMovement();
     }
-
-    /* Makes the camera move slowly by interpolating between its current position and target position */
-    void SmoothCameraMovement()
-    {
-        Vector3 camPosition = mainCamera.transform.position;
-        Quaternion camRotation = mainCamera.transform.rotation;
-        mainCamera.transform.position = Vector3.Slerp(camPosition, camTarget.transform.position, cameraRigidness * Time.deltaTime);
-        mainCamera.transform.rotation = Quaternion.Slerp(camRotation, camTarget.transform.rotation, cameraRigidness * Time.deltaTime);
-    }
-
 }
