@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using UnityEngine.UI;
 
 public class HookGun : MonoBehaviour
 {
@@ -31,6 +32,8 @@ public class HookGun : MonoBehaviour
 
     public CameraShake cameraShaker;
 
+    public HookGunCursor cursor;
+
     private void Awake()
     {
         state = HookState.Retracted;
@@ -41,6 +44,9 @@ public class HookGun : MonoBehaviour
         ropeRenderer.material = new Material(Shader.Find("Unlit/Color"));
         ropeRenderer.material.color = Color.red;
         ropeRenderer.widthMultiplier = 0.05f;
+
+        cursor = new HookGunCursor();
+
     }
     // Start is called before the first frame update
     void Start()
@@ -51,6 +57,9 @@ public class HookGun : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
+        checkHookableAndAdjustCursor();
+
         switch (state)
         {
             case HookState.Retracted:
@@ -119,6 +128,35 @@ public class HookGun : MonoBehaviour
         }
 
         DrawRope();
+    }
+
+    public void checkHookableAndAdjustCursor()
+    {
+
+        Boolean cursorRed = false;
+
+        Ray camRay = Camera.main.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0));
+        /* Prevent raycast from hitting something in front of camera but behind gun */
+        float startT = Vector3.Dot(transform.position - camRay.origin, camRay.direction);
+        RaycastHit hit;
+        if (Physics.Raycast(new Ray(camRay.GetPoint(startT), camRay.direction), out hit, maxRopeLength))
+        {
+            if (hit.collider != null)
+            {
+                if (hit.collider.tag == "Hookable")
+                {
+                    cursorRed = true;
+                }
+            }
+        }
+
+        if (cursorRed)
+        {
+            cursor.setCursorColor(Color.red);
+        } else
+        {
+            cursor.setCursorColor(Color.white);
+        }
     }
 
     IEnumerator LaunchHookCoroutine()

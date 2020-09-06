@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using UnityEngine.UI;
+
 public class PlayerController : MonoBehaviour
 {
     Rigidbody rb;
@@ -38,6 +40,8 @@ public class PlayerController : MonoBehaviour
 
     public CameraShake cameraShaker;
 
+    public Image cursorImage;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -57,6 +61,8 @@ public class PlayerController : MonoBehaviour
         GameObject hookGunGO = (GameObject) Instantiate(Resources.Load("Prefabs/HookGun"), hand.position, hand.rotation, hand);
         HookGun hookGun = hookGunGO.GetComponent<HookGun>();
         hookGun.cameraShaker = cameraShaker;
+
+        hookGun.cursor.cursorImage = cursorImage;
     }
 
     // Update is called once per frame
