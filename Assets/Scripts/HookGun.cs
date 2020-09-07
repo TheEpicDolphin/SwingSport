@@ -55,9 +55,7 @@ public class HookGun : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
-        checkHookableAndAdjustCursor();
-
+        CheckHookableAndAdjustCursor();
         switch (state)
         {
             case HookState.Retracted:
@@ -123,7 +121,7 @@ public class HookGun : MonoBehaviour
         DrawRope();
     }
 
-    public void checkHookableAndAdjustCursor()
+    public void CheckHookableAndAdjustCursor()
     {
         bool cursorRed = false;
         Ray camRay = Camera.main.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0));
@@ -143,10 +141,10 @@ public class HookGun : MonoBehaviour
 
         if (cursorRed)
         {
-            cursor.setCursorColor(Color.red);
+            cursor.SetCursorColor(Color.red);
         } else
         {
-            cursor.setCursorColor(Color.white);
+            cursor.SetCursorColor(Color.white);
         }
     }
 

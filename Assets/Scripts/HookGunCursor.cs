@@ -7,7 +7,7 @@ public class HookGunCursor : MonoBehaviour
 {
     public Image cursorImage;
 
-    public void setCursorColor(Color c)
+    public void SetCursorColor(Color c)
     {
         cursorImage.color = c;
     }
