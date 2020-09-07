@@ -32,6 +32,8 @@ public class HookGun : MonoBehaviour
     public CameraWobbleDelegate camWobbleDelegate;
     public HookGunCursor cursor;
 
+    private VerletRope verletRope;
+
     private void Awake()
     {
         state = HookState.Retracted;
@@ -162,6 +164,8 @@ public class HookGun : MonoBehaviour
 
                     isGrappled = true;
                     restRopeLength = Vector3.Distance(playerRb.transform.position, hook.transform.position);
+                    //verletRope = Instantiate();
+                    //verletRope.BuildRope(this.gameObject, hook.gameObject, 4);
                     state = HookState.Attached;
                 }
                 else

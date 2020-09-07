@@ -6,9 +6,12 @@ public class VerletRope : MonoBehaviour
 {
     LineRenderer ropeRenderer;
     public List<VerletRopeNode> ropeNodes = new List<VerletRopeNode>();
-    public float totalLength;
     private Vector3[] ropeNodePositions;
-    float constraintLength;
+    private float totalLength;
+    private float constraintLength;
+
+    public GameObject s;
+    public GameObject e;
 
     private void Awake()
     {
@@ -16,6 +19,38 @@ public class VerletRope : MonoBehaviour
         ropeRenderer.material = new Material(Shader.Find("Unlit/Color"));
         ropeRenderer.material.color = Color.blue;
         ropeRenderer.widthMultiplier = 0.05f;
+    }
+
+    private void Start()
+    {
+        BuildRope(s, e, 3);
+    }
+
+    public void BuildRope(GameObject start, GameObject end, int numSegments)
+    {
+        VerletRopeNode startRopeNode = start.AddComponent<VerletRopeNode>();
+        VerletRopeNode endRopeNode = end.AddComponent<VerletRopeNode>();
+        totalLength = Vector3.Distance(start.transform.position, end.transform.position);
+        constraintLength = totalLength / numSegments;
+        Vector3 direction = end.transform.position - start.transform.position;
+        startRopeNode.previousPosition = start.transform.position;
+
+        startRopeNode.isFixed = true;
+        ropeNodes.Add(startRopeNode);
+        for (int i = 1; i < numSegments; i++)
+        {
+            Vector3 pos = Vector3.Lerp(start.transform.position, end.transform.position, 
+                i * constraintLength / totalLength );
+            GameObject ropeNodeGO = new GameObject();
+            ropeNodeGO.transform.position = pos;
+            VerletRopeNode ropeNode = ropeNodeGO.AddComponent<VerletRopeNode>();
+            ropeNode.previousPosition = pos;
+            ropeNode.isFixed = false;
+            ropeNodes.Add(ropeNode);
+        }
+        endRopeNode.previousPosition = end.transform.position;
+        endRopeNode.isFixed = true;
+        ropeNodes.Add(endRopeNode);
     }
 
     // Update is called once per frame
