@@ -25,11 +25,7 @@ public class HookGun : MonoBehaviour
 
     bool isGrappled = false;
 
-    bool retract = false;
-
-    bool release = false;
-
-    float restRopeLength = 20.0f;
+    //float restRopeLength = 20.0f;
 
     const float maxRopeLength = 150.0f;
 
@@ -107,30 +103,30 @@ public class HookGun : MonoBehaviour
                     /* The hook has been detached */
                     isGrappled = false;
                     hook.transform.parent = null;
-                    //Destroy(verletRope);
+                    Destroy(verletRope);
                     state = HookState.Retracting;
                     StartCoroutine(RetractHookCoroutine());
 
                 }
                 else if (Input.GetKey(KeyCode.LeftShift))
                 {
+                    /* Reduce rope length so that player zooms to hook point*/
                     camWobbleDelegate(Mathf.Max(Mathf.Min(playerRb.velocity.magnitude, 90.0f) - 30.0f, 0.0f) / 60.0f);
-                    /* Hook will be retracted */
-                    retract = true;
+                    verletRope.DecreaseRestLength(hookZoomRateMultiplier * Time.fixedDeltaTime);
+                    //restRopeLength = Mathf.Max(restRopeLength - hookZoomRateMultiplier * Time.fixedDeltaTime, 0.0f);
                 }
                 else if (Input.GetKey("q"))
                 {
-                    /* Hook will be released */
-                    release = true;
-
+                    /* Increase rope length so that player gets farther from hook point */
+                    verletRope.DecreaseRestLength(10.0f * Time.fixedDeltaTime);
+                    //restRopeLength = Mathf.Min(restRopeLength + 10.0f * Time.fixedDeltaTime, maxRopeLength);
                 }
                 break;
             case HookState.Retracting:
-                
                 break;
         }
 
-        DrawRope();
+        //DrawRope();
     }
 
     public void CheckHookableAndAdjustCursor()
@@ -175,14 +171,17 @@ public class HookGun : MonoBehaviour
                     hook.transform.parent = colliders[0].transform;
 
                     isGrappled = true;
-                    restRopeLength = Vector3.Distance(playerRb.transform.position, hook.transform.position);
-                    //verletRope = Instantiate();
-                    //verletRope.BuildRope(this.gameObject, hook.gameObject, 4);
+                    //restRopeLength = Vector3.Distance(playerRb.transform.position, hook.transform.position);
+                    GameObject verletRopeGO = new GameObject();
+                    verletRope = verletRopeGO.AddComponent<VerletRope>();
+                    verletRope.BuildRope(this.gameObject, hook.gameObject, 6);
+                    verletRope.maxRestLength = maxRopeLength;
                     state = HookState.Attached;
                 }
                 else
                 {
                     state = HookState.Retracting;
+                    Destroy(verletRope);
                     StartCoroutine(RetractHookCoroutine());
                 }
                 yield break;
@@ -190,6 +189,7 @@ public class HookGun : MonoBehaviour
             yield return null;
         }
         state = HookState.Retracting;
+        Destroy(verletRope);
         StartCoroutine(RetractHookCoroutine());
         yield return null;
     }
@@ -213,40 +213,30 @@ public class HookGun : MonoBehaviour
         yield return null;
     }
 
+    /*
     private void FixedUpdate()
     {
         if (isGrappled)
         {
-            //Maybe add force to this guy?
+            // Maybe add force to this guy?
             Rigidbody connectedTo = hook.GetComponentInParent<Rigidbody>();
 
             Vector3 toHookVector = hook.transform.position - playerRb.transform.position;
             Vector3 directionToHook = toHookVector.normalized;
-
-            if (retract)
-            {
-                /* Reduce rope length so that player zooms to hook point*/
-                Debug.Log(hookZoomRateMultiplier * Time.fixedDeltaTime);
-                restRopeLength = Mathf.Max(restRopeLength - hookZoomRateMultiplier * Time.fixedDeltaTime, 0.0f);
-                retract = false;
-            }
-            else if (release)
-            {
-                /* Increase rope length so that player gets farther from hook point */
-                restRopeLength = Mathf.Min(restRopeLength + 10.0f * Time.fixedDeltaTime, maxRopeLength);
-                release = false;
-            }
             
             float k = 500.0f;
-            /* Critically damped */
+            // Critically damped
             float b = Mathf.Sqrt(4 * playerRb.mass * k);
-            /* Treating rope like a spring */
+            // Treating rope like a spring
             Vector3 fSpring = -k * (restRopeLength * directionToHook - toHookVector)
                                 + b * (Vector3.zero - Vector3.Project(playerRb.velocity, directionToHook));
             playerRb.AddForce(fSpring);
         }
     }
+    */
 
+        /*
+    //TODO: probably will remove this after rope physics code is moved to VerletRope
     void DrawRope()
     {
         if (hook)
@@ -263,4 +253,5 @@ public class HookGun : MonoBehaviour
             ropeRenderer.enabled = false;
         }
     }
+    */
 }

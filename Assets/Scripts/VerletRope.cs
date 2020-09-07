@@ -6,12 +6,12 @@ public class VerletRope : MonoBehaviour
 {
     LineRenderer ropeRenderer;
     public List<VerletRopeNode> ropeNodes = new List<VerletRopeNode>();
+    public float maxRestLength = 30.0f;
     private Vector3[] ropeNodePositions;
-    private float totalLength;
-    private float constraintLength;
+    private float restLength;
 
-    public GameObject s;
-    public GameObject e;
+    //public GameObject s;
+    //public GameObject e;
 
     private void Awake()
     {
@@ -23,15 +23,15 @@ public class VerletRope : MonoBehaviour
 
     private void Start()
     {
-        BuildRope(s, e, 3);
+        //BuildRope(s, e, 3);
     }
 
     public void BuildRope(GameObject start, GameObject end, int numSegments)
     {
         VerletRopeNode startRopeNode = start.AddComponent<VerletRopeNode>();
         VerletRopeNode endRopeNode = end.AddComponent<VerletRopeNode>();
-        totalLength = Vector3.Distance(start.transform.position, end.transform.position);
-        constraintLength = totalLength / numSegments;
+        restLength = Vector3.Distance(start.transform.position, end.transform.position);
+        float constraintLength = restLength / numSegments;
         Vector3 direction = end.transform.position - start.transform.position;
         startRopeNode.previousPosition = start.transform.position;
 
@@ -40,7 +40,7 @@ public class VerletRope : MonoBehaviour
         for (int i = 1; i < numSegments; i++)
         {
             Vector3 pos = Vector3.Lerp(start.transform.position, end.transform.position, 
-                i * constraintLength / totalLength );
+                i * constraintLength / restLength);
             GameObject ropeNodeGO = new GameObject();
             ropeNodeGO.transform.position = pos;
             VerletRopeNode ropeNode = ropeNodeGO.AddComponent<VerletRopeNode>();
@@ -63,15 +63,53 @@ public class VerletRope : MonoBehaviour
     {
         Simulate();
 
-        // Higher iteration results in stiffer ropes and stable simulation
+        /* Higher iteration results in stiffer ropes and stable simulation */
         for (int i = 0; i < 80; i++)
         {
             ApplyConstraint();
 
-            // Playing around with adjusting collisions at intervals - still stable when iterations are skipped
+            /* Playing around with adjusting collisions at intervals - still stable when iterations are skipped */
             if (i % 2 == 1)
             {
                 //AdjustCollisions();
+            }
+        }
+
+        if(ropeNodes.Count >= 2)
+        {
+            /* Apply forces */
+            Transform startTrans = ropeNodes[0].transform;
+            Transform endTrans = ropeNodes[ropeNodes.Count - 1].transform;
+            Rigidbody startRb = startTrans.GetComponentInParent<Rigidbody>();
+            //Rigidbody endRb = endTrans.GetComponentInParent<Rigidbody>();
+            Rigidbody endRb = null;
+
+            Vector3 toHookVector = endTrans.position - startTrans.position;
+            Vector3 directionToHook = toHookVector.normalized;
+
+            if (startRb && endRb)
+            {
+                
+            }
+            else if (startRb)
+            {
+                float k = 500.0f;
+                /* Critically damped */
+                float b = Mathf.Sqrt(4 * startRb.mass * k);
+                /* Treating rope like a spring */
+                Vector3 fSpring = -k * (restLength * directionToHook - toHookVector)
+                                    + b * (Vector3.zero - Vector3.Project(startRb.velocity, directionToHook));
+                startRb.AddForce(fSpring);
+            }
+            else if (endRb)
+            {
+                float k = 500.0f;
+                /* Critically damped */
+                float b = Mathf.Sqrt(4 * endRb.mass * k);
+                /* Treating rope like a spring */
+                Vector3 fSpring = k * (restLength * directionToHook - toHookVector)
+                                    + b * (Vector3.zero - Vector3.Project(endRb.velocity, directionToHook));
+                endRb.AddForce(fSpring);
             }
         }
     }
@@ -120,6 +158,7 @@ public class VerletRope : MonoBehaviour
 
     private void ApplyConstraint()
     {
+        float constraintLength = restLength / ropeNodes.Count - 1;
         for (int i = 0; i < ropeNodes.Count - 1; i++)
         {
             VerletRopeNode node1 = this.ropeNodes[i];
@@ -144,31 +183,6 @@ public class VerletRope : MonoBehaviour
                 node1.transform.position = x1 + 0.5f * d1 * d3;
                 node2.transform.position = x2 - 0.5f * d1 * d3;
             }
-            
-
-            /*
-            // Get the current distance between rope nodes
-            float currentDistance = (node1.transform.position - node2.transform.position).magnitude;
-            float difference = Mathf.Abs(currentDistance - NodeDistance);
-            Vector2 direction = Vector2.zero;
-
-            // determine what direction we need to adjust our nodes
-            if (currentDistance > NodeDistance)
-            {
-                direction = (node1.transform.position - node2.transform.position).normalized;
-            }
-            else if (currentDistance < NodeDistance)
-            {
-                direction = (node2.transform.position - node1.transform.position).normalized;
-            }
-
-            // calculate the movement vector
-            Vector3 movement = direction * difference;
-
-            // apply correction
-            node1.transform.position -= (movement * 0.5f);
-            node2.transform.position += (movement * 0.5f);
-            */
         }
     }
 
@@ -181,5 +195,28 @@ public class VerletRope : MonoBehaviour
         }
         ropeRenderer.positionCount = ropeNodes.Count;
         ropeRenderer.SetPositions(ropeNodePositions);
+    }
+
+    //TODO: make rope specifically for connecting two non-rope entities
+    
+    public void IncreaseRestLength(float amount)
+    {
+        restLength = Mathf.Min(restLength + amount, maxRestLength);
+    }
+
+    public void DecreaseRestLength(float amount)
+    {
+        restLength = Mathf.Max(restLength - amount, 0.0f);
+    }
+
+
+    private void OnDestroy()
+    {
+        Destroy(ropeRenderer);
+        for(int i = 1; i < ropeNodes.Count - 1; i++)
+        {
+            Destroy(ropeNodes[i].gameObject);
+        }
+        Destroy(gameObject);
     }
 }

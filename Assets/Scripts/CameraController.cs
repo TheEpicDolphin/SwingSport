@@ -30,7 +30,6 @@ public class CameraController : MonoBehaviour
     public void AddWobble(float intensity)
     {
         wobbleIntensity = intensity;
-        Debug.Log(wobbleIntensity);
     }
 
     private void FixedUpdate()
