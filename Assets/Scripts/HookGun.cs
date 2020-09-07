@@ -14,15 +14,23 @@ public class HookGun : MonoBehaviour
     }
 
     HookState state;
+
     Transform hookSlot;
+
     Hook hook;
 
     LineRenderer ropeRenderer;
+
     Rigidbody playerRb;
+
     bool isGrappled = false;
+
     bool retract = false;
+
     bool release = false;
+
     float restRopeLength = 20.0f;
+
     const float maxRopeLength = 150.0f;
 
     float hookLaunchForce = 200.0f;
@@ -30,6 +38,7 @@ public class HookGun : MonoBehaviour
     float hookZoomRateMultiplier = 100.0f;
 
     public CameraWobbleDelegate camWobbleDelegate;
+
     public HookGunCursor cursor;
 
     private VerletRope verletRope;
@@ -98,6 +107,7 @@ public class HookGun : MonoBehaviour
                     /* The hook has been detached */
                     isGrappled = false;
                     hook.transform.parent = null;
+                    //Destroy(verletRope);
                     state = HookState.Retracting;
                     StartCoroutine(RetractHookCoroutine());
 
@@ -152,6 +162,8 @@ public class HookGun : MonoBehaviour
 
     IEnumerator LaunchHookCoroutine()
     {
+        //TODO: use fake rope here and animate it moving to the desired position
+
         while (Vector3.Distance(transform.position, hook.transform.position) < maxRopeLength)
         {
             Collider[] colliders = new Collider[1];
@@ -184,6 +196,8 @@ public class HookGun : MonoBehaviour
 
     IEnumerator RetractHookCoroutine()
     {
+        //TODO: use fake rope here and animate it to retract
+
         float t = 0.0f;
         float animDuration = 0.3f;
         Vector3 initialHookPos = hook.transform.position;
