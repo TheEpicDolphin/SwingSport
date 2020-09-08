@@ -69,41 +69,54 @@ public class VerletRope : MonoBehaviour
 
         if(start && end)
         {
-            /* Apply forces */
+            /* Get rigidbodies that belongs to the ancestors of start and end. The rope will apply
+               forces to these rigidbodies, if they exist */
             Rigidbody startRb = start.GetComponentInParent<Rigidbody>();
             //Rigidbody endRb = end.GetComponentInParent<Rigidbody>();
+            /* I set this to null for now because none of the blocks have rigidbodies */
             Rigidbody endRb = null;
 
-            Vector3 toHookVector = end.transform.position - start.transform.position;
-            Vector3 directionToHook = toHookVector.normalized;
+            Vector3 startToEndVector = end.transform.position - start.transform.position;
+            Vector3 startToEndDirection = startToEndVector.normalized;
 
             if (startRb && endRb)
             {
-                // TODO: Figure out what to do if they are both attached to rigidbodies
+                // TODO: If both start and end are attached to rigidbodies, we will have to go back
+                // to college classical mechanics to model this 2-mass spring system
             }
             else if (startRb)
             {
-                float k = 500.0f;
-                /* Critically damped */
-                float b = Mathf.Sqrt(4 * startRb.mass * k);
-                /* Treating rope like a spring */
-                Vector3 fSpring = -k * (restLength * directionToHook - toHookVector)
-                                    + b * (Vector3.zero - Vector3.Project(startRb.velocity, directionToHook));
-                if(restLength < toHookVector.magnitude)
+                /* endRb is null. This means that end does not have a rigidbody on any of its 
+                   ancestors. We treat it as though it has infinite mass */
+                if(startToEndVector.magnitude > restLength)
                 {
+                    /* We only apply a restoring force when the length between the start and end
+                       is greater than the rest length of the rope. Ropes only pull you, never push you */
+                    float k = 500.0f;
+                    /* Critically damped */
+                    float b = Mathf.Sqrt(4 * startRb.mass * k);
+                    /* Treating rope like a spring */
+                    Vector3 fSpring = -k * (restLength * startToEndDirection - startToEndVector)
+                                        + b * (Vector3.zero - Vector3.Project(startRb.velocity, startToEndDirection));
                     startRb.AddForce(fSpring);
                 }
-                
             }
             else if (endRb)
             {
-                float k = 500.0f;
-                /* Critically damped */
-                float b = Mathf.Sqrt(4 * endRb.mass * k);
-                /* Treating rope like a spring */
-                Vector3 fSpring = k * (restLength * directionToHook - toHookVector)
-                                    + b * (Vector3.zero - Vector3.Project(endRb.velocity, directionToHook));
-                endRb.AddForce(fSpring);
+                /* startRb is null. This means that end does not have a rigidbody on any of its 
+                   ancestors. We treat it as though it has infinite mass */
+                if (startToEndVector.magnitude > restLength)
+                {
+                    /* We only apply a restoring force when the length between the start and end
+                       is greater than the rest length of the rope. Ropes only pull you, never push you */
+                    float k = 500.0f;
+                    /* Critically damped */
+                    float b = Mathf.Sqrt(4 * startRb.mass * k);
+                    /* Treating rope like a spring */
+                    Vector3 fSpring = k * (restLength * startToEndDirection - startToEndVector)
+                                        + b * (Vector3.zero - Vector3.Project(startRb.velocity, startToEndDirection));
+                    endRb.AddForce(fSpring);
+                }
             }
         }
     }
@@ -190,11 +203,15 @@ public class VerletRope : MonoBehaviour
         ropeRenderer.SetPositions(ropeNodePositions.ToArray());
     }
 
+    /* This can be used for increasing the rest length of the rope. For example, increasing distance
+       between two objects */
     public void IncreaseRestLength(float amount)
     {
         restLength = Mathf.Min(restLength + amount, maxRestLength);
     }
 
+    /* This can be used for decreasing the rest length of the rope. For example, when we want
+       to pull two objects closer together */
     public void DecreaseRestLength(float amount)
     {
         restLength = Mathf.Max(restLength - amount, 0.0f);
