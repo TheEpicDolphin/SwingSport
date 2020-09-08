@@ -19,8 +19,6 @@ public class HookGun : MonoBehaviour
 
     Hook hook;
 
-    LineRenderer ropeRenderer;
-
     Rigidbody playerRb;
 
     bool isGrappled = false;
@@ -35,6 +33,8 @@ public class HookGun : MonoBehaviour
 
     public HookGunCursor cursor;
 
+    private LineRenderer ropeRenderer;
+
     private VerletRope verletRope;
 
     public Material ropeMaterial;
@@ -47,6 +47,10 @@ public class HookGun : MonoBehaviour
 
         ropeMaterial = new Material(Shader.Find("Unlit/Color"));
         ropeMaterial.color = Color.red;
+
+        ropeRenderer = gameObject.AddComponent<LineRenderer>();
+        ropeRenderer.material = ropeMaterial;
+        ropeRenderer.widthMultiplier = 0.05f;
 
         cursor = new HookGunCursor();
 
@@ -152,17 +156,15 @@ public class HookGun : MonoBehaviour
 
     IEnumerator LaunchHookCoroutine()
     {
-        /* Fake rope */
-        LineRenderer ropeRenderer = gameObject.AddComponent<LineRenderer>();
-        ropeRenderer.material = ropeMaterial;
-        ropeRenderer.widthMultiplier = 0.05f;
+        ropeRenderer.enabled = true;
+        ropeRenderer.positionCount = 2;
 
         while (Vector3.Distance(transform.position, hook.transform.position) < maxRopeLength)
         {
             Collider[] colliders = new Collider[1];
             if (Physics.OverlapSphereNonAlloc(hook.transform.position, 0.1f, colliders) > 0)
             {
-                Destroy(ropeRenderer);
+                ropeRenderer.enabled = false;
                 if (colliders[0].tag == "Hookable")
                 {
                     hook.GetComponent<Rigidbody>().isKinematic = true;
@@ -186,18 +188,15 @@ public class HookGun : MonoBehaviour
             yield return null;
         }
         state = HookState.Retracting;
-        Destroy(ropeRenderer);
+        ropeRenderer.enabled = false;
         StartCoroutine(RetractHookCoroutine());
         yield return null;
     }
 
     IEnumerator RetractHookCoroutine()
     {
-        /* Fake rope */
-        LineRenderer ropeRenderer = gameObject.AddComponent<LineRenderer>();
-        ropeRenderer.material = ropeMaterial;
-        ropeRenderer.widthMultiplier = 0.05f;
-
+        ropeRenderer.enabled = true;
+        ropeRenderer.positionCount = 2;
         float t = 0.0f;
         float animDuration = 0.3f;
         Vector3 initialHookPos = hook.transform.position;
@@ -205,13 +204,13 @@ public class HookGun : MonoBehaviour
         {
             hook.transform.position = Vector3.Lerp(initialHookPos, hookSlot.position, t / animDuration);
             t += Time.deltaTime;
-            ropeRenderer.positionCount = 2;
+            
             ropeRenderer.SetPositions(new Vector3[] { transform.position, hook.transform.position });
             yield return null;
         }
         hook.transform.position = hookSlot.position;
         Destroy(hook.gameObject);
-        Destroy(ropeRenderer);
+        ropeRenderer.enabled = false;
         state = HookState.Retracted;
         yield return null;
     }
