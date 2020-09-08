@@ -6,9 +6,9 @@ public class VerletRope : MonoBehaviour
 {
     LineRenderer ropeRenderer;
     public List<VerletRopeNode> ropeNodes = new List<VerletRopeNode>();
-    public float maxRestLength = 30.0f;
     private Vector3[] ropeNodePositions;
     private float restLength;
+    private float maxRestLength = 30.0f;
 
     //public GameObject s;
     //public GameObject e;
@@ -16,8 +16,6 @@ public class VerletRope : MonoBehaviour
     private void Awake()
     {
         ropeRenderer = gameObject.AddComponent<LineRenderer>();
-        ropeRenderer.material = new Material(Shader.Find("Unlit/Color"));
-        ropeRenderer.material.color = Color.blue;
         ropeRenderer.widthMultiplier = 0.05f;
     }
 
@@ -26,7 +24,7 @@ public class VerletRope : MonoBehaviour
         //BuildRope(s, e, 3);
     }
 
-    public void BuildRope(GameObject start, GameObject end, int numSegments)
+    public void BuildRope(GameObject start, GameObject end, int numSegments, float maxRestLength, Material ropeMat)
     {
         VerletRopeNode startRopeNode = start.AddComponent<VerletRopeNode>();
         VerletRopeNode endRopeNode = end.AddComponent<VerletRopeNode>();
@@ -51,6 +49,9 @@ public class VerletRope : MonoBehaviour
         endRopeNode.previousPosition = end.transform.position;
         endRopeNode.isFixed = true;
         ropeNodes.Add(endRopeNode);
+
+        this.maxRestLength = maxRestLength;
+        ropeRenderer.material = ropeMat;
     }
 
     // Update is called once per frame
@@ -99,7 +100,11 @@ public class VerletRope : MonoBehaviour
                 /* Treating rope like a spring */
                 Vector3 fSpring = -k * (restLength * directionToHook - toHookVector)
                                     + b * (Vector3.zero - Vector3.Project(startRb.velocity, directionToHook));
-                startRb.AddForce(fSpring);
+                if(restLength < toHookVector.magnitude)
+                {
+                    startRb.AddForce(fSpring);
+                }
+                
             }
             else if (endRb)
             {
@@ -158,7 +163,7 @@ public class VerletRope : MonoBehaviour
 
     private void ApplyConstraint()
     {
-        float constraintLength = restLength / ropeNodes.Count - 1;
+        float constraintLength = restLength / (ropeNodes.Count - 1);
         for (int i = 0; i < ropeNodes.Count - 1; i++)
         {
             VerletRopeNode node1 = this.ropeNodes[i];

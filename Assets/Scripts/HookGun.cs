@@ -25,8 +25,6 @@ public class HookGun : MonoBehaviour
 
     bool isGrappled = false;
 
-    //float restRopeLength = 20.0f;
-
     const float maxRopeLength = 150.0f;
 
     float hookLaunchForce = 200.0f;
@@ -39,16 +37,16 @@ public class HookGun : MonoBehaviour
 
     private VerletRope verletRope;
 
+    public Material ropeMaterial;
+
     private void Awake()
     {
         state = HookState.Retracted;
         hookSlot = transform.Find("HookSlot");
         playerRb = GetComponentInParent<Rigidbody>();
 
-        ropeRenderer = gameObject.AddComponent<LineRenderer>();
-        ropeRenderer.material = new Material(Shader.Find("Unlit/Color"));
-        ropeRenderer.material.color = Color.red;
-        ropeRenderer.widthMultiplier = 0.05f;
+        ropeMaterial = new Material(Shader.Find("Unlit/Color"));
+        ropeMaterial.color = Color.red;
 
         cursor = new HookGunCursor();
 
@@ -113,20 +111,16 @@ public class HookGun : MonoBehaviour
                     /* Reduce rope length so that player zooms to hook point*/
                     camWobbleDelegate(Mathf.Max(Mathf.Min(playerRb.velocity.magnitude, 90.0f) - 30.0f, 0.0f) / 60.0f);
                     verletRope.DecreaseRestLength(hookZoomRateMultiplier * Time.fixedDeltaTime);
-                    //restRopeLength = Mathf.Max(restRopeLength - hookZoomRateMultiplier * Time.fixedDeltaTime, 0.0f);
                 }
                 else if (Input.GetKey("q"))
                 {
                     /* Increase rope length so that player gets farther from hook point */
                     verletRope.DecreaseRestLength(10.0f * Time.fixedDeltaTime);
-                    //restRopeLength = Mathf.Min(restRopeLength + 10.0f * Time.fixedDeltaTime, maxRopeLength);
                 }
                 break;
             case HookState.Retracting:
                 break;
         }
-
-        //DrawRope();
     }
 
     public void CheckHookableAndAdjustCursor()
@@ -158,45 +152,51 @@ public class HookGun : MonoBehaviour
 
     IEnumerator LaunchHookCoroutine()
     {
-        //TODO: use fake rope here and animate it moving to the desired position
+        /* Fake rope */
+        LineRenderer ropeRenderer = gameObject.AddComponent<LineRenderer>();
+        ropeRenderer.material = ropeMaterial;
+        ropeRenderer.widthMultiplier = 0.05f;
 
         while (Vector3.Distance(transform.position, hook.transform.position) < maxRopeLength)
         {
             Collider[] colliders = new Collider[1];
             if (Physics.OverlapSphereNonAlloc(hook.transform.position, 0.1f, colliders) > 0)
             {
-                if(colliders[0].tag == "Hookable")
+                Destroy(ropeRenderer);
+                if (colliders[0].tag == "Hookable")
                 {
                     hook.GetComponent<Rigidbody>().isKinematic = true;
                     hook.transform.parent = colliders[0].transform;
 
                     isGrappled = true;
-                    //restRopeLength = Vector3.Distance(playerRb.transform.position, hook.transform.position);
                     GameObject verletRopeGO = new GameObject();
                     verletRope = verletRopeGO.AddComponent<VerletRope>();
-                    verletRope.BuildRope(this.gameObject, hook.gameObject, 6);
-                    verletRope.maxRestLength = maxRopeLength;
+                    verletRope.BuildRope(this.gameObject, hook.gameObject, 6, maxRopeLength, ropeMaterial);
                     state = HookState.Attached;
                 }
                 else
                 {
                     state = HookState.Retracting;
-                    Destroy(verletRope);
                     StartCoroutine(RetractHookCoroutine());
                 }
                 yield break;
             }
+            ropeRenderer.positionCount = 2;
+            ropeRenderer.SetPositions(new Vector3[] { transform.position, hook.transform.position });
             yield return null;
         }
         state = HookState.Retracting;
-        Destroy(verletRope);
+        Destroy(ropeRenderer);
         StartCoroutine(RetractHookCoroutine());
         yield return null;
     }
 
     IEnumerator RetractHookCoroutine()
     {
-        //TODO: use fake rope here and animate it to retract
+        /* Fake rope */
+        LineRenderer ropeRenderer = gameObject.AddComponent<LineRenderer>();
+        ropeRenderer.material = ropeMaterial;
+        ropeRenderer.widthMultiplier = 0.05f;
 
         float t = 0.0f;
         float animDuration = 0.3f;
@@ -205,53 +205,14 @@ public class HookGun : MonoBehaviour
         {
             hook.transform.position = Vector3.Lerp(initialHookPos, hookSlot.position, t / animDuration);
             t += Time.deltaTime;
+            ropeRenderer.positionCount = 2;
+            ropeRenderer.SetPositions(new Vector3[] { transform.position, hook.transform.position });
             yield return null;
         }
         hook.transform.position = hookSlot.position;
         Destroy(hook.gameObject);
+        Destroy(ropeRenderer);
         state = HookState.Retracted;
         yield return null;
     }
-
-    /*
-    private void FixedUpdate()
-    {
-        if (isGrappled)
-        {
-            // Maybe add force to this guy?
-            Rigidbody connectedTo = hook.GetComponentInParent<Rigidbody>();
-
-            Vector3 toHookVector = hook.transform.position - playerRb.transform.position;
-            Vector3 directionToHook = toHookVector.normalized;
-            
-            float k = 500.0f;
-            // Critically damped
-            float b = Mathf.Sqrt(4 * playerRb.mass * k);
-            // Treating rope like a spring
-            Vector3 fSpring = -k * (restRopeLength * directionToHook - toHookVector)
-                                + b * (Vector3.zero - Vector3.Project(playerRb.velocity, directionToHook));
-            playerRb.AddForce(fSpring);
-        }
-    }
-    */
-
-        /*
-    //TODO: probably will remove this after rope physics code is moved to VerletRope
-    void DrawRope()
-    {
-        if (hook)
-        {
-            List<Vector3> ropeVerts = new List<Vector3>();
-            ropeVerts.Add(transform.position);
-            ropeVerts.Add(hook.transform.position);
-            ropeRenderer.positionCount = ropeVerts.Count;
-            ropeRenderer.SetPositions(ropeVerts.ToArray());
-            ropeRenderer.enabled = true;
-        }
-        else
-        {
-            ropeRenderer.enabled = false;
-        }
-    }
-    */
 }
