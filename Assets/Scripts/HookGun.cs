@@ -115,7 +115,7 @@ public class HookGun : MonoBehaviour
                 else if (Input.GetKey("q"))
                 {
                     /* Increase rope length so that player gets farther from hook point */
-                    verletRope.DecreaseRestLength(10.0f * Time.fixedDeltaTime);
+                    verletRope.IncreaseRestLength(10.0f * Time.fixedDeltaTime);
                 }
                 break;
             case HookState.Retracting:
