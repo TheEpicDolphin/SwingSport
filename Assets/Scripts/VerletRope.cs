@@ -10,8 +10,8 @@ public class VerletRope : MonoBehaviour
     private float restLength;
     private float maxRestLength = 30.0f;
 
-    public GameObject s;
-    public GameObject e;
+    public GameObject start;
+    public GameObject end;
 
     private void Awake()
     {
@@ -26,8 +26,8 @@ public class VerletRope : MonoBehaviour
 
     public void BuildRope(GameObject start, GameObject end, int numSegments, float maxRestLength, Material ropeMat)
     {
-        this.s = start;
-        this.e = end;
+        this.start = start;
+        this.end = end;
         restLength = Vector3.Distance(start.transform.position, end.transform.position);
         float constraintLength = restLength / numSegments;
         Vector3 direction = end.transform.position - start.transform.position;
@@ -67,19 +67,19 @@ public class VerletRope : MonoBehaviour
             }
         }
 
-        if(s && e)
+        if(start && end)
         {
             /* Apply forces */
-            Rigidbody startRb = s.GetComponentInParent<Rigidbody>();
-            //Rigidbody endRb = e.GetComponentInParent<Rigidbody>();
+            Rigidbody startRb = start.GetComponentInParent<Rigidbody>();
+            //Rigidbody endRb = end.GetComponentInParent<Rigidbody>();
             Rigidbody endRb = null;
 
-            Vector3 toHookVector = e.transform.position - s.transform.position;
+            Vector3 toHookVector = end.transform.position - start.transform.position;
             Vector3 directionToHook = toHookVector.normalized;
 
             if (startRb && endRb)
             {
-                
+                // TODO: Figure out what to do if they are both attached to rigidbodies
             }
             else if (startRb)
             {
@@ -151,7 +151,7 @@ public class VerletRope : MonoBehaviour
         float constraintLength = restLength / ((ropeNodes.Count - 1) + 2);
 
         VerletRopeNode n0 = this.ropeNodes[0];
-        Vector3 d1 = n0.transform.position - s.transform.position;
+        Vector3 d1 = n0.transform.position - start.transform.position;
         float d2 = d1.magnitude;
         float d3 = (d2 - constraintLength) / d2;
         n0.transform.position += -1.0f * d1 * d3;
@@ -171,7 +171,7 @@ public class VerletRope : MonoBehaviour
         }
 
         VerletRopeNode nLast = this.ropeNodes[this.ropeNodes.Count - 1];
-        d1 = e.transform.position - nLast.transform.position;
+        d1 = end.transform.position - nLast.transform.position;
         d2 = d1.magnitude;
         d3 = (d2 - constraintLength) / d2;
         nLast.transform.position += 1.0f * d1 * d3;
@@ -180,12 +180,12 @@ public class VerletRope : MonoBehaviour
     private void DrawRope()
     {
         ropeNodePositions = new List<Vector3>();
-        ropeNodePositions.Add(s.transform.position);
+        ropeNodePositions.Add(start.transform.position);
         for (int i = 0; i < ropeNodes.Count; i++)
         {
             ropeNodePositions.Add(ropeNodes[i].transform.position);
         }
-        ropeNodePositions.Add(e.transform.position);
+        ropeNodePositions.Add(end.transform.position);
         ropeRenderer.positionCount = ropeNodePositions.Count;
         ropeRenderer.SetPositions(ropeNodePositions.ToArray());
     }
