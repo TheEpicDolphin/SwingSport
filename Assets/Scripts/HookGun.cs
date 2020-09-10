@@ -39,6 +39,18 @@ public class HookGun : MonoBehaviour
 
     public Material ropeMaterial;
 
+    private int mouseLaunchButton;
+
+    public void setControls(int mouseLaunchButton)
+    {
+        this.mouseLaunchButton = mouseLaunchButton;
+    }
+
+    public void setColor(Color c)
+    {
+        ropeMaterial.color = c;
+    }
+
     private void Awake()
     {
         state = HookState.Retracted;
@@ -46,7 +58,7 @@ public class HookGun : MonoBehaviour
         playerRb = GetComponentInParent<Rigidbody>();
 
         ropeMaterial = new Material(Shader.Find("Unlit/Color"));
-        ropeMaterial.color = Color.red;
+        
 
         ropeRenderer = gameObject.AddComponent<LineRenderer>();
         ropeRenderer.material = ropeMaterial;
@@ -68,7 +80,7 @@ public class HookGun : MonoBehaviour
         switch (state)
         {
             case HookState.Retracted:
-                if (Input.GetMouseButtonDown(0))
+                if (Input.GetMouseButtonDown(mouseLaunchButton))
                 {
                     /* The hookGun has been fired */
                     Vector3 targetPos;
@@ -100,7 +112,7 @@ public class HookGun : MonoBehaviour
                 break;
             case HookState.Attached:
 
-                if (!Input.GetMouseButton(0))
+                if (!Input.GetMouseButton(mouseLaunchButton))
                 {
                     /* The hook has been detached */
                     isGrappled = false;
