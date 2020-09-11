@@ -125,7 +125,7 @@ public class FABRIKSolver
             for (int i = 0; i < joint.childCount; i++)
             {
                 Transform child = joint.GetChild(i);
-                centroid += ForwardReach(child);
+                centroid += BackwardReach(child);
             }
             /* Taking average of new positions calculated by this joint's children */
             joint.position = centroid / joint.childCount;
