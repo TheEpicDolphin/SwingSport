@@ -26,9 +26,11 @@ public class FreeJoint
         }
     }
 
-    public FreeJoint()
+    public FreeJoint(Vector3 position)
     {
-
+        this.position = position;
+        this.children = new List<FreeJoint>();
+        this.parent = null;
     }
 
     public FreeJoint GetChild(int i)
@@ -43,29 +45,28 @@ public class FABRIKSolver
 {
     const int maxIters = 25;
     const float tolerance = 1e-4f;
-    private Transform root;
-    private FreeJoint rootFreeJoint;
+    private Transform rootTrans;
+    private FreeJoint root;
     private Dictionary<FreeJoint, float> jointLengthMap;
     private Dictionary<FreeJoint, Vector3> endEffectorToTargetMap;
     
-    public FABRIKSolver(Transform root, Transform[] endEffectors, Vector3[] targets)
+    public FABRIKSolver(Transform rootTrans, Transform[] endEffectors, Vector3[] targets)
     {
-        this.root = root;
-
-        this.rootFreeJoint = new FreeJoint();
-        CreateFreeJointTree(root, rootFreeJoint);
+        this.rootTrans = rootTrans;
+        this.root = CreateFreeJointTree(rootTrans);
     }
 
-    private void CreateFreeJointTree(Transform trans, FreeJoint joint)
+    private FreeJoint CreateFreeJointTree(Transform trans)
     {
+        FreeJoint joint = new FreeJoint(trans.position);
         for (int i = 0; i < trans.childCount; i++)
         {
             Transform childTrans = trans.GetChild(i);
-            FreeJoint childJoint = new FreeJoint();
+            FreeJoint childJoint = CreateFreeJointTree(childTrans);
             childJoint.parent = joint;
             jointLengthMap[childJoint] = Vector3.Distance(childTrans.position, trans.position);
-            CreateFreeJointTree(childTrans, childJoint);
         }
+        return joint;
     }
 
     public void PlaceLimb()
