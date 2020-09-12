@@ -153,11 +153,12 @@ public class FABRIKSolver
         int iters = 0;
         while (iters < maxIters)
         {
-            BackwardReach(rootFreeJoint);
-            ForwardReach(rootFreeJoint);
+            BackwardReach(root);
+            root.position = rootTrans.transform.position;
+            ForwardReach(root);
             iters += 1;
         }
-        
+        SetBonesTransformsToFitJoints(rootTrans, root);
     }
 
     private Vector3 BackwardReach(FreeJoint joint)
@@ -168,8 +169,7 @@ public class FABRIKSolver
             joint.position = endEffectorToTargetMap[joint];
             ForwardReach(joint);
         }
-
-        if (joint.childCount == 0)
+        else if (joint.childCount == 0)
         {
             /* This chain has no end effectors in it. Don't change anything */
             return joint.parent.position;
@@ -182,7 +182,7 @@ public class FABRIKSolver
                 FreeJoint child = joint.GetChild(i);
                 centroid += BackwardReach(child);
             }
-            /* Taking average of new positions calculated by this joint's children */
+            /* Set joint position as centroid of new positions calculated by this joint's children */
             joint.position = centroid / joint.childCount;
         }
         Vector3 v = joint.parent.position - joint.position;
@@ -199,6 +199,20 @@ public class FABRIKSolver
             Vector3 newChildPos = joint.position + jointLengthMap[child] * v.normalized;
             child.position = newChildPos;
             ForwardReach(child);
+        }
+    }
+
+    private void SetBonesTransformsToFitJoints(Transform trans, FreeJoint joint)
+    {
+        for (int i = 0; i < trans.childCount; i++)
+        {
+            Transform childTrans = trans.GetChild(i);
+            FreeJoint childJoint = joint.GetChild(i);
+
+            Vector3 currentOffset = trans.InverseTransformPoint(childTrans.position);
+            Vector3 desiredOffset = trans.InverseTransformPoint(childJoint.position);
+            trans.localRotation *= Quaternion.FromToRotation(currentOffset, desiredOffset);
+            SetBonesTransformsToFitJoints(childTrans, childJoint);
         }
     }
 
