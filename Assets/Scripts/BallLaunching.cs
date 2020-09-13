@@ -41,7 +41,7 @@ public class BallLaunching : MonoBehaviour
             Random.Range(minZVelocity, maxZVelocity)
             );
 
-        Debug.Log("Launching ball with velocity " + ballVelocity);
+        //Debug.Log("Launching ball with velocity " + ballVelocity);
 
         GameObject bounceBall = (GameObject)Instantiate(Resources.Load("Prefabs/BounceBall"),
             gameObject.transform.position, gameObject.transform.rotation, gameObject.transform);
