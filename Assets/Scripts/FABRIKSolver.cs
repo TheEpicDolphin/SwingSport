@@ -5,7 +5,8 @@ using UnityEngine;
 public class FreeJoint
 {
     public Vector3 position;
-    public FreeJoint parent
+    private FreeJoint parent;
+    public FreeJoint Parent
     {
         get
         {
@@ -30,15 +31,12 @@ public class FreeJoint
     {
         this.position = position;
         this.children = new List<FreeJoint>();
-        this.parent = null;
     }
 
     public FreeJoint GetChild(int i)
     {
         return children[i];
     }
-
-    
 }
 
 public class FABRIKSolver
@@ -50,102 +48,30 @@ public class FABRIKSolver
     private Dictionary<FreeJoint, float> jointLengthMap;
     private Dictionary<FreeJoint, Vector3> endEffectorToTargetMap;
     
-    public FABRIKSolver(Transform rootTrans, Transform[] endEffectors, Vector3[] targets)
+    public FABRIKSolver(Transform rootTrans, Dictionary<Transform, Vector3> endEffectorTransToTargetMap)
     {
         this.rootTrans = rootTrans;
-        this.root = CreateFreeJointTree(rootTrans);
+        this.jointLengthMap = new Dictionary<FreeJoint, float>();
+        this.endEffectorToTargetMap = new Dictionary<FreeJoint, Vector3>();
+        this.root = CreateFreeJointTree(rootTrans, endEffectorTransToTargetMap);
     }
 
-    private FreeJoint CreateFreeJointTree(Transform trans)
+    private FreeJoint CreateFreeJointTree(Transform trans, Dictionary<Transform, Vector3> endEffectorTransToTargetMap)
     {
         FreeJoint joint = new FreeJoint(trans.position);
         for (int i = 0; i < trans.childCount; i++)
         {
             Transform childTrans = trans.GetChild(i);
-            FreeJoint childJoint = CreateFreeJointTree(childTrans);
-            childJoint.parent = joint;
+            FreeJoint childJoint = CreateFreeJointTree(childTrans, endEffectorTransToTargetMap);
+            childJoint.Parent = joint;
             jointLengthMap[childJoint] = Vector3.Distance(childTrans.position, trans.position);
+            if (endEffectorTransToTargetMap.ContainsKey(childTrans))
+            {
+                endEffectorToTargetMap[childJoint] = endEffectorTransToTargetMap[childTrans];
+            }
+             
         }
         return joint;
-    }
-
-    public void PlaceLimb()
-    {
-
-        List<Vector3> bonePosL = new List<Vector3>();
-        List<Vector3> boneRelPosL = new List<Vector3>();
-        for (int i = 0; i < joints.Length; i++)
-        {
-            bonePosL.Add(joints[i].position);
-        }
-
-        boneRelPosL.Add(joints[0].position);
-        for (int i = 1; i < joints.Length; i++)
-        {
-            boneRelPosL.Add(joints[i - 1].InverseTransformPoint(joints[i].position));
-        }
-
-        List<Vector3> newBonePosL = FABRIKSolve(bonePosL);
-
-        for (int i = 0; i < joints.Length - 1; i++)
-        {
-            Vector3 currentOffset = boneRelPosL[i + 1];
-            Vector3 desiredOffset = joints[i].InverseTransformPoint(newBonePosL[i + 1]);
-            joints[i].localRotation *= Quaternion.FromToRotation(currentOffset, desiredOffset);
-        }
-    }
-
-    public List<Vector3> SolveTemp(List<Vector3> bonePos)
-    {
-        /*
-         *  Uses FABRIK algorithm for solving IK 
-         */
-        Vector3 start = bonePos[0];
-        int iters = 0;
-
-        List<float> boneL = new List<float>();
-        float totalLength = 0.0f;
-        for (int i = 0; i < bonePos.Count - 1; i++)
-        {
-            float l = (bonePos[i + 1] - bonePos[i]).magnitude;
-            boneL.Add(l);
-            totalLength += l;
-        }
-
-        //Target is out of reach
-        if (totalLength < (target.position - start).magnitude)
-        {
-            for (int i = 0; i < bonePos.Count - 1; i++)
-            {
-                Vector3 v = target.position - bonePos[i];
-                bonePos[i + 1] = bonePos[i] + boneL[i] * v.normalized;
-
-            }
-            return bonePos;
-        }
-
-        while (iters < maxIters)
-        {
-
-            bonePos[bonePos.Count - 1] = target.position;
-            for (int i = bonePos.Count - 1; i > 0; i--)
-            {
-                Vector3 v = bonePos[i - 1] - bonePos[i];
-                bonePos[i - 1] = bonePos[i] + boneL[i - 1] * v.normalized;
-
-            }
-
-            bonePos[0] = start;
-            for (int i = 0; i < bonePos.Count - 1; i++)
-            {
-                Vector3 v = bonePos[i + 1] - bonePos[i];
-                bonePos[i + 1] = bonePos[i] + boneL[i] * v.normalized;
-
-            }
-
-            iters += 1;
-        }
-        return bonePos;
     }
 
     public void Solve()
@@ -172,7 +98,7 @@ public class FABRIKSolver
         else if (joint.childCount == 0)
         {
             /* This chain has no end effectors in it. Don't change anything */
-            return joint.parent.position;
+            return joint.Parent.position;
         }
         else
         {
@@ -185,9 +111,13 @@ public class FABRIKSolver
             /* Set joint position as centroid of new positions calculated by this joint's children */
             joint.position = centroid / joint.childCount;
         }
-        Vector3 v = joint.parent.position - joint.position;
-        Vector3 newParentPos = joint.position + jointLengthMap[joint] * v.normalized;
-        return newParentPos;
+        if(joint.Parent != null)
+        {
+            Vector3 v = joint.Parent.position - joint.position;
+            Vector3 newParentPos = joint.position + jointLengthMap[joint] * v.normalized;
+            return newParentPos;
+        }
+        return Vector3.zero;
     }
 
     private void ForwardReach(FreeJoint joint)
@@ -204,15 +134,37 @@ public class FABRIKSolver
 
     private void SetBonesTransformsToFitJoints(Transform trans, FreeJoint joint)
     {
+        /*
         for (int i = 0; i < trans.childCount; i++)
         {
             Transform childTrans = trans.GetChild(i);
             FreeJoint childJoint = joint.GetChild(i);
-
             Vector3 currentOffset = trans.InverseTransformPoint(childTrans.position);
             Vector3 desiredOffset = trans.InverseTransformPoint(childJoint.position);
             trans.localRotation *= Quaternion.FromToRotation(currentOffset, desiredOffset);
             SetBonesTransformsToFitJoints(childTrans, childJoint);
+        }
+        */
+
+        Vector3 childrenCentroid = Vector3.zero;
+
+        if(trans.childCount == 1)
+        {
+            Transform childTrans = trans.GetChild(0);
+            FreeJoint childJoint = joint.GetChild(0);
+            Vector3 currentOffset = trans.InverseTransformPoint(childTrans.position);
+            Vector3 desiredOffset = trans.InverseTransformPoint(childJoint.position);
+            trans.localRotation *= Quaternion.FromToRotation(currentOffset, desiredOffset);
+            SetBonesTransformsToFitJoints(childTrans, childJoint);
+        }
+        else
+        {
+            for (int i = 0; i < trans.childCount; i++)
+            {
+                Transform childTrans = trans.GetChild(i);
+                FreeJoint childJoint = joint.GetChild(i);
+                SetBonesTransformsToFitJoints(childTrans, childJoint);
+            }
         }
     }
 
