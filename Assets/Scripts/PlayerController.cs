@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 using UnityEngine.UI;
+
+public delegate void OrientPlayerInAirDelegate(Vector3 force);
 
 public class PlayerController : MonoBehaviour
 {
@@ -38,6 +39,8 @@ public class PlayerController : MonoBehaviour
 
     public Image cursorImage;
 
+    Vector3 orientingForce = Vector3.zero;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -55,6 +58,7 @@ public class PlayerController : MonoBehaviour
         GameObject hookGunGO = (GameObject) Instantiate(Resources.Load("Prefabs/HookGun"), hand.position, hand.rotation, hand);
         HookGun hookGun = hookGunGO.GetComponent<HookGun>();
         hookGun.camWobbleDelegate = mainCamera.GetComponent<CameraController>().AddWobble;
+        hookGun.orientPlayerInAirDelegate = ApplyCentrifugalForce;
         hookGun.cursor.cursorImage = cursorImage;
     }
 
@@ -77,6 +81,9 @@ public class PlayerController : MonoBehaviour
         }
 
         rocketUp = Input.GetKey(KeyCode.Space) && !isGrounded;
+
+        OrientInAir();
+        
     }
 
     private void FixedUpdate()
@@ -107,12 +114,42 @@ public class PlayerController : MonoBehaviour
 
         if (isPlayerLockedToCamera)
         {
-            character.rotation = Quaternion.Euler(-mouseY, mouseX, 0);
+            //character.rotation = Quaternion.Euler(-mouseY, mouseX, 0);
             view.rotation = Quaternion.Euler(-mouseY, mouseX, 0);
         }
         else
         {
             view.rotation = Quaternion.Euler(-mouseY, mouseX, 0);
         }
+    }
+
+    private void OrientInAir()
+    {
+        if (!isGrounded)
+        {
+            if (orientingForce.magnitude > 100.0f)
+            {
+                Vector3 forwardSphereProj = Vector3.ProjectOnPlane(character.forward, orientingForce).normalized;
+                if (Vector3.Angle(character.forward, forwardSphereProj) < Vector3.Angle(character.forward, -forwardSphereProj))
+                {
+                    character.rotation = Quaternion.LookRotation(forwardSphereProj, -orientingForce.normalized);
+                }
+                else
+                {
+                    character.rotation = Quaternion.LookRotation(-forwardSphereProj, -orientingForce.normalized);
+                }
+            }
+            else
+            {
+                Quaternion desiredUprightRotation = Quaternion.LookRotation(Vector3.ProjectOnPlane(character.forward, Vector3.up), Vector3.up);
+                character.rotation = Quaternion.Slerp(character.rotation, desiredUprightRotation, 2.0f * Time.deltaTime);
+            }
+        }
+        orientingForce = Vector3.zero;
+    }
+
+    private void ApplyCentrifugalForce(Vector3 centrifugalForce)
+    {
+        orientingForce = centrifugalForce;
     }
 }

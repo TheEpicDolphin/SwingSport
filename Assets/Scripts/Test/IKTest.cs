@@ -15,6 +15,11 @@ public class IKTest : MonoBehaviour
         
     }
 
+    private void Update()
+    {
+
+    }
+
     private void LateUpdate()
     {
         FABRIKSolver fabrikSolver = new FABRIKSolver(root,
@@ -23,6 +28,10 @@ public class IKTest : MonoBehaviour
                 { handR, target1.position },
                 { handL, target2.position }
             });
-        fabrikSolver.Solve();
+        if (!Input.GetKey(KeyCode.Space))
+        {
+            fabrikSolver.Solve();
+        }
+        
     }
 }
