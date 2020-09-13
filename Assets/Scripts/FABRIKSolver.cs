@@ -2,45 +2,45 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FreeJoint
-{
-    public Vector3 position;
-    private FreeJoint parent;
-    public FreeJoint Parent
-    {
-        get
-        {
-            return parent;
-        }
-        set
-        {
-            value.children.Add(this);
-            parent = value;
-        }
-    }
-    private List<FreeJoint> children;
-    public int childCount
-    {
-        get
-        {
-            return children.Count;
-        }
-    }
-
-    public FreeJoint(Vector3 position)
-    {
-        this.position = position;
-        this.children = new List<FreeJoint>();
-    }
-
-    public FreeJoint GetChild(int i)
-    {
-        return children[i];
-    }
-}
-
 public class FABRIKSolver
 {
+    public class FreeJoint
+    {
+        public Vector3 position;
+        private FreeJoint parent;
+        public FreeJoint Parent
+        {
+            get
+            {
+                return parent;
+            }
+            set
+            {
+                value.children.Add(this);
+                parent = value;
+            }
+        }
+        private List<FreeJoint> children;
+        public int childCount
+        {
+            get
+            {
+                return children.Count;
+            }
+        }
+
+        public FreeJoint(Vector3 position)
+        {
+            this.position = position;
+            this.children = new List<FreeJoint>();
+        }
+
+        public FreeJoint GetChild(int i)
+        {
+            return children[i];
+        }
+    }
+
     const int maxIters = 25;
     const float tolerance = 1e-4f;
     private Transform rootTrans;
@@ -146,25 +146,22 @@ public class FABRIKSolver
         }
         */
 
-        Vector3 childrenCentroid = Vector3.zero;
-
-        if(trans.childCount == 1)
+        Vector3 originalChildrenCentroid = Vector3.zero;
+        Vector3 newChildrenCentroid = Vector3.zero;
+        for (int i = 0; i < trans.childCount; i++)
         {
-            Transform childTrans = trans.GetChild(0);
-            FreeJoint childJoint = joint.GetChild(0);
-            Vector3 currentOffset = trans.InverseTransformPoint(childTrans.position);
-            Vector3 desiredOffset = trans.InverseTransformPoint(childJoint.position);
-            trans.localRotation *= Quaternion.FromToRotation(currentOffset, desiredOffset);
-            SetBonesTransformsToFitJoints(childTrans, childJoint);
+            Transform childTrans = trans.GetChild(i);
+            FreeJoint childJoint = joint.GetChild(i);
+            originalChildrenCentroid += trans.InverseTransformPoint(childTrans.position);
+            newChildrenCentroid += trans.InverseTransformPoint(childJoint.position);
         }
-        else
+
+        trans.localRotation *= Quaternion.FromToRotation(originalChildrenCentroid, newChildrenCentroid);
+        for (int i = 0; i < trans.childCount; i++)
         {
-            for (int i = 0; i < trans.childCount; i++)
-            {
-                Transform childTrans = trans.GetChild(i);
-                FreeJoint childJoint = joint.GetChild(i);
-                SetBonesTransformsToFitJoints(childTrans, childJoint);
-            }
+            Transform childTrans = trans.GetChild(i);
+            FreeJoint childJoint = joint.GetChild(i);
+            SetBonesTransformsToFitJoints(childTrans, childJoint);
         }
     }
 

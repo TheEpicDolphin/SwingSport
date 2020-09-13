@@ -15,8 +15,7 @@ public class IKTest : MonoBehaviour
         
     }
 
-    // Update is called once per frame
-    void Update()
+    private void LateUpdate()
     {
         FABRIKSolver fabrikSolver = new FABRIKSolver(root,
             new Dictionary<Transform, Vector3>

@@ -236,9 +236,28 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target1: {fileID: 1283450464}
   target2: {fileID: 1522875251}
-  root: {fileID: 1795998823}
+  root: {fileID: 2001541565}
   handR: {fileID: 909971886}
   handL: {fileID: 544741767}
+--- !u!95 &522266531
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 522266529}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 284fddf73a195024d88f7ebf71dc124a, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!4 &544741767 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -4618267715946595656, guid: c9ea8bd4c2340ad45bc5bec8a794fb95,
@@ -399,7 +418,7 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: c9ea8bd4c2340ad45bc5bec8a794fb95,
         type: 3}
       propertyPath: m_Name
-      value: basic_character_rigged
+      value: Player
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c9ea8bd4c2340ad45bc5bec8a794fb95, type: 3}
@@ -593,9 +612,9 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!4 &1795998823 stripped
+--- !u!4 &2001541565 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: -2447997291283153268, guid: c9ea8bd4c2340ad45bc5bec8a794fb95,
+  m_CorrespondingSourceObject: {fileID: 4081949142207283072, guid: c9ea8bd4c2340ad45bc5bec8a794fb95,
     type: 3}
   m_PrefabInstance: {fileID: 1069970505}
   m_PrefabAsset: {fileID: 0}
