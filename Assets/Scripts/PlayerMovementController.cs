@@ -121,12 +121,13 @@ public class PlayerMovementController : MonoBehaviour
         else
         {
             playerAnimController.OrientInAir(view, orientingForce);
+            /* This is causing twitching bug */
             orientingForce = Vector3.zero;
         }
     }
 
     private void ApplyCentrifugalForce(Vector3 centrifugalForce)
     {
-        orientingForce = centrifugalForce;
+        orientingForce += centrifugalForce;
     }
 }
