@@ -5,14 +5,15 @@ using UnityEngine.UI;
 
 public delegate void OrientPlayerInAirDelegate(Vector3 force);
 
-public class PlayerController : MonoBehaviour
+public class PlayerMovementController : MonoBehaviour
 {
     Rigidbody rb;
     Transform view;
     Transform camTarget;
     Transform hand;
-    Transform character;
     public Transform mainCamera;
+
+    public PlayerAnimController playerAnimController;
 
     /* mouse position on screen */ 
     float mouseX, mouseY;
@@ -32,9 +33,6 @@ public class PlayerController : MonoBehaviour
     /* if true, player is rocketing up */
     public bool rocketUp = false;
 
-    /* determines whether the player will look in the direction of the camera or not */
-    public bool isPlayerLockedToCamera = true;
-
     public float bDrag = 2.0f;
 
     public Image cursorImage;
@@ -44,13 +42,15 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        playerAnimController = GetComponent<PlayerAnimController>();
+
         /* removes mouse cursor and locks cursor to center of the screen */
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
         rb = GetComponent<Rigidbody>();
         view = transform.Find("View");
-        character = transform.Find("Character");
+        Transform character = transform.Find("Character");
         hand = character.Find("Hand");
         camTarget = view.GetChild(0);
 
@@ -60,30 +60,6 @@ public class PlayerController : MonoBehaviour
         hookGun.camWobbleDelegate = mainCamera.GetComponent<CameraController>().AddWobble;
         hookGun.orientPlayerInAirDelegate = ApplyCentrifugalForce;
         hookGun.cursor.cursorImage = cursorImage;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        mouseX += Input.GetAxis("Mouse X") * mouseSensitivity;
-        mouseY += Input.GetAxis("Mouse Y") * mouseSensitivity;
-        mouseY = Mathf.Clamp(mouseY, -80, 80);
-
-        float moveHorizontal = Input.GetAxisRaw("Horizontal");
-        float moveVertical = Input.GetAxisRaw("Vertical");
-        movement = moveVertical * Vector3.ProjectOnPlane(mainCamera.transform.forward, Vector3.up).normalized + 
-                            moveHorizontal * mainCamera.transform.right;
-
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
-        {
-            /* jump */
-            rb.AddForce(300.0f * Vector3.up, ForceMode.Impulse);
-        }
-
-        rocketUp = Input.GetKey(KeyCode.Space) && !isGrounded;
-
-        OrientInAir();
-        
     }
 
     private void FixedUpdate()
@@ -112,40 +88,41 @@ public class PlayerController : MonoBehaviour
             rb.AddForce(-bDrag * rb.velocity);
         }
 
-        if (isPlayerLockedToCamera)
+        view.rotation = Quaternion.Euler(-mouseY, mouseX, 0);
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        mouseX += Input.GetAxis("Mouse X") * mouseSensitivity;
+        mouseY += Input.GetAxis("Mouse Y") * mouseSensitivity;
+        mouseY = Mathf.Clamp(mouseY, -80, 80);
+
+        float moveHorizontal = Input.GetAxisRaw("Horizontal");
+        float moveVertical = Input.GetAxisRaw("Vertical");
+        movement = moveVertical * Vector3.ProjectOnPlane(mainCamera.transform.forward, Vector3.up).normalized +
+                            moveHorizontal * mainCamera.transform.right;
+
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
-            //character.rotation = Quaternion.Euler(-mouseY, mouseX, 0);
-            view.rotation = Quaternion.Euler(-mouseY, mouseX, 0);
+            /* jump */
+            rb.AddForce(300.0f * Vector3.up, ForceMode.Impulse);
+        }
+
+        rocketUp = Input.GetKey(KeyCode.Space) && !isGrounded;
+    }
+
+    private void LateUpdate()
+    {
+        if (isGrounded)
+        {
+            playerAnimController.OrientOnGround(view);
         }
         else
         {
-            view.rotation = Quaternion.Euler(-mouseY, mouseX, 0);
+            playerAnimController.OrientInAir(view, orientingForce);
+            orientingForce = Vector3.zero;
         }
-    }
-
-    private void OrientInAir()
-    {
-        if (!isGrounded)
-        {
-            if (orientingForce.magnitude > 100.0f)
-            {
-                Vector3 forwardSphereProj = Vector3.ProjectOnPlane(character.forward, orientingForce).normalized;
-                if (Vector3.Angle(character.forward, forwardSphereProj) < Vector3.Angle(character.forward, -forwardSphereProj))
-                {
-                    character.rotation = Quaternion.LookRotation(forwardSphereProj, -orientingForce.normalized);
-                }
-                else
-                {
-                    character.rotation = Quaternion.LookRotation(-forwardSphereProj, -orientingForce.normalized);
-                }
-            }
-            else
-            {
-                Quaternion desiredUprightRotation = Quaternion.LookRotation(Vector3.ProjectOnPlane(character.forward, Vector3.up), Vector3.up);
-                character.rotation = Quaternion.Slerp(character.rotation, desiredUprightRotation, 2.0f * Time.deltaTime);
-            }
-        }
-        orientingForce = Vector3.zero;
     }
 
     private void ApplyCentrifugalForce(Vector3 centrifugalForce)
