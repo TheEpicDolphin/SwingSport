@@ -31,7 +31,6 @@ public class PlayerAnimController : MonoBehaviour
     
     public void OrientInAir(Transform view, Vector3 orientingForce)
     {
-        Debug.Log(orientingForce.magnitude);
         if (orientingForce.magnitude > 100.0f)
         {
             Vector3 forwardSphereProj = Vector3.ProjectOnPlane(view.forward, orientingForce).normalized;
