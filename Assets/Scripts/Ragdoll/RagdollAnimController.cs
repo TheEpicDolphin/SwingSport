@@ -158,5 +158,10 @@ public class RagdollAnimController : MonoBehaviour
             MatchRagdollToAnimatedRig(ragdollBoneChild, animeBoneChild);
         }
     }
+
+    public void ApplyForceToAll(Vector3 force)
+    {
+
+    }
     
 }

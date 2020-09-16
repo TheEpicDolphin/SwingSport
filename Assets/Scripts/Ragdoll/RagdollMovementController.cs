@@ -24,8 +24,8 @@ public class RagdollMovementController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        float moveHorizontal = Input.GetAxisRaw("Horizontal");
-        float moveVertical = Input.GetAxisRaw("Vertical");
+        float moveHorizontal = PlayerInputManager.Instance.horizontal;
+        float moveVertical = PlayerInputManager.Instance.vertical;
         movement = moveVertical * Vector3.ProjectOnPlane(cameraTrans.forward, Vector3.up).normalized +
                             moveHorizontal * cameraTrans.right;
     }
@@ -40,5 +40,10 @@ public class RagdollMovementController : MonoBehaviour
 
         Vector3 turningTorque = 100.0f * Vector3.Cross(transform.forward, cameraTrans.forward);
         rb.AddTorque(turningTorque, ForceMode.Acceleration);
+    }
+
+    public void MoveRagdoll(Vector3 force)
+    {
+
     }
 }

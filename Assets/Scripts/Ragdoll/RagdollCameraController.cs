@@ -25,8 +25,8 @@ public class RagdollCameraController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        mouseX += Input.GetAxis("Mouse X") * mouseSensitivity;
-        mouseY += Input.GetAxis("Mouse Y") * mouseSensitivity;
+        mouseX += PlayerInputManager.Instance.mouseXDelta * mouseSensitivity;
+        mouseY += PlayerInputManager.Instance.mouseYDelta * mouseSensitivity;
         mouseY = Mathf.Clamp(mouseY, -80, 80);
     }
 
