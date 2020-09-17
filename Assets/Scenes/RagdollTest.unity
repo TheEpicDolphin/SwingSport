@@ -242,7 +242,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 142862126}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 1.1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1377121384}
@@ -400,6 +400,7 @@ GameObject:
   - component: {fileID: 266111207}
   - component: {fileID: 266111206}
   - component: {fileID: 266111205}
+  - component: {fileID: 266111209}
   m_Layer: 0
   m_Name: hip
   m_TagString: Untagged
@@ -486,6 +487,19 @@ Transform:
   m_Father: {fileID: 1655737695}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &266111209
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 266111204}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0297179541f410b41826527d5f8cfe0a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cameraTrans: {fileID: 1377121384}
 --- !u!1 &528430366
 GameObject:
   m_ObjectHideFlags: 0
@@ -1504,7 +1518,7 @@ SphereCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1101659430}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 072ed766efcf85741b23572de3c0ad3d, type: 2}
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
@@ -1747,7 +1761,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1377121381}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.691, y: 1.936, z: -2.383}
+  m_LocalPosition: {x: 0.691, y: 1.27, z: -2.383}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 142862127}
@@ -1765,7 +1779,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 22c79bb9f63eba54d846f062c20bee77, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ragdollTrans: {fileID: 1655737695}
+  ragdollTrans: {fileID: 266111208}
 --- !u!1 &1556817541
 GameObject:
   m_ObjectHideFlags: 0
@@ -1971,7 +1985,6 @@ GameObject:
   - component: {fileID: 1655737695}
   - component: {fileID: 1655737696}
   - component: {fileID: 1655737697}
-  - component: {fileID: 1655737698}
   m_Layer: 0
   m_Name: Ragdoll
   m_TagString: Untagged
@@ -2022,19 +2035,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &1655737698
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1655737694}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0297179541f410b41826527d5f8cfe0a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  cameraTrans: {fileID: 1377121384}
 --- !u!1 &2030603753
 GameObject:
   m_ObjectHideFlags: 0
@@ -2268,7 +2268,7 @@ SphereCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2098268125}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 072ed766efcf85741b23572de3c0ad3d, type: 2}
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2

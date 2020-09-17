@@ -38,8 +38,9 @@ public class RagdollMovementController : MonoBehaviour
         Vector3 f = k * (vDesired - rb.velocity);
         rb.AddForce(f, ForceMode.Acceleration);
 
-        Vector3 turningTorque = 100.0f * Vector3.Cross(transform.forward, cameraTrans.forward);
-        rb.AddTorque(turningTorque, ForceMode.Acceleration);
+        /* Rotating character is done in RagdollAnimController */
+        //Vector3 turningTorque = 100.0f * Vector3.Cross(transform.forward, cameraTrans.forward);
+        //rb.AddTorque(turningTorque, ForceMode.Acceleration);
     }
 
     public void MoveRagdoll(Vector3 force)

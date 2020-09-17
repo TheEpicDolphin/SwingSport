@@ -6,8 +6,8 @@ public class RagdollAnimController : MonoBehaviour
 {
     Transform animatedTargetRig;
     Transform ragdollRig;
-    // Start is called before the first frame update
-    void Start()
+
+    private void Awake()
     {
         ragdollRig = transform.GetChild(0);
         CreateRagdoll(ragdollRig);
@@ -15,47 +15,21 @@ public class RagdollAnimController : MonoBehaviour
         animatedTargetRig.parent = transform;
 
         ConfigurableJoint confJoint = ragdollRig.gameObject.AddComponent<ConfigurableJoint>();
-        confJoint.connectedBody = transform.GetComponent<Rigidbody>();
-        confJoint.anchor = Vector3.zero;
 
-        JointDrive ydrive = new JointDrive();
-        ydrive.positionSpring = 500.0f;
-        ydrive.positionDamper = 0.0f;
-        ydrive.maximumForce = 500.0f;
-
-        SoftJointLimitSpring spring = new SoftJointLimitSpring();
-        spring.spring = 0.0f;
-        spring.damper = 0.0f;
-
-        confJoint.yDrive = ydrive;
-        confJoint.linearLimitSpring = spring;
-        confJoint.rotationDriveMode = RotationDriveMode.Slerp;
-        confJoint.projectionMode = JointProjectionMode.None;
-        confJoint.targetAngularVelocity = Vector3.zero;
-        confJoint.configuredInWorldSpace = false;
-        confJoint.swapBodies = true;
-
-        confJoint.xMotion = ConfigurableJointMotion.Locked;
-        confJoint.yMotion = ConfigurableJointMotion.Locked;
-        confJoint.zMotion = ConfigurableJointMotion.Locked;
+        confJoint.xMotion = ConfigurableJointMotion.Free;
+        confJoint.yMotion = ConfigurableJointMotion.Free;
+        confJoint.zMotion = ConfigurableJointMotion.Free;
         confJoint.angularXMotion = ConfigurableJointMotion.Free;
         confJoint.angularYMotion = ConfigurableJointMotion.Free;
         confJoint.angularZMotion = ConfigurableJointMotion.Free;
 
-        SoftJointLimit lowAngXLim = confJoint.lowAngularXLimit;
-        lowAngXLim.limit = -120.0f;
-        SoftJointLimit highAngXLim = confJoint.highAngularXLimit;
-        highAngXLim.limit = 120.0f;
-        confJoint.lowAngularXLimit = lowAngXLim;
-        confJoint.highAngularXLimit = highAngXLim;
+        JointDrive drive = new JointDrive();
+        drive.positionSpring = 500.0f;
+        drive.positionDamper = 0.0f;
+        drive.maximumForce = 500.0f;
 
-        SoftJointLimit angYLim = confJoint.angularYLimit;
-        angYLim.limit = 120.0f;
-        confJoint.angularYLimit = angYLim;
-
-        SoftJointLimit angZLim = confJoint.angularZLimit;
-        angZLim.limit = 120.0f;
-        confJoint.angularZLimit = angZLim;
+        confJoint.angularXDrive = drive;
+        confJoint.angularYZDrive = drive;
     }
 
     // Update is called once per frame
@@ -67,7 +41,7 @@ public class RagdollAnimController : MonoBehaviour
     private void LateUpdate()
     {
         ConfigurableJoint confJoint = ragdollRig.GetComponent<ConfigurableJoint>();
-        confJoint.targetRotation = Quaternion.identity;
+        confJoint.targetRotation = Quaternion.Inverse(Camera.main.transform.rotation);
         MatchRagdollToAnimatedRig(ragdollRig, animatedTargetRig);
     }
 
@@ -93,17 +67,9 @@ public class RagdollAnimController : MonoBehaviour
             drive.positionDamper = 0.0f;
             drive.maximumForce = 500.0f;
 
-            SoftJointLimitSpring spring = new SoftJointLimitSpring();
-            spring.spring = 0.0f;
-            spring.damper = 0.0f;
-
-            confJoint.slerpDrive = drive;
-            confJoint.linearLimitSpring = spring;
-            confJoint.rotationDriveMode = RotationDriveMode.Slerp;
-            confJoint.projectionMode = JointProjectionMode.None;
+            confJoint.angularXDrive = drive;
+            confJoint.angularYZDrive = drive;
             confJoint.targetAngularVelocity = Vector3.zero;
-            confJoint.configuredInWorldSpace = false;
-            confJoint.swapBodies = true;
 
             confJoint.xMotion = ConfigurableJointMotion.Locked;
             confJoint.yMotion = ConfigurableJointMotion.Locked;
@@ -159,9 +125,8 @@ public class RagdollAnimController : MonoBehaviour
         }
     }
 
-    public void ApplyForceToAll(Vector3 force)
+    void RotateRagdollToFaceDirection(Vector3 direction, Vector3 up)
     {
 
     }
-    
 }
