@@ -15,10 +15,13 @@ public class RagdollMovementController : MonoBehaviour
     /* movement vector of the player*/
     Vector3 movement = Vector3.zero;
 
+    ConfigurableJoint confJoint;
+
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        confJoint = GetComponent<ConfigurableJoint>();
     }
 
     // Update is called once per frame
@@ -41,6 +44,9 @@ public class RagdollMovementController : MonoBehaviour
         /* Rotating character is done in RagdollAnimController */
         //Vector3 turningTorque = 100.0f * Vector3.Cross(transform.forward, cameraTrans.forward);
         //rb.AddTorque(turningTorque, ForceMode.Acceleration);
+
+        
+        confJoint.targetRotation = Quaternion.Inverse(Camera.main.transform.rotation);
     }
 
     public void MoveRagdoll(Vector3 force)
