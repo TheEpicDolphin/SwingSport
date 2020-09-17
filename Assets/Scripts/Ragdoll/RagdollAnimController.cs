@@ -154,9 +154,4 @@ public class RagdollAnimController : MonoBehaviour
             MatchRagdollToAnimatedRig(ragdollBoneChild, animeBoneChild);
         }
     }
-
-    void RotateRagdollToFaceDirection(Vector3 direction, Vector3 up)
-    {
-
-    }
 }
