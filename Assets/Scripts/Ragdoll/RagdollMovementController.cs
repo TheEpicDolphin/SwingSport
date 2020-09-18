@@ -28,13 +28,17 @@ public class RagdollMovementController : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         confJoint = GetComponent<ConfigurableJoint>();
 
-        //Instantiate hook gun in player's hand
-        GameObject hookGunGO = (GameObject)Instantiate(Resources.Load("Prefabs/HookGun"), 
-            handR.position + 0.15f * handR.transform.forward, handR.rotation, handR);
-        HookGun hookGun = hookGunGO.GetComponent<HookGun>();
-        //hookGun.camWobbleDelegate = mainCamera.GetComponent<CameraController>().AddWobble;
-        //hookGun.orientPlayerInAirDelegate = ApplyCentrifugalForce;
-        hookGun.cursor.cursorImage = cursorImage;
+        if (handR)
+        {
+            //Instantiate hook gun in player's hand
+            GameObject hookGunGO = (GameObject)Instantiate(Resources.Load("Prefabs/HookGun"),
+                handR.position + 0.15f * handR.transform.forward, handR.rotation, handR);
+            HookGun hookGun = hookGunGO.GetComponent<HookGun>();
+            //hookGun.camWobbleDelegate = mainCamera.GetComponent<CameraController>().AddWobble;
+            //hookGun.orientPlayerInAirDelegate = ApplyCentrifugalForce;
+            hookGun.cursor.cursorImage = cursorImage;
+        }
+        
     }
 
     // Update is called once per frame

@@ -9,7 +9,7 @@ public class RagdollAnimController : MonoBehaviour
 
     float totalMass = 50.0f;
     float boneMass;
-    bool useGravity = true;
+    bool useGravity = false;
 
     private void Awake()
     {
@@ -18,6 +18,9 @@ public class RagdollAnimController : MonoBehaviour
 
         Rigidbody rb = gameObject.AddComponent<Rigidbody>();
         rb.useGravity = useGravity;
+        // Root rigidbody mass is small compared to ragdoll mass, and so moving hip and 
+        // everything else will displace the root A LOT unless root is massive
+        // TODO: Consider removing root and controlling hip directly
         ConfigurableJoint rootConfJoint = gameObject.AddComponent<ConfigurableJoint>();
 
         ConvertRigToRagdoll(ragdollRigHip);
@@ -38,7 +41,6 @@ public class RagdollAnimController : MonoBehaviour
         hipConfJoint.angularYMotion = ConfigurableJointMotion.Free;
         hipConfJoint.angularZMotion = ConfigurableJointMotion.Free;
 
-        // TODO: SET MAXIMUM FORCE AS MAXIMUM FLOAT
         JointDrive hipJointAngularDrive = new JointDrive();
         hipJointAngularDrive.positionSpring = 10000.0f;
         hipJointAngularDrive.positionDamper = 100.0f;
@@ -83,6 +85,8 @@ public class RagdollAnimController : MonoBehaviour
 
     private void LateUpdate()
     {
+        //ConfigurableJoint hipConfJoint = ragdollRigHip.GetComponent<ConfigurableJoint>();
+        //hipConfJoint.targetPosition -= new Vector3(0, Time.deltaTime, 0);
         MatchRagdollToAnimatedRig(ragdollRigHip, animatedTargetRigHip);
     }
 
