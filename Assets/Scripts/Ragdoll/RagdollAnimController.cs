@@ -37,14 +37,14 @@ public class RagdollAnimController : MonoBehaviour
         hipConfJoint.angularZMotion = ConfigurableJointMotion.Free;
 
         JointDrive hipJointAngularDrive = new JointDrive();
-        hipJointAngularDrive.positionSpring = 1000.0f;
+        hipJointAngularDrive.positionSpring = 10000.0f;
         hipJointAngularDrive.positionDamper = 100.0f;
-        hipJointAngularDrive.maximumForce = 1000.0f;
+        hipJointAngularDrive.maximumForce = 10000.0f;
 
         JointDrive hipJointLinearDrive = new JointDrive();
-        hipJointLinearDrive.positionSpring = 1000.0f;
+        hipJointLinearDrive.positionSpring = 10000.0f;
         hipJointLinearDrive.positionDamper = 100.0f;
-        hipJointLinearDrive.maximumForce = 1000.0f;
+        hipJointLinearDrive.maximumForce = 10000.0f;
 
         hipConfJoint.xDrive = hipJointLinearDrive;
         hipConfJoint.yDrive = hipJointLinearDrive;
@@ -114,9 +114,9 @@ public class RagdollAnimController : MonoBehaviour
             confJoint.anchor = Vector3.zero;
 
             JointDrive drive = new JointDrive();
-            drive.positionSpring = 1000.0f;
+            drive.positionSpring = 10000.0f;
             drive.positionDamper = 100.0f;
-            drive.maximumForce = 1000.0f;
+            drive.maximumForce = 10000.0f;
 
             confJoint.angularXDrive = drive;
             confJoint.angularYZDrive = drive;
