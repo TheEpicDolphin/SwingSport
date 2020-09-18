@@ -36,6 +36,7 @@ public class RagdollAnimController : MonoBehaviour
         hipConfJoint.angularYMotion = ConfigurableJointMotion.Free;
         hipConfJoint.angularZMotion = ConfigurableJointMotion.Free;
 
+        // TODO: SET MAXIMUM FORCE AS MAXIMUM FLOAT
         JointDrive hipJointAngularDrive = new JointDrive();
         hipJointAngularDrive.positionSpring = 10000.0f;
         hipJointAngularDrive.positionDamper = 100.0f;
