@@ -5,23 +5,14 @@ using UnityEngine;
 public class RagdollAnimController : MonoBehaviour
 {
     Transform animatedTargetRigHip;
-    Transform ragdollRigHip;
-
+    public bool useGravity = true;
     float totalMass = 50.0f;
     float boneMass;
-    bool useGravity = false;
 
     private void Awake()
     {
-        ragdollRigHip = transform.GetChild(0);
+        Transform ragdollRigHip = transform;
         boneMass = totalMass / CountBones(ragdollRigHip);
-
-        Rigidbody rb = gameObject.AddComponent<Rigidbody>();
-        rb.useGravity = useGravity;
-        // Root rigidbody mass is small compared to ragdoll mass, and so moving hip and 
-        // everything else will displace the root A LOT unless root is massive
-        // TODO: Consider removing root and controlling hip directly
-        ConfigurableJoint rootConfJoint = gameObject.AddComponent<ConfigurableJoint>();
 
         ConvertRigToRagdoll(ragdollRigHip);
         animatedTargetRigHip = CreateAnimationTargetRig(ragdollRigHip);
@@ -29,10 +20,11 @@ public class RagdollAnimController : MonoBehaviour
 
         /* Set hip configurable joint */
         ConfigurableJoint hipConfJoint = ragdollRigHip.gameObject.AddComponent<ConfigurableJoint>();
-        hipConfJoint.connectedBody = rb;
-        hipConfJoint.anchor = Vector3.zero;
+        //hipConfJoint.connectedBody = rb;
+        //hipConfJoint.anchor = Vector3.zero;
 
         hipConfJoint.projectionMode = JointProjectionMode.PositionAndRotation;
+        hipConfJoint.enablePreprocessing = false;
 
         hipConfJoint.xMotion = ConfigurableJointMotion.Free;
         hipConfJoint.yMotion = ConfigurableJointMotion.Free;
@@ -51,30 +43,11 @@ public class RagdollAnimController : MonoBehaviour
         hipJointLinearDrive.positionDamper = 100.0f;
         hipJointLinearDrive.maximumForce = float.MaxValue;
 
-        hipConfJoint.xDrive = hipJointLinearDrive;
-        hipConfJoint.yDrive = hipJointLinearDrive;
-        hipConfJoint.zDrive = hipJointLinearDrive;
+        //hipConfJoint.xDrive = hipJointLinearDrive;
+        //hipConfJoint.yDrive = hipJointLinearDrive;
+        //hipConfJoint.zDrive = hipJointLinearDrive;
         hipConfJoint.angularXDrive = hipJointAngularDrive;
         hipConfJoint.angularYZDrive = hipJointAngularDrive;
-
-        /* Set root configurable joint */
-        rootConfJoint.projectionMode = JointProjectionMode.PositionAndRotation;
-
-        rootConfJoint.xMotion = ConfigurableJointMotion.Free;
-        rootConfJoint.yMotion = ConfigurableJointMotion.Free;
-        rootConfJoint.zMotion = ConfigurableJointMotion.Free;
-        rootConfJoint.angularXMotion = ConfigurableJointMotion.Free;
-        rootConfJoint.angularYMotion = ConfigurableJointMotion.Free;
-        rootConfJoint.angularZMotion = ConfigurableJointMotion.Free;
-
-        JointDrive rootJointDrive = new JointDrive();
-        rootJointDrive.positionSpring = 10000.0f;
-        rootJointDrive.positionDamper = 100.0f;
-        rootJointDrive.maximumForce = float.MaxValue;
-
-        rootConfJoint.angularXDrive = rootJointDrive;
-        rootConfJoint.angularYZDrive = rootJointDrive;
-
     }
 
     // Update is called once per frame
@@ -87,7 +60,7 @@ public class RagdollAnimController : MonoBehaviour
     {
         //ConfigurableJoint hipConfJoint = ragdollRigHip.GetComponent<ConfigurableJoint>();
         //hipConfJoint.targetPosition -= new Vector3(0, Time.deltaTime, 0);
-        MatchRagdollToAnimatedRig(ragdollRigHip, animatedTargetRigHip);
+        MatchRagdollToAnimatedRig(transform, animatedTargetRigHip);
     }
 
     int CountBones(Transform bone)
@@ -108,6 +81,8 @@ public class RagdollAnimController : MonoBehaviour
             boneRb = bone.gameObject.AddComponent<Rigidbody>();
         }
         boneRb.mass = boneMass;
+        boneRb.drag = 0.0f;
+        boneRb.angularDrag = 0.0f;
         boneRb.useGravity = useGravity;
         for (int i = 0; i < bone.childCount; i++)
         {
@@ -123,6 +98,7 @@ public class RagdollAnimController : MonoBehaviour
             confJoint.anchor = Vector3.zero;
 
             confJoint.projectionMode = JointProjectionMode.PositionAndRotation;
+            confJoint.enablePreprocessing = false;
 
             JointDrive drive = new JointDrive();
             drive.positionSpring = 10000.0f;

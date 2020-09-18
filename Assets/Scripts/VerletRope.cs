@@ -110,7 +110,7 @@ public class VerletRope : MonoBehaviour
                     float k = 500.0f;
                     /* Critically damped */
                     //float b = Mathf.Sqrt(4 * startRb.mass * k);
-                    float b = 10.0f;
+                    float b = Mathf.Sqrt(4 * 50.0f * k);
                     /* Treating rope like a spring */
                     ropeTension = -k * (restLength * startToEndDirection - startToEndVector)
                                         + b * (Vector3.zero - Vector3.Project(startRb.velocity, startToEndDirection));
