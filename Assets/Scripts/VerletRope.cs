@@ -109,7 +109,8 @@ public class VerletRope : MonoBehaviour
                        is greater than the rest length of the rope. Ropes only pull you, never push you */
                     float k = 500.0f;
                     /* Critically damped */
-                    float b = Mathf.Sqrt(4 * startRb.mass * k);
+                    //float b = Mathf.Sqrt(4 * startRb.mass * k);
+                    float b = 10.0f;
                     /* Treating rope like a spring */
                     ropeTension = -k * (restLength * startToEndDirection - startToEndVector)
                                         + b * (Vector3.zero - Vector3.Project(startRb.velocity, startToEndDirection));

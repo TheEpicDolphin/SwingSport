@@ -7,11 +7,17 @@ public class RagdollAnimController : MonoBehaviour
     Transform animatedTargetRigHip;
     Transform ragdollRigHip;
 
+    float totalMass = 50.0f;
+    float boneMass;
+    bool useGravity = true;
+
     private void Awake()
     {
         ragdollRigHip = transform.GetChild(0);
+        boneMass = totalMass / CountBones(ragdollRigHip);
+
         Rigidbody rb = gameObject.AddComponent<Rigidbody>();
-        rb.useGravity = false;
+        rb.useGravity = useGravity;
         ConfigurableJoint rootConfJoint = gameObject.AddComponent<ConfigurableJoint>();
 
         ConvertRigToRagdoll(ragdollRigHip);
@@ -30,16 +36,21 @@ public class RagdollAnimController : MonoBehaviour
         hipConfJoint.angularYMotion = ConfigurableJointMotion.Free;
         hipConfJoint.angularZMotion = ConfigurableJointMotion.Free;
 
-        JointDrive hipJointDrive = new JointDrive();
-        hipJointDrive.positionSpring = 1000.0f;
-        hipJointDrive.positionDamper = 100.0f;
-        hipJointDrive.maximumForce = 1000.0f;
+        JointDrive hipJointAngularDrive = new JointDrive();
+        hipJointAngularDrive.positionSpring = 1000.0f;
+        hipJointAngularDrive.positionDamper = 100.0f;
+        hipJointAngularDrive.maximumForce = 1000.0f;
 
-        hipConfJoint.xDrive = hipJointDrive;
-        hipConfJoint.yDrive = hipJointDrive;
-        hipConfJoint.zDrive = hipJointDrive;
-        hipConfJoint.angularXDrive = hipJointDrive;
-        hipConfJoint.angularYZDrive = hipJointDrive;
+        JointDrive hipJointLinearDrive = new JointDrive();
+        hipJointLinearDrive.positionSpring = 1000.0f;
+        hipJointLinearDrive.positionDamper = 100.0f;
+        hipJointLinearDrive.maximumForce = 1000.0f;
+
+        hipConfJoint.xDrive = hipJointLinearDrive;
+        hipConfJoint.yDrive = hipJointLinearDrive;
+        hipConfJoint.zDrive = hipJointLinearDrive;
+        hipConfJoint.angularXDrive = hipJointAngularDrive;
+        hipConfJoint.angularYZDrive = hipJointAngularDrive;
 
         /* Set root configurable joint */
         rootConfJoint.xMotion = ConfigurableJointMotion.Free;
@@ -50,9 +61,9 @@ public class RagdollAnimController : MonoBehaviour
         rootConfJoint.angularZMotion = ConfigurableJointMotion.Free;
 
         JointDrive rootJointDrive = new JointDrive();
-        rootJointDrive.positionSpring = 1000.0f;
+        rootJointDrive.positionSpring = 10000.0f;
         rootJointDrive.positionDamper = 100.0f;
-        rootJointDrive.maximumForce = 1000.0f;
+        rootJointDrive.maximumForce = 10000.0f;
 
         rootConfJoint.angularXDrive = rootJointDrive;
         rootConfJoint.angularYZDrive = rootJointDrive;
@@ -70,15 +81,25 @@ public class RagdollAnimController : MonoBehaviour
         MatchRagdollToAnimatedRig(ragdollRigHip, animatedTargetRigHip);
     }
 
+    int CountBones(Transform bone)
+    {
+        int count = 1;
+        for(int i = 0; i < bone.childCount; i++)
+        {
+            count += CountBones(bone.GetChild(i));
+        }
+        return count;
+    }
+
     void ConvertRigToRagdoll(Transform bone)
     {
-        Rigidbody boneRb = GetComponent<Rigidbody>();
+        Rigidbody boneRb = bone.GetComponent<Rigidbody>();
         if (!boneRb)
         {
             boneRb = bone.gameObject.AddComponent<Rigidbody>();
         }
-
-        boneRb.useGravity = false;
+        boneRb.mass = boneMass;
+        boneRb.useGravity = useGravity;
         for (int i = 0; i < bone.childCount; i++)
         {
             Transform child = bone.GetChild(i);
@@ -145,7 +166,7 @@ public class RagdollAnimController : MonoBehaviour
 
     void MatchRagdollToAnimatedRig(Transform ragdollBone, Transform animBone)
     {
-        for (int i = 0; i < ragdollBone.childCount; i++)
+        for (int i = 0; i < animBone.childCount; i++)
         {
             Transform ragdollBoneChild = ragdollBone.GetChild(i);
             Transform animeBoneChild = animBone.GetChild(i);

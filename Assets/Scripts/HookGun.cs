@@ -115,7 +115,7 @@ public class HookGun : MonoBehaviour
                 else if (Input.GetKey(KeyCode.LeftShift))
                 {
                     /* Reduce rope length so that player zooms to hook point*/
-                    camWobbleDelegate(Mathf.Max(Mathf.Min(playerRb.velocity.magnitude, 90.0f) - 30.0f, 0.0f) / 60.0f);
+                    camWobbleDelegate?.Invoke(Mathf.Max(Mathf.Min(playerRb.velocity.magnitude, 90.0f) - 30.0f, 0.0f) / 60.0f);
                     verletRope.DecreaseRestLength(hookZoomRateMultiplier * Time.fixedDeltaTime);
                 }
                 else if (Input.GetKey("q"))

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class RagdollMovementController : MonoBehaviour
 {
@@ -17,11 +18,23 @@ public class RagdollMovementController : MonoBehaviour
 
     ConfigurableJoint confJoint;
 
+    public Image cursorImage;
+
+    public Transform handR;
+
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         confJoint = GetComponent<ConfigurableJoint>();
+
+        //Instantiate hook gun in player's hand
+        GameObject hookGunGO = (GameObject)Instantiate(Resources.Load("Prefabs/HookGun"), 
+            handR.position + 0.15f * handR.transform.forward, handR.rotation, handR);
+        HookGun hookGun = hookGunGO.GetComponent<HookGun>();
+        //hookGun.camWobbleDelegate = mainCamera.GetComponent<CameraController>().AddWobble;
+        //hookGun.orientPlayerInAirDelegate = ApplyCentrifugalForce;
+        hookGun.cursor.cursorImage = cursorImage;
     }
 
     // Update is called once per frame
