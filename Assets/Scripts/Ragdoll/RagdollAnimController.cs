@@ -29,6 +29,8 @@ public class RagdollAnimController : MonoBehaviour
         hipConfJoint.connectedBody = rb;
         hipConfJoint.anchor = Vector3.zero;
 
+        hipConfJoint.projectionMode = JointProjectionMode.PositionAndRotation;
+
         hipConfJoint.xMotion = ConfigurableJointMotion.Free;
         hipConfJoint.yMotion = ConfigurableJointMotion.Free;
         hipConfJoint.zMotion = ConfigurableJointMotion.Free;
@@ -54,6 +56,8 @@ public class RagdollAnimController : MonoBehaviour
         hipConfJoint.angularYZDrive = hipJointAngularDrive;
 
         /* Set root configurable joint */
+        rootConfJoint.projectionMode = JointProjectionMode.PositionAndRotation;
+
         rootConfJoint.xMotion = ConfigurableJointMotion.Free;
         rootConfJoint.yMotion = ConfigurableJointMotion.Free;
         rootConfJoint.zMotion = ConfigurableJointMotion.Free;
@@ -114,6 +118,8 @@ public class RagdollAnimController : MonoBehaviour
             confJoint.connectedBody = boneRb;
             confJoint.anchor = Vector3.zero;
 
+            confJoint.projectionMode = JointProjectionMode.PositionAndRotation;
+
             JointDrive drive = new JointDrive();
             drive.positionSpring = 10000.0f;
             drive.positionDamper = 100.0f;
@@ -167,6 +173,8 @@ public class RagdollAnimController : MonoBehaviour
 
     void MatchRagdollToAnimatedRig(Transform ragdollBone, Transform animBone)
     {
+        //ConfigurableJoint confJoint = ragdollBone.GetComponent<ConfigurableJoint>();
+        //confJoint.targetRotation = animBone.localRotation;
         for (int i = 0; i < animBone.childCount; i++)
         {
             Transform ragdollBoneChild = ragdollBone.GetChild(i);
