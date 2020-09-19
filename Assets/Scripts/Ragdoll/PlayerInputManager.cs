@@ -11,6 +11,8 @@ public class PlayerInputManager : MonoBehaviour
 
     public float horizontal;
     public float vertical;
+    public bool spacebar;
+    public bool spacebarDown;
     public float mouseXDelta;
     public float mouseYDelta;
 
@@ -43,5 +45,8 @@ public class PlayerInputManager : MonoBehaviour
 
         mouseXDelta = Input.GetAxis("Mouse X");
         mouseYDelta = Input.GetAxis("Mouse Y");
+
+        spacebar = Input.GetKey(KeyCode.Space);
+        spacebarDown = Input.GetKeyDown(KeyCode.Space);
     }
 }

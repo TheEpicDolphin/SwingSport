@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public delegate void OrientPlayerInAirDelegate(Vector3 force);
-
 public class PlayerMovementController : MonoBehaviour
 {
     Rigidbody rb;
@@ -37,8 +35,6 @@ public class PlayerMovementController : MonoBehaviour
 
     public Image cursorImage;
 
-    Vector3 orientingForce = Vector3.zero;
-
     // Start is called before the first frame update
     void Start()
     {
@@ -58,7 +54,6 @@ public class PlayerMovementController : MonoBehaviour
         GameObject hookGunGO = (GameObject) Instantiate(Resources.Load("Prefabs/HookGun"), hand.position, hand.rotation, hand);
         HookGun hookGun = hookGunGO.GetComponent<HookGun>();
         hookGun.camWobbleDelegate = mainCamera.GetComponent<CameraController>().AddWobble;
-        hookGun.orientPlayerInAirDelegate = ApplyCentrifugalForce;
         hookGun.cursor.cursorImage = cursorImage;
     }
 
@@ -110,24 +105,5 @@ public class PlayerMovementController : MonoBehaviour
         }
 
         rocketUp = Input.GetKey(KeyCode.Space) && !isGrounded;
-    }
-
-    private void LateUpdate()
-    {
-        if (isGrounded)
-        {
-            playerAnimController.OrientOnGround(view);
-        }
-        else
-        {
-            playerAnimController.OrientInAir(view, orientingForce);
-            /* This is causing twitching bug */
-            orientingForce = Vector3.zero;
-        }
-    }
-
-    private void ApplyCentrifugalForce(Vector3 centrifugalForce)
-    {
-        orientingForce += centrifugalForce;
     }
 }

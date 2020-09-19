@@ -58,8 +58,6 @@ public class RagdollAnimController : MonoBehaviour
 
     private void LateUpdate()
     {
-        //ConfigurableJoint hipConfJoint = ragdollRigHip.GetComponent<ConfigurableJoint>();
-        //hipConfJoint.targetPosition -= new Vector3(0, Time.deltaTime, 0);
         MatchRagdollToAnimatedRig(transform, animatedTargetRigHip);
     }
 
@@ -99,22 +97,27 @@ public class RagdollAnimController : MonoBehaviour
 
             confJoint.projectionMode = JointProjectionMode.PositionAndRotation;
             confJoint.enablePreprocessing = false;
-
-            JointDrive drive = new JointDrive();
-            drive.positionSpring = 10000.0f;
-            drive.positionDamper = 100.0f;
-            drive.maximumForce = float.MaxValue;
-
-            confJoint.angularXDrive = drive;
-            confJoint.angularYZDrive = drive;
-            confJoint.targetAngularVelocity = Vector3.zero;
-
+            
             confJoint.xMotion = ConfigurableJointMotion.Locked;
             confJoint.yMotion = ConfigurableJointMotion.Locked;
             confJoint.zMotion = ConfigurableJointMotion.Locked;
             confJoint.angularXMotion = ConfigurableJointMotion.Free;
             confJoint.angularYMotion = ConfigurableJointMotion.Free;
             confJoint.angularZMotion = ConfigurableJointMotion.Free;
+            
+            JointDrive drive = new JointDrive();
+            drive.positionSpring = 10000.0f;
+            drive.positionDamper = 100.0f;
+            drive.maximumForce = float.MaxValue;
+
+            // This changes everything
+            //confJoint.xDrive = drive;
+            //confJoint.yDrive = drive;
+            //confJoint.zDrive = drive;
+
+            confJoint.angularXDrive = drive;
+            confJoint.angularYZDrive = drive;
+            confJoint.targetAngularVelocity = Vector3.zero;
 
             SoftJointLimit lowAngXLim = confJoint.lowAngularXLimit;
             lowAngXLim.limit = -120.0f;
@@ -130,8 +133,7 @@ public class RagdollAnimController : MonoBehaviour
             SoftJointLimit angZLim = confJoint.angularZLimit;
             angZLim.limit = 120.0f;
             confJoint.angularZLimit = angZLim;
-
-
+            
         }
     }
 
@@ -153,8 +155,6 @@ public class RagdollAnimController : MonoBehaviour
 
     void MatchRagdollToAnimatedRig(Transform ragdollBone, Transform animBone)
     {
-        //ConfigurableJoint confJoint = ragdollBone.GetComponent<ConfigurableJoint>();
-        //confJoint.targetRotation = animBone.localRotation;
         for (int i = 0; i < animBone.childCount; i++)
         {
             Transform ragdollBoneChild = ragdollBone.GetChild(i);

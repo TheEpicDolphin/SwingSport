@@ -11,6 +11,9 @@ public class RagdollCameraController : MonoBehaviour
     /* mouse sensitivity */
     float mouseSensitivity = 5.0f;
 
+    /* How responsive the camera feels. [0, 1]*/
+    float cameraFluidity = 0.8f;
+
     public Transform ragdollTrans;
 
     /* camera is a child of view. view is always constrained to at the position of the player */
@@ -33,6 +36,6 @@ public class RagdollCameraController : MonoBehaviour
     private void FixedUpdate()
     {
         view.position = ragdollTrans.position;
-        view.rotation = Quaternion.Euler(-mouseY, mouseX, 0);
+        view.rotation = Quaternion.Slerp(view.rotation, Quaternion.Euler(-mouseY, mouseX, 0), cameraFluidity);
     }
 }

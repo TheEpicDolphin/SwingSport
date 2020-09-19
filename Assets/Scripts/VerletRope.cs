@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public delegate void RopeTensionDelegate(Vector3 force);
 
 public class VerletRope : MonoBehaviour
 {
@@ -14,9 +13,6 @@ public class VerletRope : MonoBehaviour
 
     public GameObject start;
     public GameObject end;
-
-    public RopeTensionDelegate startTensionDelegate;
-    public RopeTensionDelegate endTensionDelegate;
 
     Vector3 ropeTension = Vector3.zero;
 
@@ -56,9 +52,6 @@ public class VerletRope : MonoBehaviour
     void Update()
     {
         DrawRope();
-
-        startTensionDelegate?.Invoke(ropeTension);
-        endTensionDelegate?.Invoke(-ropeTension);
     }
 
     private void FixedUpdate()
@@ -79,9 +72,6 @@ public class VerletRope : MonoBehaviour
 
         if(start && end)
         {
-            // TODO: get this sorted out
-            startTensionDelegate?.Invoke(Vector3.zero);
-
             /* Get rigidbodies that belongs to the ancestors of start and end. The rope will apply
                forces to these rigidbodies, if they exist */
             Rigidbody startRb = start.GetComponentInParent<Rigidbody>();

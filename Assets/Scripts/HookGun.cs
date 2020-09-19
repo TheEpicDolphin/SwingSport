@@ -31,8 +31,6 @@ public class HookGun : MonoBehaviour
 
     public CameraWobbleDelegate camWobbleDelegate;
 
-    public OrientPlayerInAirDelegate orientPlayerInAirDelegate;
-
     public HookGunCursor cursor;
 
     private LineRenderer ropeRenderer;
@@ -53,6 +51,7 @@ public class HookGun : MonoBehaviour
         ropeRenderer = gameObject.AddComponent<LineRenderer>();
         ropeRenderer.material = ropeMaterial;
         ropeRenderer.widthMultiplier = 0.05f;
+        ropeRenderer.enabled = false;
 
         cursor = new HookGunCursor();
 
@@ -175,7 +174,6 @@ public class HookGun : MonoBehaviour
                     isGrappled = true;
                     GameObject verletRopeGO = new GameObject();
                     verletRope = verletRopeGO.AddComponent<VerletRope>();
-                    verletRope.startTensionDelegate = HandleRopeTension;
                     verletRope.BuildRope(this.gameObject, hook.gameObject, 6, maxRopeLength, ropeMaterial);
                     state = HookState.Attached;
                 }
@@ -216,11 +214,6 @@ public class HookGun : MonoBehaviour
         ropeRenderer.enabled = false;
         state = HookState.Retracted;
         yield return null;
-    }
-
-    private void HandleRopeTension(Vector3 tensionForce)
-    {
-        orientPlayerInAirDelegate?.Invoke(-tensionForce);
     }
 
 }
