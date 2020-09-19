@@ -19460,7 +19460,7 @@ MonoBehaviour:
   isGrounded: 0
   rocketUp: 0
   isPlayerLockedToCamera: 1
-  bDrag: 1
+  bDrag: 10
   cursorImage: {fileID: 1579430425}
 --- !u!1 &1040212086
 GameObject:
