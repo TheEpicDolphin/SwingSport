@@ -7,6 +7,11 @@ public class BallGrabbing : MonoBehaviour
     bool hasBall = false;
 
     public float ballLaunchForce = 100.0f;
+    public const float maxGrabTime = 3.0f;
+
+    public float ballUngrabbableTimeLimit = 3.0f;
+
+    private float currentGrabTime = 0.0f;
 
     void Start()
     {
@@ -20,34 +25,62 @@ public class BallGrabbing : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Q))
+        if (hasBall)
         {
-            if (hasBall)
+
+            currentGrabTime -= Time.deltaTime;
+
+            hasBallVisual.gameObject.GetComponent<Renderer>().material.color = Color.Lerp(Color.green, Color.red, 1.0f - (currentGrabTime / maxGrabTime));
+
+            if (Input.GetKeyDown(KeyCode.Q))
             {
-                Debug.Log("User launched ball.");
-
-                Ray camRay = Camera.main.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0));
-                /* Prevent raycast from hitting something in front of camera but behind gun */
-                Vector3 newBounceBallStartPos = transform.position + ((camRay.direction / camRay.direction.magnitude) * 7.5f);
-
-                GameObject bounceBall = (GameObject) Instantiate(
-                    Resources.Load("Prefabs/BounceBall"),
-                    gameObject.transform.position, 
-                    gameObject.transform.rotation
-                );
-
-                bounceBall.transform.position = newBounceBallStartPos;
-
-                Vector3 ballLaunchForceVector = (camRay.direction / camRay.direction.magnitude) * ballLaunchForce;
-
-                Debug.Log("Launching ball with force vector: " + ballLaunchForceVector);
-
-                bounceBall.GetComponent<Rigidbody>().AddForce(ballLaunchForceVector, ForceMode.Impulse);
-
-                hasBallVisual.gameObject.SetActive(false);
-                hasBall = false;
+                letGoOfBall(true);
+            } 
+            else if (currentGrabTime < 0.0f)
+            {
+                letGoOfBall(false);
             }
-}
+            
+        }
+        
+    }
+
+    private void letGoOfBall(bool shouldLaunch)
+    {
+        Ray camRay = Camera.main.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0));
+        Vector3 newBounceBallStartPos = transform.position + ((camRay.direction / camRay.direction.magnitude) * 7.5f);
+
+        GameObject bounceBall = (GameObject)Instantiate(
+            Resources.Load("Prefabs/BounceBall"),
+            gameObject.transform.position,
+            gameObject.transform.rotation
+        );
+
+        bounceBall.transform.position = newBounceBallStartPos;
+        bounceBall.layer = LayerMask.NameToLayer("HookableLayer");
+
+        if (shouldLaunch)
+        {
+            Debug.Log("User launched ball.");
+
+            Vector3 ballLaunchForceVector = (camRay.direction / camRay.direction.magnitude) * ballLaunchForce;
+
+            Debug.Log("Launching ball with force vector: " + ballLaunchForceVector);
+
+            bounceBall.GetComponent<Rigidbody>().AddForce(ballLaunchForceVector, ForceMode.Impulse);
+        }
+
+        bounceBall.GetComponent<GrabbableObject>().setUngrabbable(ballUngrabbableTimeLimit);
+
+        turnOffBallVisual();
+    }
+
+    private void turnOffBallVisual()
+    {
+        hasBallVisual.gameObject.SetActive(false);
+        hasBall = false;
+        currentGrabTime = 0.0f;
+        hasBallVisual.gameObject.GetComponent<Renderer>().material.color = Color.green;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -56,7 +89,7 @@ public class BallGrabbing : MonoBehaviour
         {
             Debug.Log("Detected a bounce ball entered grabbing collider: " + other.gameObject.name);
 
-            if (!hasBall)
+            if (other.gameObject.GetComponent<GrabbableObject>().isCurrentlyGrabbable() && !hasBall)
             {
 
                 Debug.Log("Didn't already have ball, destroying game object and placing on back.");
@@ -65,6 +98,8 @@ public class BallGrabbing : MonoBehaviour
                 Destroy(other.gameObject);
 
                 hasBallVisual.gameObject.SetActive(true);
+
+                currentGrabTime = maxGrabTime;
             }
 
         }
