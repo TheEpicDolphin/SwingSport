@@ -42,7 +42,7 @@ public class BallGrabbing : MonoBehaviour
 
                 Debug.Log("Launching ball with force vector: " + ballLaunchForceVector);
 
-                bounceBall.GetComponent<Rigidbody>().AddForce(ballLaunchForceVector);
+                bounceBall.GetComponent<Rigidbody>().AddForce(ballLaunchForceVector, ForceMode.Impulse);
 
                 hasBallVisual.gameObject.SetActive(false);
                 hasBall = false;

@@ -11212,6 +11212,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 590308289}
+  - component: {fileID: 590308290}
   m_Layer: 0
   m_Name: ball launchers
   m_TagString: Untagged
@@ -11234,6 +11235,26 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &590308290
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 590308288}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75c40e280ca91b6439c0be4ade8d9128, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxBalls: 20
+  launchFrequency: 5
+  minXVelocity: 0
+  minYVelocity: 0
+  minZVelocity: 0
+  maxXVelocity: 50
+  maxYVelocity: 50
+  maxZVelocity: 50
 --- !u!1 &592687296
 GameObject:
   m_ObjectHideFlags: 0
@@ -14613,7 +14634,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hasBallVisual: {fileID: 1774219869}
-  ballLaunchForce: 500
+  ballLaunchForce: 1500
 --- !u!135 &802172280
 SphereCollider:
   m_ObjectHideFlags: 0

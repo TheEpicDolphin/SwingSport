@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.ConstrainedExecution;
 using UnityEngine;
 
-public class BallLaunching : MonoBehaviour
+public class BallSpawner : MonoBehaviour
 {
 
     public int maxBalls = 20;
