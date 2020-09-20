@@ -112,6 +112,17 @@ public class HookGun : MonoBehaviour
                 break;
             case HookState.Attached:
 
+                // check to make sure that the hook hasn't been deleted (as is the case
+                // when the player grabs a ball and pulls it within grabbing distance)
+                if (hook == null)
+                {
+                    // if the hook was deleted, treat it as if the hook is retracted
+                    /* The hook has been detached */
+                    isGrappled = false;
+                    Destroy(verletRope);
+                    state = HookState.Retracted;
+                }
+
                 if (!Input.GetMouseButton(mouseLaunchButton))
                 {
                     /* The hook has been detached */
@@ -150,7 +161,7 @@ public class HookGun : MonoBehaviour
         {
             if (hit.collider != null)
             {
-                if (hit.collider.tag == "Hookable")
+                if (hit.collider.tag == "Hookable" || hit.collider.tag == "BounceBall")
                 {
                     cursorRed = true;
                 }
@@ -174,10 +185,11 @@ public class HookGun : MonoBehaviour
         while (Vector3.Distance(transform.position, hook.transform.position) < maxRopeLength)
         {
             Collider[] colliders = new Collider[1];
-            if (Physics.OverlapSphereNonAlloc(hook.transform.position, 0.1f, colliders) > 0)
+            LayerMask hookableLayerMask = LayerMask.GetMask("HookableLayer");
+            if (Physics.OverlapSphereNonAlloc(hook.transform.position, 0.1f, colliders, hookableLayerMask) > 0)
             {
                 ropeRenderer.enabled = false;
-                if (colliders[0].tag == "Hookable")
+                if (colliders[0].tag == "Hookable" || colliders[0].tag == "BounceBall")
                 {
                     hook.GetComponent<Rigidbody>().isKinematic = true;
                     hook.transform.parent = colliders[0].transform;

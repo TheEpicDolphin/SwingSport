@@ -241,15 +241,18 @@ public class VerletRope : MonoBehaviour
 
     private void DrawRope()
     {
-        ropeNodePositions = new List<Vector3>();
-        ropeNodePositions.Add(start.transform.position);
-        for (int i = 0; i < ropeNodes.Count; i++)
+        if (start != null && end != null)
         {
-            ropeNodePositions.Add(ropeNodes[i].transform.position);
+            ropeNodePositions = new List<Vector3>();
+            ropeNodePositions.Add(start.transform.position);
+            for (int i = 0; i < ropeNodes.Count; i++)
+            {
+                ropeNodePositions.Add(ropeNodes[i].transform.position);
+            }
+            ropeNodePositions.Add(end.transform.position);
+            ropeRenderer.positionCount = ropeNodePositions.Count;
+            ropeRenderer.SetPositions(ropeNodePositions.ToArray());
         }
-        ropeNodePositions.Add(end.transform.position);
-        ropeRenderer.positionCount = ropeNodePositions.Count;
-        ropeRenderer.SetPositions(ropeNodePositions.ToArray());
     }
 
     /* This can be used for increasing the rest length of the rope. For example, increasing distance
