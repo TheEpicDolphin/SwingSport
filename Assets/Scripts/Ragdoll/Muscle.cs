@@ -59,6 +59,9 @@ public class Muscle
         joint.projectionMode = JointProjectionMode.PositionAndRotation;
         joint.enablePreprocessing = false;
 
+        joint.xMotion = ConfigurableJointMotion.Free;
+        joint.yMotion = ConfigurableJointMotion.Free;
+        joint.zMotion = ConfigurableJointMotion.Free;
         joint.angularXMotion = ConfigurableJointMotion.Free;
         joint.angularYMotion = ConfigurableJointMotion.Free;
         joint.angularZMotion = ConfigurableJointMotion.Free;
