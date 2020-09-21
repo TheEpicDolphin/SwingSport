@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class MagnetoGlove : MonoBehaviour
 {
+    FixedJoint ballHolder;
+
     float maxRange = 20.0f;
     float magneticCoeff = 10.0f;
 
@@ -14,7 +16,8 @@ public class MagnetoGlove : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        ballHolder = GetComponent<FixedJoint>();
+        ballHolder.breakForce = 200.0f;
     }
 
     // Update is called once per frame
@@ -25,7 +28,7 @@ public class MagnetoGlove : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if(equipped && PlayerInputManager.Instance.leftMouse)
+        if(equipped && PlayerInputManager.Instance.leftMouse && !ballHolder.connectedBody)
         {
             Collider[] colliders = new Collider[1];
             Physics.OverlapSphereNonAlloc(transform.position, maxRange, colliders, 1 << 10);
@@ -47,4 +50,22 @@ public class MagnetoGlove : MonoBehaviour
             }
         }
     }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        /* Handle when ball is close enough to glove to be grabbed */
+        if (equipped && PlayerInputManager.Instance.leftMouse && 
+            other.tag == "ball")
+        {
+            Rigidbody ballRb = other.GetComponent<Rigidbody>();
+            if (ballRb)
+            {
+                ballRb.isKinematic = true;
+                ballRb.MovePosition(transform.position);
+                ballRb.isKinematic = false;
+                ballHolder.connectedBody = ballRb;
+            }
+        }
+    }
+
 }
