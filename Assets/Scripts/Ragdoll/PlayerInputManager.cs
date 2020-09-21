@@ -11,10 +11,13 @@ public class PlayerInputManager : MonoBehaviour
 
     public float horizontal;
     public float vertical;
-    public bool spacebar;
-    public bool spacebarDown;
     public float mouseXDelta;
     public float mouseYDelta;
+
+    public bool spacebar;
+    public bool spacebarDown;
+    public bool leftMouse;
+    public bool leftMouseDown;
 
 
     private void Awake()
@@ -48,5 +51,8 @@ public class PlayerInputManager : MonoBehaviour
 
         spacebar = Input.GetKey(KeyCode.Space);
         spacebarDown = Input.GetKeyDown(KeyCode.Space);
+
+        leftMouse = Input.GetMouseButton(0);
+        leftMouseDown = Input.GetMouseButtonDown(0);
     }
 }

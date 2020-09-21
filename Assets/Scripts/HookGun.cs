@@ -69,7 +69,7 @@ public class HookGun : MonoBehaviour
         switch (state)
         {
             case HookState.Retracted:
-                if (Input.GetMouseButtonDown(0))
+                if (PlayerInputManager.Instance.leftMouseDown)
                 {
                     /* The hookGun has been fired */
                     Vector3 targetPos;
@@ -101,7 +101,7 @@ public class HookGun : MonoBehaviour
                 break;
             case HookState.Attached:
 
-                if (!Input.GetMouseButton(0))
+                if (!PlayerInputManager.Instance.leftMouse)
                 {
                     /* The hook has been detached */
                     isGrappled = false;

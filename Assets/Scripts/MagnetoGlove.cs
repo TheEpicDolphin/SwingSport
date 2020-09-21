@@ -2,8 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// TODO: make it adhere to IItem interface
 public class MagnetoGlove : MonoBehaviour
 {
+    Transform ballTarget;
+
+    /* Holds the ball in place when it is close enough to hand */
     FixedJoint ballHolder;
 
     float maxRange = 20.0f;
@@ -13,9 +17,12 @@ public class MagnetoGlove : MonoBehaviour
      * is perpendicular to the direction from the glove to the ball*/
     float magneticBallDrag = 5.0f;
 
-    // Start is called before the first frame update
-    void Start()
+    bool equipped = true;
+
+    private void Awake()
     {
+        ballTarget = transform.GetChild(0);
+
         ballHolder = GetComponent<FixedJoint>();
         ballHolder.breakForce = 200.0f;
     }
@@ -28,16 +35,17 @@ public class MagnetoGlove : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if(equipped && PlayerInputManager.Instance.leftMouse && !ballHolder.connectedBody)
+        if(equipped && PlayerInputManager.Instance.leftMouse && 
+            !ballHolder.connectedBody)
         {
             Collider[] colliders = new Collider[1];
-            Physics.OverlapSphereNonAlloc(transform.position, maxRange, colliders, 1 << 10);
+            Physics.OverlapSphereNonAlloc(ballTarget.position, maxRange, colliders, 1 << 10);
             if (colliders[0])
             {
                 /* The ball only feels a force when within maxRange distance
                  * of glove */
                 Rigidbody ballRb = colliders[0].GetComponent<Rigidbody>();
-                Vector3 r = ballRb.transform.position - transform.position;
+                Vector3 r = ballRb.transform.position - ballTarget.position;
                 /* If ball is within 0.5f of glove, we do not increase
                  * magnetic field any further*/
                 float rMag = Mathf.Max(r.magnitude, 0.5f);
@@ -61,7 +69,7 @@ public class MagnetoGlove : MonoBehaviour
             if (ballRb)
             {
                 ballRb.isKinematic = true;
-                ballRb.MovePosition(transform.position);
+                ballRb.MovePosition(ballTarget.position);
                 ballRb.isKinematic = false;
                 ballHolder.connectedBody = ballRb;
             }
