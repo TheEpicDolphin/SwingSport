@@ -5,6 +5,8 @@ using UnityEngine;
 // TODO: make it adhere to IItem interface
 public class MagnetoGlove : MonoBehaviour
 {
+    public float ballRadius = 2.0f;
+
     Transform ballTarget;
 
     /* Holds the ball in place when it is close enough to hand */
@@ -12,7 +14,6 @@ public class MagnetoGlove : MonoBehaviour
 
     float maxRange = 20.0f;
     float magneticCoeff = 10.0f;
-
     /* This drag is performed against the ball's velocity component that 
      * is perpendicular to the direction from the glove to the ball*/
     float magneticBallDrag = 5.0f;
@@ -21,7 +22,11 @@ public class MagnetoGlove : MonoBehaviour
 
     private void Awake()
     {
-        ballTarget = transform.GetChild(0);
+        GameObject ballTargetGO = new GameObject();
+        ballTarget = ballTargetGO.transform;
+        ballTarget.parent = transform;
+        ballTarget.position = transform.position + ballRadius * transform.forward;
+        ballTarget.rotation = Quaternion.identity;
 
         ballHolder = GetComponent<FixedJoint>();
         ballHolder.breakForce = 200.0f;
@@ -74,6 +79,11 @@ public class MagnetoGlove : MonoBehaviour
                 ballHolder.connectedBody = ballRb;
             }
         }
+    }
+
+    private void OnDestroy()
+    {
+        Destroy(ballTarget.gameObject);
     }
 
 }
