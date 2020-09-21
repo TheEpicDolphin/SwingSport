@@ -14,6 +14,9 @@ public class VerletRope : MonoBehaviour
     public GameObject start;
     public GameObject end;
 
+    public float springConstant = 500.0f;
+    public float damper = 0.0f;
+
     Vector3 ropeTension = Vector3.zero;
 
     private void Awake()
@@ -27,7 +30,7 @@ public class VerletRope : MonoBehaviour
         //BuildRope(s, e, 3);
     }
 
-    public void BuildRope(GameObject start, GameObject end, int numSegments, float maxRestLength, Material ropeMat)
+    public void BuildRope(GameObject start, GameObject end, int numSegments, float maxRestLength, Material ropeMat, float springConstant, float damper)
     {
         this.start = start;
         this.end = end;
@@ -46,6 +49,9 @@ public class VerletRope : MonoBehaviour
         }
         this.maxRestLength = maxRestLength;
         ropeRenderer.material = ropeMat;
+
+        this.springConstant = springConstant;
+        this.damper = damper;
     }
 
     // Update is called once per frame
@@ -97,13 +103,9 @@ public class VerletRope : MonoBehaviour
                 {
                     /* We only apply a restoring force when the length between the start and end
                        is greater than the rest length of the rope. Ropes only pull you, never push you */
-                    float k = 500.0f;
-                    /* Critically damped */
-                    //float b = Mathf.Sqrt(4 * startRb.mass * k);
-                    float b = Mathf.Sqrt(4 * 50.0f * k);
                     /* Treating rope like a spring */
-                    ropeTension = -k * (restLength * startToEndDirection - startToEndVector)
-                                        + b * (Vector3.zero - Vector3.Project(startRb.velocity, startToEndDirection));
+                    ropeTension = -springConstant * (restLength * startToEndDirection - startToEndVector)
+                                        + damper * (Vector3.zero - Vector3.Project(startRb.velocity, startToEndDirection));
                     startRb.AddForce(ropeTension);
                 }
             }
@@ -116,12 +118,9 @@ public class VerletRope : MonoBehaviour
                 {
                     /* We only apply a restoring force when the length between the start and end
                        is greater than the rest length of the rope. Ropes only pull you, never push you */
-                    float k = 500.0f;
-                    /* Critically damped */
-                    float b = Mathf.Sqrt(4 * endRb.mass * k);
                     /* Treating rope like a spring */
-                    ropeTension = -k * (restLength * startToEndDirection - startToEndVector)
-                                        + b * (Vector3.zero - Vector3.Project(endRb.velocity, startToEndDirection));
+                    ropeTension = -springConstant * (restLength * startToEndDirection - startToEndVector)
+                                        + damper * (Vector3.zero - Vector3.Project(endRb.velocity, startToEndDirection));
                     endRb.AddForce(-ropeTension);
                 }
             }

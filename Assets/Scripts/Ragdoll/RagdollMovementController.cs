@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class RagdollMovementController : MonoBehaviour
 {
-    Rigidbody rb;
+    ActiveRagdoll activeRagdoll;
 
     /* Transform of camera following player */
     public Transform cameraTrans;
@@ -31,7 +31,7 @@ public class RagdollMovementController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        rb = GetComponent<Rigidbody>();
+        activeRagdoll = GetComponent<ActiveRagdoll>();
         confJoint = GetComponent<ConfigurableJoint>();
 
         if (handR)
@@ -62,13 +62,13 @@ public class RagdollMovementController : MonoBehaviour
             /* Player is on the ground */
             Vector3 vDesired = movementSpeed * movement.normalized;
             float k = (1 / Time.fixedDeltaTime) * 0.4f;
-            Vector3 f = k * (vDesired - rb.velocity);
-            rb.AddForce(f, ForceMode.Acceleration);
+            Vector3 a = k * (vDesired - activeRagdoll.Velocity);
+            activeRagdoll.AddAcceleration(a);
 
             if (PlayerInputManager.Instance.spacebarDown)
             {
                 /* jump */
-                rb.AddForce(300.0f * Vector3.up, ForceMode.Impulse);
+                activeRagdoll.AddVelocityChange(10.0f * Vector3.up);
             }
         }
         else
@@ -77,16 +77,16 @@ public class RagdollMovementController : MonoBehaviour
             if (PlayerInputManager.Instance.spacebar)
             {
                 /* Propels player upwards */
-                rb.AddForce(-11.0f * Physics.gravity, ForceMode.Acceleration);
+                activeRagdoll.AddAcceleration(-1.1f * Physics.gravity);
             }
             /* Propels player left, right, forwards, and backwards */
-            rb.AddForce(100.0f * movement.normalized, ForceMode.Acceleration);
+            activeRagdoll.AddAcceleration(10.0f * movement.normalized);
         }
         /* Rotating character is done in RagdollAnimController */
         //Vector3 turningTorque = 100.0f * Vector3.Cross(transform.forward, cameraTrans.forward);
         //rb.AddTorque(turningTorque, ForceMode.Acceleration);
 
         /* Rotates player to face in direction of camera */
-        confJoint.targetRotation = Quaternion.Inverse(Camera.main.transform.rotation);
+        activeRagdoll.MatchRotation(Camera.main.transform.rotation);
     }
 }

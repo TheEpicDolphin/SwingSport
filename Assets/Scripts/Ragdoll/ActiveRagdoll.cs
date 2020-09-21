@@ -2,10 +2,21 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RagdollAnimController : MonoBehaviour
+public class ActiveRagdoll : MonoBehaviour
 {
     Transform animatedTargetRigHip;
+    Rigidbody hipRb;
+    ConfigurableJoint hipConfJoint;
     public bool useGravity = true;
+
+    public Vector3 Velocity
+    {
+        get
+        {
+            return hipRb.velocity;
+        }
+    }
+
     float totalMass = 50.0f;
     float boneMass;
 
@@ -19,9 +30,7 @@ public class RagdollAnimController : MonoBehaviour
         animatedTargetRigHip.parent = transform.parent;
 
         /* Set hip configurable joint */
-        ConfigurableJoint hipConfJoint = ragdollRigHip.gameObject.AddComponent<ConfigurableJoint>();
-        //hipConfJoint.connectedBody = rb;
-        //hipConfJoint.anchor = Vector3.zero;
+        hipConfJoint = ragdollRigHip.gameObject.AddComponent<ConfigurableJoint>();
 
         hipConfJoint.projectionMode = JointProjectionMode.PositionAndRotation;
         hipConfJoint.enablePreprocessing = false;
@@ -38,16 +47,10 @@ public class RagdollAnimController : MonoBehaviour
         hipJointAngularDrive.positionDamper = 100.0f;
         hipJointAngularDrive.maximumForce = float.MaxValue;
 
-        JointDrive hipJointLinearDrive = new JointDrive();
-        hipJointLinearDrive.positionSpring = 10000.0f;
-        hipJointLinearDrive.positionDamper = 100.0f;
-        hipJointLinearDrive.maximumForce = float.MaxValue;
-
-        //hipConfJoint.xDrive = hipJointLinearDrive;
-        //hipConfJoint.yDrive = hipJointLinearDrive;
-        //hipConfJoint.zDrive = hipJointLinearDrive;
         hipConfJoint.angularXDrive = hipJointAngularDrive;
         hipConfJoint.angularYZDrive = hipJointAngularDrive;
+
+        hipRb = GetComponent<Rigidbody>();
     }
 
     // Update is called once per frame
@@ -110,11 +113,6 @@ public class RagdollAnimController : MonoBehaviour
             drive.positionDamper = 100.0f;
             drive.maximumForce = float.MaxValue;
 
-            // This changes everything
-            //confJoint.xDrive = drive;
-            //confJoint.yDrive = drive;
-            //confJoint.zDrive = drive;
-
             confJoint.angularXDrive = drive;
             confJoint.angularYZDrive = drive;
             confJoint.targetAngularVelocity = Vector3.zero;
@@ -163,5 +161,20 @@ public class RagdollAnimController : MonoBehaviour
             confJoint.targetRotation = animeBoneChild.localRotation;
             MatchRagdollToAnimatedRig(ragdollBoneChild, animeBoneChild);
         }
+    }
+
+    public void AddAcceleration(Vector3 acceleration)
+    {
+        hipRb.AddForce(totalMass * acceleration, ForceMode.Force);
+    }
+
+    public void AddVelocityChange(Vector3 velocityChange)
+    {
+        hipRb.AddForce(totalMass * velocityChange, ForceMode.Impulse);
+    }
+
+    public void MatchRotation(Quaternion targetRotation)
+    {
+        hipConfJoint.targetRotation = Quaternion.Inverse(targetRotation);
     }
 }

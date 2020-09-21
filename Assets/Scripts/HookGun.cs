@@ -174,7 +174,10 @@ public class HookGun : MonoBehaviour
                     isGrappled = true;
                     GameObject verletRopeGO = new GameObject();
                     verletRope = verletRopeGO.AddComponent<VerletRope>();
-                    verletRope.BuildRope(this.gameObject, hook.gameObject, 6, maxRopeLength, ropeMaterial);
+                    float springConstant = 500.0f;
+                    /* Critically damped spring */
+                    float damper = Mathf.Sqrt(4 * 50.0f * springConstant);
+                    verletRope.BuildRope(this.gameObject, hook.gameObject, 6, maxRopeLength, ropeMaterial, springConstant, damper);
                     state = HookState.Attached;
                 }
                 else
