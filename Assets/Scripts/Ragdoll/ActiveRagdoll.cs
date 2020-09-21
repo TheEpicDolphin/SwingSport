@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class ActiveRagdoll : MonoBehaviour
 {
+    List<Muscle> ragdollMuscles = new List<Muscle>();
+
     Transform animatedTargetRigHip;
     Rigidbody hipRb;
     ConfigurableJoint hipConfJoint;
@@ -22,121 +24,43 @@ public class ActiveRagdoll : MonoBehaviour
 
     private void Awake()
     {
-        Transform ragdollRigHip = transform;
-        boneMass = totalMass / CountBones(ragdollRigHip);
-
-        ConvertRigToRagdoll(ragdollRigHip);
-        animatedTargetRigHip = CreateAnimationTargetRig(ragdollRigHip);
+        animatedTargetRigHip = CreateAnimatedTargetRig(transform);
         animatedTargetRigHip.parent = transform.parent;
 
-        /* Set hip configurable joint */
-        hipConfJoint = ragdollRigHip.gameObject.AddComponent<ConfigurableJoint>();
+        boneMass = totalMass / CountBones(transform);
 
-        hipConfJoint.projectionMode = JointProjectionMode.PositionAndRotation;
-        hipConfJoint.enablePreprocessing = false;
-
-        hipConfJoint.xMotion = ConfigurableJointMotion.Free;
-        hipConfJoint.yMotion = ConfigurableJointMotion.Free;
-        hipConfJoint.zMotion = ConfigurableJointMotion.Free;
-        hipConfJoint.angularXMotion = ConfigurableJointMotion.Free;
-        hipConfJoint.angularYMotion = ConfigurableJointMotion.Free;
-        hipConfJoint.angularZMotion = ConfigurableJointMotion.Free;
-
-        JointDrive hipJointAngularDrive = new JointDrive();
-        hipJointAngularDrive.positionSpring = 10000.0f;
-        hipJointAngularDrive.positionDamper = 100.0f;
-        hipJointAngularDrive.maximumForce = float.MaxValue;
-
-        hipConfJoint.angularXDrive = hipJointAngularDrive;
-        hipConfJoint.angularYZDrive = hipJointAngularDrive;
+        CreateAndConnectMuscles(transform, animatedTargetRigHip);
 
         hipRb = GetComponent<Rigidbody>();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
+        hipConfJoint = gameObject.GetComponent<ConfigurableJoint>();
     }
 
     private void LateUpdate()
     {
-        MatchRagdollToAnimatedRig(transform, animatedTargetRigHip);
+        MatchRagdollToAnimatedRig();
     }
 
     int CountBones(Transform bone)
     {
         int count = 1;
-        for(int i = 0; i < bone.childCount; i++)
+        for (int i = 0; i < bone.childCount; i++)
         {
             count += CountBones(bone.GetChild(i));
         }
         return count;
     }
 
-    void ConvertRigToRagdoll(Transform bone)
+    List<Transform> FlattenedBoneHeirarchy(Transform bone)
     {
-        Rigidbody boneRb = bone.GetComponent<Rigidbody>();
-        if (!boneRb)
+        List<Transform> flattened = new List<Transform>() { bone };
+        for(int i = 0; i < bone.childCount; i++)
         {
-            boneRb = bone.gameObject.AddComponent<Rigidbody>();
+            flattened.AddRange(FlattenedBoneHeirarchy(bone.GetChild(i)));
         }
-        boneRb.mass = boneMass;
-        boneRb.drag = 0.0f;
-        boneRb.angularDrag = 0.0f;
-        boneRb.useGravity = useGravity;
-        for (int i = 0; i < bone.childCount; i++)
-        {
-            Transform child = bone.GetChild(i);
-            ConvertRigToRagdoll(child);
-            ConfigurableJoint confJoint = child.GetComponent<ConfigurableJoint>();
-            if (!confJoint)
-            {
-                confJoint = child.gameObject.AddComponent<ConfigurableJoint>();
-            }
-            
-            confJoint.connectedBody = boneRb;
-            confJoint.anchor = Vector3.zero;
-
-            confJoint.projectionMode = JointProjectionMode.PositionAndRotation;
-            confJoint.enablePreprocessing = false;
-            
-            confJoint.xMotion = ConfigurableJointMotion.Locked;
-            confJoint.yMotion = ConfigurableJointMotion.Locked;
-            confJoint.zMotion = ConfigurableJointMotion.Locked;
-            confJoint.angularXMotion = ConfigurableJointMotion.Free;
-            confJoint.angularYMotion = ConfigurableJointMotion.Free;
-            confJoint.angularZMotion = ConfigurableJointMotion.Free;
-            
-            JointDrive drive = new JointDrive();
-            drive.positionSpring = 10000.0f;
-            drive.positionDamper = 100.0f;
-            drive.maximumForce = float.MaxValue;
-
-            confJoint.angularXDrive = drive;
-            confJoint.angularYZDrive = drive;
-            confJoint.targetAngularVelocity = Vector3.zero;
-
-            SoftJointLimit lowAngXLim = confJoint.lowAngularXLimit;
-            lowAngXLim.limit = -120.0f;
-            SoftJointLimit highAngXLim = confJoint.highAngularXLimit;
-            highAngXLim.limit = 120.0f;
-            confJoint.lowAngularXLimit = lowAngXLim;
-            confJoint.highAngularXLimit = highAngXLim;
-
-            SoftJointLimit angYLim = confJoint.angularYLimit;
-            angYLim.limit = 120.0f;
-            confJoint.angularYLimit = angYLim;
-
-            SoftJointLimit angZLim = confJoint.angularZLimit;
-            angZLim.limit = 120.0f;
-            confJoint.angularZLimit = angZLim;
-            
-        }
+        return flattened;
     }
 
-
-    Transform CreateAnimationTargetRig(Transform bone)
+    Transform CreateAnimatedTargetRig(Transform bone)
     {
         GameObject animBoneGO = new GameObject();
         Transform animBone = animBoneGO.transform;
@@ -145,21 +69,41 @@ public class ActiveRagdoll : MonoBehaviour
         for (int i = 0; i < bone.childCount; i++)
         {
             Transform child = bone.GetChild(i);
-            Transform childAnimBone = CreateAnimationTargetRig(child);
+            Transform childAnimBone = CreateAnimatedTargetRig(child);
             childAnimBone.parent = animBone;
         }
         return animBone;
     }
 
-    void MatchRagdollToAnimatedRig(Transform ragdollBone, Transform animBone)
+    Muscle CreateAndConnectMuscles(Transform ragdollBone, Transform animBone)
     {
-        for (int i = 0; i < animBone.childCount; i++)
+        Rigidbody boneRb = ragdollBone.GetComponent<Rigidbody>();
+        if (!boneRb)
         {
-            Transform ragdollBoneChild = ragdollBone.GetChild(i);
-            Transform animeBoneChild = animBone.GetChild(i);
-            ConfigurableJoint confJoint = ragdollBoneChild.GetComponent<ConfigurableJoint>();
-            confJoint.targetRotation = animeBoneChild.localRotation;
-            MatchRagdollToAnimatedRig(ragdollBoneChild, animeBoneChild);
+            boneRb = ragdollBone.gameObject.AddComponent<Rigidbody>();
+        }
+        boneRb.mass = boneMass;
+        boneRb.drag = 0.0f;
+        boneRb.angularDrag = 0.0f;
+        boneRb.useGravity = useGravity;
+
+        Muscle muscle = new Muscle(boneRb, animBone);
+        for (int i = 0; i < ragdollBone.childCount; i++)
+        {
+            Transform childRagdollBone = ragdollBone.GetChild(i);
+            Transform childAnimBone = animBone.GetChild(i);
+            Muscle childMuscle = CreateAndConnectMuscles(childRagdollBone, childAnimBone);
+            childMuscle.SetParent(muscle);
+        }
+        this.ragdollMuscles.Add(muscle);
+        return muscle;
+    }
+
+    void MatchRagdollToAnimatedRig()
+    {
+        foreach(Muscle muscle in ragdollMuscles)
+        {
+            muscle.MatchAnimationTarget();
         }
     }
 
