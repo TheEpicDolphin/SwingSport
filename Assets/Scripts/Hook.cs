@@ -5,11 +5,10 @@ using System;
 
 public class Hook : MonoBehaviour
 {
-    Rigidbody rb;
 
     private void Awake()
     {
-        rb = GetComponent<Rigidbody>();
+
     }
 
     // Start is called before the first frame update

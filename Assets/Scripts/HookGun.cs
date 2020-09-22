@@ -39,6 +39,18 @@ public class HookGun : MonoBehaviour
 
     public Material ropeMaterial;
 
+    private int mouseLaunchButton;
+
+    public void setControls(int mouseLaunchButton)
+    {
+        this.mouseLaunchButton = mouseLaunchButton;
+    }
+
+    public void setColor(Color c)
+    {
+        ropeMaterial.color = c;
+    }
+
     private void Awake()
     {
         state = HookState.Retracted;
@@ -46,7 +58,7 @@ public class HookGun : MonoBehaviour
         playerRb = GetComponentInParent<Rigidbody>();
 
         ropeMaterial = new Material(Shader.Find("Unlit/Color"));
-        ropeMaterial.color = Color.red;
+        
 
         ropeRenderer = gameObject.AddComponent<LineRenderer>();
         ropeRenderer.material = ropeMaterial;
@@ -68,7 +80,7 @@ public class HookGun : MonoBehaviour
         switch (state)
         {
             case HookState.Retracted:
-                if (Input.GetMouseButtonDown(0))
+                if (Input.GetMouseButtonDown(mouseLaunchButton))
                 {
                     /* The hookGun has been fired */
                     Vector3 targetPos;
@@ -100,7 +112,18 @@ public class HookGun : MonoBehaviour
                 break;
             case HookState.Attached:
 
-                if (!Input.GetMouseButton(0))
+                // check to make sure that the hook hasn't been deleted (as is the case
+                // when the player grabs a ball and pulls it within grabbing distance)
+                if (hook == null)
+                {
+                    // if the hook was deleted, treat it as if the hook is retracted
+                    /* The hook has been detached */
+                    isGrappled = false;
+                    Destroy(verletRope);
+                    state = HookState.Retracted;
+                }
+
+                if (!Input.GetMouseButton(mouseLaunchButton))
                 {
                     /* The hook has been detached */
                     isGrappled = false;
@@ -138,7 +161,7 @@ public class HookGun : MonoBehaviour
         {
             if (hit.collider != null)
             {
-                if (hit.collider.tag == "Hookable")
+                if (hit.collider.tag == "Hookable" || hit.collider.tag == "BounceBall")
                 {
                     cursorRed = true;
                 }
@@ -162,10 +185,11 @@ public class HookGun : MonoBehaviour
         while (Vector3.Distance(transform.position, hook.transform.position) < maxRopeLength)
         {
             Collider[] colliders = new Collider[1];
-            if (Physics.OverlapSphereNonAlloc(hook.transform.position, 0.1f, colliders) > 0)
+            LayerMask hookableLayerMask = LayerMask.GetMask("HookableLayer");
+            if (Physics.OverlapSphereNonAlloc(hook.transform.position, 0.1f, colliders, hookableLayerMask) > 0)
             {
                 ropeRenderer.enabled = false;
-                if (colliders[0].tag == "Hookable")
+                if (colliders[0].tag == "Hookable" || colliders[0].tag == "BounceBall")
                 {
                     hook.GetComponent<Rigidbody>().isKinematic = true;
                     hook.transform.parent = colliders[0].transform;

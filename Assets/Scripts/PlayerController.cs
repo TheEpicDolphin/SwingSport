@@ -9,7 +9,8 @@ public class PlayerController : MonoBehaviour
     Rigidbody rb;
     Transform view;
     Transform camTarget;
-    Transform hand;
+    Transform wallHookHand;
+    Transform ballHookHand;
     Transform character;
     public Transform mainCamera;
 
@@ -48,14 +49,25 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         view = transform.Find("View");
         character = transform.Find("Character");
-        hand = character.Find("Hand");
+        wallHookHand = character.Find("WallHookHand");
+        ballHookHand = character.Find("BallHookHand");
         camTarget = view.GetChild(0);
 
-        //Instantiate hook gun in player's hand
-        GameObject hookGunGO = (GameObject) Instantiate(Resources.Load("Prefabs/HookGun"), hand.position, hand.rotation, hand);
-        HookGun hookGun = hookGunGO.GetComponent<HookGun>();
-        hookGun.camWobbleDelegate = mainCamera.GetComponent<CameraController>().AddWobble;
-        hookGun.cursor.cursorImage = cursorImage;
+        //Instantiate wall hook gun in player's wall hook hand
+        GameObject wallHookGunGO = (GameObject) Instantiate(Resources.Load("Prefabs/HookGun"), wallHookHand.position, wallHookHand.rotation, wallHookHand);
+        HookGun wallHookGun = wallHookGunGO.GetComponent<HookGun>();
+        wallHookGun.setControls(1);
+        wallHookGun.setColor(Color.red);
+        wallHookGun.camWobbleDelegate = mainCamera.GetComponent<CameraController>().AddWobble;
+        wallHookGun.cursor.cursorImage = cursorImage;
+
+        //Instantiate ball hook gun in player's ball hook hand
+        GameObject ballHookGunGO = (GameObject)Instantiate(Resources.Load("Prefabs/HookGun"), ballHookHand.position, ballHookHand.rotation, ballHookHand);
+        HookGun ballHookGun = ballHookGunGO.GetComponent<HookGun>();
+        ballHookGun.camWobbleDelegate = mainCamera.GetComponent<CameraController>().AddWobble;
+        ballHookGun.setControls(0);
+        ballHookGun.setColor(Color.blue);
+        ballHookGun.cursor.cursorImage = cursorImage;
     }
 
     // Update is called once per frame
