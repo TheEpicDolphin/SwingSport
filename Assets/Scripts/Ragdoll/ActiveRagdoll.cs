@@ -17,6 +17,10 @@ public class ActiveRagdoll : MonoBehaviour
         {
             return hipRb.velocity;
         }
+        set
+        {
+            hipRb.velocity = value;
+        }
     }
 
     float totalMass = 50.0f;

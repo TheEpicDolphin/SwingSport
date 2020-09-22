@@ -38,10 +38,10 @@ public class RagdollMovementController : MonoBehaviour
 
         if (handR)
         {
-            //Instantiate hook gun in player's hand
-            GameObject hookGunGO = (GameObject)Instantiate(Resources.Load("Prefabs/HookGun"),
-                handR.position + 0.15f * handR.transform.forward, handR.rotation, handR);
+            GameObject hookGunGO = (GameObject)Instantiate(Resources.Load("Prefabs/HookGun"));
             HookGun hookGun = hookGunGO.GetComponent<HookGun>();
+            hookGun.AttachTo(handR, handR.position + 0.25f * handR.transform.forward,
+                            handR.rotation, false);
             //hookGun.camWobbleDelegate = mainCamera.GetComponent<CameraController>().AddWobble;
             hookGun.cursor.cursorImage = cursorImage;
         }

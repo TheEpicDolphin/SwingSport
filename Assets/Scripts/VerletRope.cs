@@ -14,10 +14,11 @@ public class VerletRope : MonoBehaviour
     public GameObject start;
     public GameObject end;
 
+    Rigidbody startLoad;
+    Rigidbody endLoad;
+
     public float springConstant = 500.0f;
     public float damper = 0.0f;
-
-    Vector3 ropeTension = Vector3.zero;
 
     private void Awake()
     {
@@ -52,6 +53,19 @@ public class VerletRope : MonoBehaviour
 
         this.springConstant = springConstant;
         this.damper = damper;
+
+        startLoad = GetNonKinematicRigidbodyInParent(start.transform);
+        endLoad = GetNonKinematicRigidbodyInParent(end.transform);
+    }
+
+    Rigidbody GetNonKinematicRigidbodyInParent(Transform trans)
+    {
+        Rigidbody currentRb = trans.GetComponent<Rigidbody>();
+        while (currentRb && currentRb.isKinematic)
+        {
+            currentRb = currentRb.transform.parent.GetComponent<Rigidbody>();
+        }
+        return currentRb;
     }
 
     // Update is called once per frame
@@ -78,23 +92,16 @@ public class VerletRope : MonoBehaviour
 
         if(start && end)
         {
-            /* Get rigidbodies that belongs to the ancestors of start and end. The rope will apply
-               forces to these rigidbodies, if they exist */
-            Rigidbody startRb = start.GetComponentInParent<Rigidbody>();
-            //Rigidbody endRb = end.GetComponentInParent<Rigidbody>();
-            /* I set this to null for now because none of the blocks have rigidbodies */
-            Rigidbody endRb = null;
-
             Vector3 startToEndVector = end.transform.position - start.transform.position;
             Vector3 startToEndDirection = startToEndVector.normalized;
 
-            if (startRb && endRb)
+            Vector3 ropeTension = Vector3.zero;
+            if (startLoad && endLoad)
             {
                 // TODO: If both start and end are attached to rigidbodies, we will have to go back
                 // to college classical mechanics to model this 2-mass spring system
-                ropeTension = Vector3.zero;
             }
-            else if (startRb)
+            else if (startLoad)
             {
                 /* endRb is null. This means that end does not have a rigidbody on any of its 
                    ancestors. We treat it as though it has infinite mass */
@@ -105,11 +112,11 @@ public class VerletRope : MonoBehaviour
                        is greater than the rest length of the rope. Ropes only pull you, never push you */
                     /* Treating rope like a spring */
                     ropeTension = -springConstant * (restLength * startToEndDirection - startToEndVector)
-                                        + damper * (Vector3.zero - Vector3.Project(startRb.velocity, startToEndDirection));
-                    startRb.AddForce(ropeTension);
+                                        + damper * (Vector3.zero - Vector3.Project(startLoad.velocity, startToEndDirection));
+                    startLoad.AddForceAtPosition(ropeTension, start.transform.position);
                 }
             }
-            else if (endRb)
+            else if (endLoad)
             {
                 /* startRb is null. This means that end does not have a rigidbody on any of its 
                    ancestors. We treat it as though it has infinite mass */
@@ -120,8 +127,8 @@ public class VerletRope : MonoBehaviour
                        is greater than the rest length of the rope. Ropes only pull you, never push you */
                     /* Treating rope like a spring */
                     ropeTension = -springConstant * (restLength * startToEndDirection - startToEndVector)
-                                        + damper * (Vector3.zero - Vector3.Project(endRb.velocity, startToEndDirection));
-                    endRb.AddForce(-ropeTension);
+                                        + damper * (Vector3.zero - Vector3.Project(endLoad.velocity, startToEndDirection));
+                    endLoad.AddForceAtPosition(-ropeTension, end.transform.position);
                 }
             }
         }

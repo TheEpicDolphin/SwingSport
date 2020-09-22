@@ -19,7 +19,9 @@ public class HookGun : MonoBehaviour
 
     Hook hook;
 
-    Rigidbody playerRb;
+    Rigidbody hookGunRb;
+
+    FixedJoint attachJoint;
 
     bool isGrappled = false;
 
@@ -43,7 +45,6 @@ public class HookGun : MonoBehaviour
     {
         state = HookState.Retracted;
         hookSlot = transform.Find("HookSlot");
-        playerRb = GetComponentInParent<Rigidbody>();
 
         ropeMaterial = new Material(Shader.Find("Unlit/Color"));
         ropeMaterial.color = Color.red;
@@ -55,6 +56,8 @@ public class HookGun : MonoBehaviour
 
         cursor = new HookGunCursor();
 
+        hookGunRb = GetComponent<Rigidbody>();
+        hookGunRb.isKinematic = false;
     }
     // Start is called before the first frame update
     void Start()
@@ -114,7 +117,7 @@ public class HookGun : MonoBehaviour
                 else if (Input.GetKey(KeyCode.LeftShift))
                 {
                     /* Reduce rope length so that player zooms to hook point*/
-                    camWobbleDelegate?.Invoke(Mathf.Max(Mathf.Min(playerRb.velocity.magnitude, 90.0f) - 30.0f, 0.0f) / 60.0f);
+                    camWobbleDelegate?.Invoke(Mathf.Max(Mathf.Min(hookGunRb.velocity.magnitude, 90.0f) - 30.0f, 0.0f) / 60.0f);
                     verletRope.DecreaseRestLength(hookZoomRateMultiplier * Time.fixedDeltaTime);
                 }
                 else if (Input.GetKey("q"))
@@ -217,6 +220,25 @@ public class HookGun : MonoBehaviour
         ropeRenderer.enabled = false;
         state = HookState.Retracted;
         yield return null;
+    }
+
+    public void AttachTo(Transform parent, Vector3 position, Quaternion rotation, bool usePhysics)
+    {
+        transform.position = position;
+        transform.rotation = rotation;
+        if (usePhysics)
+        {
+            hookGunRb.isKinematic = false;
+            Rigidbody parentRb = parent.GetComponent<Rigidbody>();
+            attachJoint = gameObject.AddComponent<FixedJoint>();
+            attachJoint.connectedBody = parentRb;
+            attachJoint.breakForce = float.PositiveInfinity;
+        }
+        else
+        {
+            hookGunRb.isKinematic = true;
+        }
+        transform.parent = parent;
     }
 
 }
