@@ -16,8 +16,10 @@ public class PlayerInputManager : MonoBehaviour
 
     public bool spacebar;
     public bool spacebarDown;
+    public bool leftCTRL;
     public bool leftMouse;
     public bool leftMouseDown;
+    
 
 
     private void Awake()
@@ -54,5 +56,7 @@ public class PlayerInputManager : MonoBehaviour
 
         leftMouse = Input.GetMouseButton(0);
         leftMouseDown = Input.GetMouseButtonDown(0);
+
+        leftCTRL = Input.GetKey(KeyCode.LeftControl);
     }
 }

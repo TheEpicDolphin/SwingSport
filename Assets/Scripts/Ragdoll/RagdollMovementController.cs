@@ -28,6 +28,8 @@ public class RagdollMovementController : MonoBehaviour
 
     public Transform handR;
 
+    public Transform handL;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -42,6 +44,11 @@ public class RagdollMovementController : MonoBehaviour
             HookGun hookGun = hookGunGO.GetComponent<HookGun>();
             //hookGun.camWobbleDelegate = mainCamera.GetComponent<CameraController>().AddWobble;
             hookGun.cursor.cursorImage = cursorImage;
+        }
+
+        if (handL)
+        {
+            handL.gameObject.AddComponent<MagnetoGlove>();
         }
         
     }

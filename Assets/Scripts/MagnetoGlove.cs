@@ -50,7 +50,7 @@ public class MagnetoGlove : MonoBehaviour
         //}
 
         // TODO: check if ball is in player's inventory.
-        if(equipped && PlayerInputManager.Instance.leftMouse && !ballHolder)
+        if(equipped && PlayerInputManager.Instance.leftCTRL && !ballHolder)
         {
             Collider[] colliders = new Collider[1];
             Physics.OverlapSphereNonAlloc(ballTarget.position, maxRange, colliders, 1 << 10);
