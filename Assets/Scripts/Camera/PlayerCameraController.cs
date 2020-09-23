@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RagdollCameraController : MonoBehaviour
+public class PlayerCameraController : MonoBehaviour
 {
 
     /* mouse position on screen */

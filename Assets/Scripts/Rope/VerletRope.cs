@@ -107,9 +107,9 @@ public class VerletRope : MonoBehaviour
                 {
                     /* We only apply a restoring force when the length between the start and end
                        is greater than the rest length of the rope. Ropes only pull you, never push you */
-                    ropeTension = -springConstant * (restLength * startToEndDirection - startToEndVector)
+                    ropeTension = springConstant * (restLength * startToEndDirection - startToEndVector)
                                         + damper * (Vector3.zero - Vector3.Project(endLoad.velocity, startToEndDirection));
-                    endLoad.AddForce(-ropeTension);
+                    endLoad.AddForce(ropeTension);
                 }
             }
             else if (startLoad)
@@ -137,9 +137,9 @@ public class VerletRope : MonoBehaviour
                     /* We only apply a restoring force when the length between the start and end
                        is greater than the rest length of the rope. Ropes only pull you, never push you */
                     /* Treating rope like a spring */
-                    ropeTension = -springConstant * (restLength * startToEndDirection - startToEndVector)
+                    ropeTension = springConstant * (restLength * startToEndDirection - startToEndVector)
                                         + damper * (Vector3.zero - Vector3.Project(endLoad.velocity, startToEndDirection));
-                    endLoad.AddForceAtPosition(-ropeTension, end.transform.position);
+                    endLoad.AddForceAtPosition(ropeTension, end.transform.position);
                 }
             }
         }

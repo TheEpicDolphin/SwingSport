@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class RagdollMovementController : MonoBehaviour
+public class PlayerMovementController : MonoBehaviour
 {
     ActiveRagdoll activeRagdoll;
 
@@ -58,7 +58,7 @@ public class RagdollMovementController : MonoBehaviour
     private void FixedUpdate()
     {
         /* Checks if player is on the ground. Consider doing a spherecast for more accuracy */
-        isGrounded = Physics.Raycast(transform.position, Vector3.down, 1.3f, ~(1 << 11));
+        isGrounded = Physics.Raycast(transform.position, Vector3.down, 1.3f, ~(1 << 10));
 
         /* Handles movement based on camera direction */
         float moveHorizontal = PlayerInputManager.Instance.horizontal;

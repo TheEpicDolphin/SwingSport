@@ -52,8 +52,8 @@ public class MagnetoGlove : MonoBehaviour
         if(equipped && PlayerInputManager.Instance.leftCTRL && !ballHolder)
         {
             Collider[] colliders = new Collider[1];
-            Physics.OverlapSphereNonAlloc(ballTarget.position, maxRange, colliders, 1 << 10);
-            if (colliders[0])
+            Physics.OverlapSphereNonAlloc(ballTarget.position, maxRange, colliders);
+            if (colliders[0].tag == "BounceBall")
             {
                 Rigidbody ballRb = colliders[0].GetComponent<Rigidbody>();
 
