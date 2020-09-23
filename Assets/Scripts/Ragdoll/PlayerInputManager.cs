@@ -17,7 +17,7 @@ public class PlayerInputManager : MonoBehaviour
 
     public bool spacebar;
     public bool spacebarDown;
-    public bool leftCTRL;
+    public bool capsLock;
 
     public UnityEvent leftMouseEvent = new UnityEvent();
     public UnityEvent leftMouseDownEvent = new UnityEvent();
@@ -57,7 +57,7 @@ public class PlayerInputManager : MonoBehaviour
 
         spacebar = Input.GetKey(KeyCode.Space);
         spacebarDown = Input.GetKeyDown(KeyCode.Space);
-        leftCTRL = Input.GetKey(KeyCode.LeftControl);
+        capsLock = Input.GetKey(KeyCode.CapsLock);
 
         if (Input.GetMouseButton(0))
         {

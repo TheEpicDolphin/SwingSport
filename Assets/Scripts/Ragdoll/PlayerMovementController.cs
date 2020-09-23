@@ -34,7 +34,7 @@ public class PlayerMovementController : MonoBehaviour
         {
             GameObject hookGunGO = (GameObject)Instantiate(Resources.Load("Prefabs/HookGun"));
             HookGun hookGun = hookGunGO.GetComponent<HookGun>();
-            hookGun.AttachTo(handR, handR.position + 0.25f * handR.transform.forward,
+            hookGun.Equip(handR, handR.position + 0.25f * handR.transform.forward,
                             handR.rotation, false);
             hookGun.setControls(1);
             hookGun.setColor(Color.red);
@@ -43,7 +43,10 @@ public class PlayerMovementController : MonoBehaviour
 
         if (handL)
         {
-            //handL.gameObject.AddComponent<MagnetoGlove>();
+            GameObject magnetoGloveGO = new GameObject();
+            MagnetoGlove magnetoGlove = magnetoGloveGO.AddComponent<MagnetoGlove>();
+            magnetoGlove.Equip(handL, handL.position, handL.rotation, false);
+            /*
             GameObject ballHookGunGO = (GameObject)Instantiate(Resources.Load("Prefabs/HookGun"));
             HookGun ballHookGun = ballHookGunGO.GetComponent<HookGun>();
             ballHookGun.AttachTo(handL, handL.position + 0.25f * handL.transform.forward,
@@ -51,6 +54,7 @@ public class PlayerMovementController : MonoBehaviour
             ballHookGun.setControls(0);
             ballHookGun.setColor(Color.blue);
             ballHookGun.cursor.cursorImage = cursorImage;
+            */
         }
         
     }

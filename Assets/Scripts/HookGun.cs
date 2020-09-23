@@ -188,7 +188,8 @@ public class HookGun : MonoBehaviour
         {
             Collider[] colliders = new Collider[1];
             LayerMask hookableLayerMask = LayerMask.GetMask("HookableLayer");
-            if (Physics.OverlapSphereNonAlloc(hook.transform.position, 0.1f, colliders, hookableLayerMask) > 0)
+            LayerMask ballLayerMask = LayerMask.GetMask("Ball");
+            if (Physics.OverlapSphereNonAlloc(hook.transform.position, 0.1f, colliders, hookableLayerMask | ballLayerMask) > 0)
             {
                 ropeRenderer.enabled = false;
                 if (colliders[0].tag == "Hookable" || colliders[0].tag == "BounceBall")
@@ -244,7 +245,7 @@ public class HookGun : MonoBehaviour
         yield return null;
     }
 
-    public void AttachTo(Transform parent, Vector3 position, Quaternion rotation, bool usePhysics)
+    public void Equip(Transform parent, Vector3 position, Quaternion rotation, bool usePhysics)
     {
         transform.position = position;
         transform.rotation = rotation;
