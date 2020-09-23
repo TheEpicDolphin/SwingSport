@@ -62,7 +62,7 @@ public class PlayerMovementController : MonoBehaviour
     private void FixedUpdate()
     {
         /* Checks if player is on the ground. Consider doing a spherecast for more accuracy */
-        isGrounded = Physics.Raycast(transform.position, Vector3.down, 1.3f, ~(1 << 10));
+        isGrounded = Physics.Raycast(transform.position, Vector3.down, 1.3f, ~LayerMask.GetMask("Player"));
 
         /* Handles movement based on camera direction */
         float moveHorizontal = PlayerInputManager.Instance.horizontal;

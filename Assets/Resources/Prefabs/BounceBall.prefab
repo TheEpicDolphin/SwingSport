@@ -11,10 +11,10 @@ GameObject:
   - component: {fileID: 8163811494991977848}
   - component: {fileID: 8163811494991977849}
   - component: {fileID: 8163811494991977854}
-  - component: {fileID: 8163811494991977855}
   - component: {fileID: 8163811494991977850}
   - component: {fileID: 8163811494991977851}
   - component: {fileID: 6519708127751860142}
+  - component: {fileID: 2918658291637029099}
   m_Layer: 11
   m_Name: BounceBall
   m_TagString: BounceBall
@@ -85,19 +85,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!135 &8163811494991977855
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8163811494991977852}
-  m_Material: {fileID: 13400000, guid: 93f616c91fbc620438dfd0e4bfb73ac9, type: 2}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &8163811494991977850
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -139,3 +126,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d1d3fea759f0eb2449aaed3d08c3ab6d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &2918658291637029099
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8163811494991977852}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d320d2cc1f56854aa9e5fceba1f3b36, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  numPlayers: 1
+  influnceRange: 40

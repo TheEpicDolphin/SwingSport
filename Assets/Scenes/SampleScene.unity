@@ -1410,64 +1410,6 @@ Transform:
   m_Father: {fileID: 891699485}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &74408446
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 74408449}
-  - component: {fileID: 74408448}
-  - component: {fileID: 74408447}
-  m_Layer: 0
-  m_Name: MagnetoGlove
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!135 &74408447
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 74408446}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &74408448
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 74408446}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9e1f6623122c1f244a8133c54226726c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  shrunkBallRadius: 0.5
---- !u!4 &74408449
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 74408446}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -11.022666, y: -3.9180923, z: 27.405119}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 11
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &79866054
 GameObject:
   m_ObjectHideFlags: 0
@@ -11168,7 +11110,8 @@ PrefabInstance:
       propertyPath: m_Name
       value: BounceBall
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 8186323285482625499, guid: 650f4da4e8d3b8145961afe01fdd0029, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 650f4da4e8d3b8145961afe01fdd0029, type: 3}
 --- !u!1 &592687296
 GameObject:
@@ -20004,7 +19947,7 @@ MonoBehaviour:
   mouseYDelta: 0
   spacebar: 0
   spacebarDown: 0
-  leftCTRL: 0
+  capsLock: 0
   leftMouseEvent:
     m_PersistentCalls:
       m_Calls: []

@@ -8,11 +8,13 @@ public class BallController : MonoBehaviour
     public float influnceRange = 40.0f;
 
     Rigidbody ballRb;
+    SphereCollider ballCollider;
 
     private void Awake()
     {
         ballRb = GetComponent<Rigidbody>();
         ballRb.isKinematic = false;
+        ballCollider = GetComponent<SphereCollider>();
     }
 
     // Start is called before the first frame update
@@ -31,11 +33,11 @@ public class BallController : MonoBehaviour
     {
         Collider[] colliders = new Collider[numPlayers];
         LayerMask magnetogloveLayerMask = LayerMask.GetMask("MagnetoGlove");
-        Physics.OverlapSphereNonAlloc(transform.position, influnceRange, colliders, magnetogloveLayerMask);
-        foreach (Collider collider in colliders)
+        int overlapCount = Physics.OverlapSphereNonAlloc(transform.position, influnceRange, colliders, magnetogloveLayerMask);
+        for(int i = 0; i < overlapCount; i++)
         {
+            Collider collider = colliders[i];
             MagnetoGlove magnetoGlove = collider.GetComponent<MagnetoGlove>();
-            Rigidbody magnetoGloveRb = collider.GetComponent<Rigidbody>();
             if (collider.transform != transform.parent && magnetoGlove.IsMagnetizing)
             {
                 Vector3 r = magnetoGlove.ballTarget.position - transform.position;
@@ -58,16 +60,17 @@ public class BallController : MonoBehaviour
 
     private void OnTriggerStay(Collider other)
     {
-        if(transform.parent != null)
+        if(transform.parent == null)
         {
+            MagnetoGlove magnetoGlove = other.GetComponent<MagnetoGlove>();
+            ballCollider.enabled = false;
+
             Vector3 ballVel = ballRb.velocity;
 
             ballRb.isKinematic = true;
-            ballRb.MovePosition(other.transform.position);
+            ballRb.MovePosition(magnetoGlove.ballTarget.position);
             /* give triggering entity possession of ball */
             transform.parent = other.transform;
-
-            MagnetoGlove magnetoGlove = other.GetComponent<MagnetoGlove>();
             /* Apply force to glove after catching */
             magnetoGlove.ApplyForceOnHand(ballVel, ForceMode.Impulse);
         }
@@ -80,6 +83,8 @@ public class BallController : MonoBehaviour
         {
             ballRb.isKinematic = false;
             transform.parent = null;
+
+            ballCollider.enabled = true;
         }
     }
 }

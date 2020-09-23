@@ -10,7 +10,7 @@ public class MagnetoGlove : MonoBehaviour
     public Transform ballTarget;
 
     /* This can vary as glove loses magnetic power */
-    public float Strength { get; private set; } = 10.0f;
+    public float Strength { get; private set; } = 20.0f;
 
     public bool IsMagnetizing { get; private set; } = false;
 
@@ -29,19 +29,19 @@ public class MagnetoGlove : MonoBehaviour
 
     private void Awake()
     {
-        //GameObject ballTargetGO = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        //Destroy(ballTargetGO.GetComponent<Collider>());
-        GameObject ballTargetGO = new GameObject();
+        GameObject ballTargetGO = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        Destroy(ballTargetGO.GetComponent<Collider>());
+        //GameObject ballTargetGO = new GameObject();
         ballTarget = ballTargetGO.transform;
         ballTarget.parent = transform;
         ballTarget.position = transform.position + shrunkBallRadius * transform.forward;
         ballTarget.rotation = Quaternion.identity;
 
         sphereCollider = gameObject.AddComponent<SphereCollider>();
-        sphereCollider.radius = 0.25f;
+        sphereCollider.radius = 0.5f;
         sphereCollider.isTrigger = true;
 
-        gameObject.layer = LayerMask.GetMask("Ball");
+        gameObject.layer = LayerMask.NameToLayer("MagnetoGlove");
     }
 
     public void Equip(Transform parent, Vector3 position, Quaternion rotation, bool usePhysics)
