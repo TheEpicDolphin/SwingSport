@@ -43,12 +43,6 @@ public class MagnetoGlove : MonoBehaviour
 
     private void FixedUpdate()
     {
-
-        //if (ballHolder && PlayerInputManager.Instance.spacebar)
-        //{
-        //    ballHolder.connectedBody.AddForce(21.0f * Vector3.down);
-        //}
-
         // TODO: check if ball is in player's inventory.
         if(equipped && PlayerInputManager.Instance.leftCTRL && !ballHolder)
         {
@@ -59,7 +53,6 @@ public class MagnetoGlove : MonoBehaviour
                 Rigidbody ballRb = colliders[0].GetComponent<Rigidbody>();
 
                 float ballToTargetDistance = Vector3.Distance(ballTarget.position, ballRb.transform.position);
-                //Debug.Log(ballToTargetDistance);
                 if (ballToTargetDistance < 0.25f)
                 {
                     ballRb.isKinematic = true;

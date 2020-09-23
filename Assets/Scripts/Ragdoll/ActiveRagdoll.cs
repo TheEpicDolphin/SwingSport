@@ -6,24 +6,41 @@ public class ActiveRagdoll : MonoBehaviour
 {
     List<Muscle> ragdollMuscles = new List<Muscle>();
 
+    /* Animated rig that the active ragdoll tries to copy */
     Transform animatedTargetRigHip;
+
+    /* Rigidbody of hip */
     Rigidbody hipRb;
+
+    /* hip joint */
     ConfigurableJoint hipConfJoint;
+
+    /* Determines if active ragdoll is affected by gravity */
     public bool useGravity = true;
 
     public Vector3 Velocity
     {
         get
         {
+            /* Return the hip velocity when fetching ragdoll velocity */
             return hipRb.velocity;
         }
         set
         {
-            hipRb.velocity = value;
+            /* Sets velocity of each ragdoll joint to the value */
+            /* **CAUTION** Moving ragdoll by setting velocities can 
+             * be visually jarring and can create insanely large collision forces*/
+            foreach(Muscle muscle in ragdollMuscles)
+            {
+                muscle.bone.velocity = value;
+            }
         }
     }
 
+    /* total mass of the ragdoll */
     float totalMass = 50.0f;
+
+    /* mass of each bone */
     float boneMass;
 
     private void Awake()
@@ -124,5 +141,16 @@ public class ActiveRagdoll : MonoBehaviour
     public void MatchRotation(Quaternion targetRotation)
     {
         hipConfJoint.targetRotation = Quaternion.Inverse(targetRotation);
+    }
+
+    /* Sets the position of the ragdoll hip to pos */
+    /* **CAUTION** Not recommended to use this to move active ragdoll because 
+     * translating rigidbodies can cause jitter and insanely large collision forces*/
+    public void MovePosition(Vector3 pos)
+    {
+        //TODO: make this move the whole ragdoll so that the current relative
+        // positions and rotations of the non-hip bones are preserved and the 
+        // hip is moved to pos
+        hipRb.MovePosition(pos);
     }
 }

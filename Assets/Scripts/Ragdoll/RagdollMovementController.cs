@@ -19,11 +19,6 @@ public class RagdollMovementController : MonoBehaviour
     /* determines whether the player is touching the ground */
     public bool isGrounded = false;
 
-    /* if true, player is rocketing up */
-    public bool rocketUp = false;
-
-    ConfigurableJoint confJoint;
-
     public Image cursorImage;
 
     public Transform handR;
@@ -34,7 +29,6 @@ public class RagdollMovementController : MonoBehaviour
     void Start()
     {
         activeRagdoll = GetComponent<ActiveRagdoll>();
-        confJoint = GetComponent<ConfigurableJoint>();
 
         if (handR)
         {
