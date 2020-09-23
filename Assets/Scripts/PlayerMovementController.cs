@@ -1,10 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 using UnityEngine.UI;
 
-public class PlayerController : MonoBehaviour
+public class PlayerMovementController : MonoBehaviour
 {
     Rigidbody rb;
     Transform view;
@@ -13,6 +12,8 @@ public class PlayerController : MonoBehaviour
     Transform ballHookHand;
     Transform character;
     public Transform mainCamera;
+
+    public PlayerAnimController playerAnimController;
 
     /* mouse position on screen */ 
     float mouseX, mouseY;
@@ -32,9 +33,6 @@ public class PlayerController : MonoBehaviour
     /* if true, player is rocketing up */
     public bool rocketUp = false;
 
-    /* determines whether the player will look in the direction of the camera or not */
-    public bool isPlayerLockedToCamera = true;
-
     public float bDrag = 2.0f;
 
     public Image cursorImage;
@@ -42,6 +40,8 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        playerAnimController = GetComponent<PlayerAnimController>();
+
         /* removes mouse cursor and locks cursor to center of the screen */
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
@@ -70,27 +70,6 @@ public class PlayerController : MonoBehaviour
         ballHookGun.cursor.cursorImage = cursorImage;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        mouseX += Input.GetAxis("Mouse X") * mouseSensitivity;
-        mouseY += Input.GetAxis("Mouse Y") * mouseSensitivity;
-        mouseY = Mathf.Clamp(mouseY, -80, 80);
-
-        float moveHorizontal = Input.GetAxisRaw("Horizontal");
-        float moveVertical = Input.GetAxisRaw("Vertical");
-        movement = moveVertical * Vector3.ProjectOnPlane(mainCamera.transform.forward, Vector3.up).normalized + 
-                            moveHorizontal * mainCamera.transform.right;
-
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
-        {
-            /* jump */
-            rb.AddForce(300.0f * Vector3.up, ForceMode.Impulse);
-        }
-
-        rocketUp = Input.GetKey(KeyCode.Space) && !isGrounded;
-    }
-
     private void FixedUpdate()
     {
         isGrounded = Physics.Raycast(transform.position + 0.05f * Vector3.up, Vector3.down, 0.1f);
@@ -117,14 +96,27 @@ public class PlayerController : MonoBehaviour
             rb.AddForce(-bDrag * rb.velocity);
         }
 
-        if (isPlayerLockedToCamera)
+        view.rotation = Quaternion.Euler(-mouseY, mouseX, 0);
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        mouseX += Input.GetAxis("Mouse X") * mouseSensitivity;
+        mouseY += Input.GetAxis("Mouse Y") * mouseSensitivity;
+        mouseY = Mathf.Clamp(mouseY, -80, 80);
+
+        float moveHorizontal = Input.GetAxisRaw("Horizontal");
+        float moveVertical = Input.GetAxisRaw("Vertical");
+        movement = moveVertical * Vector3.ProjectOnPlane(mainCamera.transform.forward, Vector3.up).normalized +
+                            moveHorizontal * mainCamera.transform.right;
+
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
-            character.rotation = Quaternion.Euler(-mouseY, mouseX, 0);
-            view.rotation = Quaternion.Euler(-mouseY, mouseX, 0);
+            /* jump */
+            rb.AddForce(300.0f * Vector3.up, ForceMode.Impulse);
         }
-        else
-        {
-            view.rotation = Quaternion.Euler(-mouseY, mouseX, 0);
-        }
+
+        rocketUp = Input.GetKey(KeyCode.Space) && !isGrounded;
     }
 }

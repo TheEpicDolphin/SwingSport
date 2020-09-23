@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class VerletRope : MonoBehaviour
 {
     LineRenderer ropeRenderer;
@@ -12,6 +13,12 @@ public class VerletRope : MonoBehaviour
 
     public GameObject start;
     public GameObject end;
+
+    Rigidbody startLoad;
+    Rigidbody endLoad;
+
+    public float springConstant = 500.0f;
+    public float damper = 0.0f;
 
     private void Awake()
     {
@@ -24,39 +31,10 @@ public class VerletRope : MonoBehaviour
         //BuildRope(s, e, 3);
     }
 
-    public void BuildRope(GameObject start, GameObject end, int numSegments, float maxRestLength, Material ropeMat)
+    public void BuildRope(GameObject start, GameObject end, int numSegments, float maxRestLength, Material ropeMat, float springConstant, float damper)
     {
         this.start = start;
         this.end = end;
-
-        Rigidbody startRB = start.transform.parent.GetComponentInParent<Rigidbody>();
-        Rigidbody endRB = end.transform.parent.GetComponentInParent<Rigidbody>();
-
-        if (start && end)
-        {
-            Debug.Log("Start: " + start.transform.parent.name);
-            Debug.Log("End: " + end.transform.parent.name);
-        } else if (start)
-        {
-            Debug.Log("Start: " + start.transform.parent.name);
-        } else if (end)
-        {
-            Debug.Log("End: " + end.transform.parent.name);
-        }
-
-        if (startRB && endRB)
-        {
-            Debug.Log("StartRB: " + startRB.gameObject.name);
-            Debug.Log("EndRB: " + endRB.gameObject.name);
-        }
-        else if (startRB)
-        {
-            Debug.Log("StartRB: " + startRB.gameObject.name);
-        }
-        else if (endRB)
-        {
-            Debug.Log("EndRB: " + endRB.gameObject.name);
-        }
 
         restLength = Vector3.Distance(start.transform.position, end.transform.position);
         float constraintLength = restLength / numSegments;
@@ -73,6 +51,22 @@ public class VerletRope : MonoBehaviour
         }
         this.maxRestLength = maxRestLength;
         ropeRenderer.material = ropeMat;
+
+        this.springConstant = springConstant;
+        this.damper = damper;
+
+        startLoad = GetNonKinematicRigidbodyInParent(start.transform);
+        endLoad = GetNonKinematicRigidbodyInParent(end.transform);
+    }
+
+    Rigidbody GetNonKinematicRigidbodyInParent(Transform trans)
+    {
+        Rigidbody currentRb = trans.GetComponent<Rigidbody>();
+        while (currentRb && currentRb.isKinematic)
+        {
+            currentRb = currentRb.transform.parent.GetComponent<Rigidbody>();
+        }
+        return currentRb;
     }
 
     // Update is called once per frame
@@ -99,72 +93,53 @@ public class VerletRope : MonoBehaviour
 
         if(start && end)
         {
-            /* Get rigidbodies that belongs to the ancestors of start and end. The rope will apply
-               forces to these rigidbodies, if they exist */
-            Rigidbody startRb = start.transform.parent.GetComponentInParent<Rigidbody>();
-            //Rigidbody endRb = end.GetComponentInParent<Rigidbody>();
-            /* I set this to null for now because none of the blocks have rigidbodies */
-            Rigidbody endRb = end.transform.parent.GetComponentInParent<Rigidbody>();
-
             Vector3 startToEndVector = end.transform.position - start.transform.position;
             Vector3 startToEndDirection = startToEndVector.normalized;
 
-            if (startRb && endRb)
+            Vector3 ropeTension = Vector3.zero;
+            if (startLoad && endLoad)
             {
                 // TODO: If both start and end are attached to rigidbodies, we will have to go back
                 // to college classical mechanics to model this 2-mass spring system
 
                 // TESTING: Just treat this as the only endRb case, see what it feels like
-
-                /* startRb is null. This means that end does not have a rigidbody on any of its 
-                ancestors. We treat it as though it has infinite mass */
                 if (startToEndVector.magnitude > restLength)
                 {
                     /* We only apply a restoring force when the length between the start and end
                        is greater than the rest length of the rope. Ropes only pull you, never push you */
-                    float k = 500.0f;
-                    /* Critically damped */
-                    float b = Mathf.Sqrt(4 * startRb.mass * k);
-                    /* Treating rope like a spring */
-                    Vector3 fSpring = k * (restLength * startToEndDirection - startToEndVector)
-                                        + b * (Vector3.zero - Vector3.Project(startRb.velocity, startToEndDirection));
-                    endRb.AddForce(fSpring);
+                    ropeTension = -springConstant * (restLength * startToEndDirection - startToEndVector)
+                                        + damper * (Vector3.zero - Vector3.Project(endLoad.velocity, startToEndDirection));
+                    endLoad.AddForce(-ropeTension);
                 }
             }
-            else if (startRb)
+            else if (startLoad)
             {
-
                 /* endRb is null. This means that end does not have a rigidbody on any of its 
                    ancestors. We treat it as though it has infinite mass */
                 if (startToEndVector.magnitude > restLength)
                 {
                     /* We only apply a restoring force when the length between the start and end
                        is greater than the rest length of the rope. Ropes only pull you, never push you */
-                    float k = 500.0f;
-                    /* Critically damped */
-                    float b = Mathf.Sqrt(4 * startRb.mass * k);
                     /* Treating rope like a spring */
-                    Vector3 fSpring = -k * (restLength * startToEndDirection - startToEndVector)
-                                        + b * (Vector3.zero - Vector3.Project(startRb.velocity, startToEndDirection));
-                    startRb.AddForce(fSpring);
+                    ropeTension = -springConstant * (restLength * startToEndDirection - startToEndVector)
+                                        + damper * (Vector3.zero - Vector3.Project(startLoad.velocity, startToEndDirection));
+                    startLoad.AddForceAtPosition(ropeTension, start.transform.position);
                 }
             }
-            else if (endRb)
+            else if (endLoad)
             {
 
                 /* startRb is null. This means that end does not have a rigidbody on any of its 
                    ancestors. We treat it as though it has infinite mass */
+
                 if (startToEndVector.magnitude > restLength)
                 {
                     /* We only apply a restoring force when the length between the start and end
                        is greater than the rest length of the rope. Ropes only pull you, never push you */
-                    float k = 500.0f;
-                    /* Critically damped */
-                    float b = Mathf.Sqrt(4 * startRb.mass * k);
                     /* Treating rope like a spring */
-                    Vector3 fSpring = k * (restLength * startToEndDirection - startToEndVector)
-                                        + b * (Vector3.zero - Vector3.Project(startRb.velocity, startToEndDirection));
-                    endRb.AddForce(fSpring);
+                    ropeTension = -springConstant * (restLength * startToEndDirection - startToEndVector)
+                                        + damper * (Vector3.zero - Vector3.Project(endLoad.velocity, startToEndDirection));
+                    endLoad.AddForceAtPosition(-ropeTension, end.transform.position);
                 }
             }
         }

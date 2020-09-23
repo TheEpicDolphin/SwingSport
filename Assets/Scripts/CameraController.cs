@@ -14,17 +14,10 @@ public class CameraController : MonoBehaviour
     public float shakeMultiplier = 0.2f;
     float wobbleIntensity = 0.0f;
 
-    // Start is called before the first frame update
     void Start()
     {
         transform.position = target.position;
         transform.rotation = target.rotation;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 
     public void AddWobble(float intensity)
@@ -34,12 +27,13 @@ public class CameraController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        //Camera shake
+        /* Camera follows physics-controlled player. Camera wobble is also incorporated */
         Vector3 shookCameraPosition = target.position + shakeMultiplier * wobbleIntensity * Random.insideUnitSphere;
         transform.position = Vector3.Slerp(transform.position, shookCameraPosition, Mathf.Min(cameraRigidness * Time.fixedDeltaTime, 1.0f));
         transform.rotation = Quaternion.Slerp(transform.rotation, target.rotation, Mathf.Min(cameraRigidness * Time.fixedDeltaTime, 1.0f));
 
-        //wobble intensity is decreased smoothly
+        /* wobble intensity is decreased smoothly */
         wobbleIntensity = Mathf.Lerp(wobbleIntensity, 0.0f, 2.0f * Time.fixedDeltaTime);
     }
+
 }
