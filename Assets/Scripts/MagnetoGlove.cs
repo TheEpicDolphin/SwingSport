@@ -14,6 +14,8 @@ public class MagnetoGlove : MonoBehaviour
 
     public bool IsMagnetizing { get; private set; } = false;
 
+    public bool visualizeGrabbingRegion = false;
+
     /* Holds the ball in place when it is close enough to hand */
     FixedJoint ballHolder;
 
@@ -29,9 +31,17 @@ public class MagnetoGlove : MonoBehaviour
 
     private void Awake()
     {
-        GameObject ballTargetGO = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        Destroy(ballTargetGO.GetComponent<Collider>());
-        //GameObject ballTargetGO = new GameObject();
+        GameObject ballTargetGO;
+        if (visualizeGrabbingRegion)
+        {
+            ballTargetGO = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            Destroy(ballTargetGO.GetComponent<Collider>());
+        }
+        else
+        {
+            ballTargetGO = new GameObject();
+        }
+
         ballTarget = ballTargetGO.transform;
         ballTarget.parent = transform;
         ballTarget.position = transform.position + shrunkBallRadius * transform.forward;

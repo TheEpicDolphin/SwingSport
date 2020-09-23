@@ -41,7 +41,8 @@ public class BallController : MonoBehaviour
             if (collider.transform != transform.parent && magnetoGlove.IsMagnetizing)
             {
                 Vector3 r = magnetoGlove.ballTarget.position - transform.position;
-                Vector3 homingForce = InverseSquareForceLaw(magnetoGlove.Strength, r);
+                //Vector3 homingForce = InverseSquareForceLaw(magnetoGlove.Strength, r);
+                Vector3 homingForce = InverseForceLaw(magnetoGlove.Strength, r);
                 ballRb.AddForce(homingForce);
                 magnetoGlove.ApplyForceOnHand(-homingForce, ForceMode.Force);
             }
@@ -68,7 +69,7 @@ public class BallController : MonoBehaviour
             Vector3 ballVel = ballRb.velocity;
 
             ballRb.isKinematic = true;
-            ballRb.MovePosition(magnetoGlove.ballTarget.position);
+            transform.position = magnetoGlove.ballTarget.position;
             /* give triggering entity possession of ball */
             transform.parent = other.transform;
             /* Apply force to glove after catching */
