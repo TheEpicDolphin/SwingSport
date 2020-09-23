@@ -44,7 +44,7 @@ public class BallSpawner : MonoBehaviour
         //Debug.Log("Launching ball with velocity " + ballVelocity);
 
         GameObject bounceBall = (GameObject)Instantiate(Resources.Load("Prefabs/BounceBall"),
-            gameObject.transform.position, gameObject.transform.rotation, gameObject.transform);
+            gameObject.transform.position, gameObject.transform.rotation);
         bounceBall.GetComponent<Rigidbody>().velocity = ballVelocity;
 
         balls.Enqueue(bounceBall);

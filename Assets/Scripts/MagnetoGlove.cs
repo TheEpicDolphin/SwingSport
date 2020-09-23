@@ -9,6 +9,8 @@ public class MagnetoGlove : MonoBehaviour
 
     public Transform ballTarget;
 
+    Renderer ballGrabbingRegionRenderer;
+
     /* This can vary as glove loses magnetic power */
     public float Strength { get; private set; } = 20.0f;
 
@@ -31,16 +33,9 @@ public class MagnetoGlove : MonoBehaviour
 
     private void Awake()
     {
-        GameObject ballTargetGO;
-        if (visualizeGrabbingRegion)
-        {
-            ballTargetGO = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            Destroy(ballTargetGO.GetComponent<Collider>());
-        }
-        else
-        {
-            ballTargetGO = new GameObject();
-        }
+        GameObject ballTargetGO = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        Destroy(ballTargetGO.GetComponent<Collider>());
+        ballGrabbingRegionRenderer = ballTargetGO.GetComponent<Renderer>();
 
         ballTarget = ballTargetGO.transform;
         ballTarget.parent = transform;
@@ -70,6 +65,7 @@ public class MagnetoGlove : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        ballGrabbingRegionRenderer.enabled = visualizeGrabbingRegion;
         IsMagnetizing = PlayerInputManager.Instance.capsLock;
     }
 

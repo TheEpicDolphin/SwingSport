@@ -10,6 +10,9 @@ public class BallController : MonoBehaviour
     Rigidbody ballRb;
     SphereCollider ballCollider;
 
+    float maxSpeed = 20.0f;
+    float kP = 5.0f;
+
     private void Awake()
     {
         ballRb = GetComponent<Rigidbody>();
@@ -42,7 +45,8 @@ public class BallController : MonoBehaviour
             {
                 Vector3 r = magnetoGlove.ballTarget.position - transform.position;
                 //Vector3 homingForce = InverseSquareForceLaw(magnetoGlove.Strength, r);
-                Vector3 homingForce = InverseForceLaw(magnetoGlove.Strength, r);
+                //Vector3 homingForce = InverseForceLaw(magnetoGlove.Strength, r);
+                Vector3 homingForce = PControllerForce(magnetoGlove.ballTarget.position);
                 ballRb.AddForce(homingForce);
                 magnetoGlove.ApplyForceOnHand(-homingForce, ForceMode.Force);
             }
@@ -57,6 +61,15 @@ public class BallController : MonoBehaviour
     Vector3 InverseForceLaw(float magCoeff, Vector3 r)
     {
         return (magCoeff / r.magnitude) * r.normalized;
+    }
+
+    Vector3 PControllerForce(Vector3 targetPosition)
+    {
+        Vector3 currentPosition = transform.position;
+        Vector3 currentVelocity = ballRb.velocity;
+        Vector3 desiredVelocity = maxSpeed * (targetPosition - currentPosition).normalized;
+        Vector3 error = desiredVelocity - currentVelocity;
+        return kP * error;
     }
 
     private void OnTriggerStay(Collider other)
