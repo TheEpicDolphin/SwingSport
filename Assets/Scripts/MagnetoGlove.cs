@@ -15,7 +15,9 @@ public class MagnetoGlove : MonoBehaviour
     Rigidbody handRb;
 
     float maxRange = 20.0f;
-    float magneticCoeff = 30.0f;
+    float constantRange = 0.5f;
+    float magneticCoeff;
+    float breakForce = 1000.0f;
     /* This drag is performed against the ball's velocity component that 
      * is perpendicular to the direction from the glove to the ball*/
     float magneticBallDrag = 10.0f;
@@ -24,6 +26,8 @@ public class MagnetoGlove : MonoBehaviour
 
     private void Awake()
     {
+        magneticCoeff = breakForce * constantRange * constantRange;
+
         //GameObject ballTargetGO = GameObject.CreatePrimitive(PrimitiveType.Cube);
         //Destroy(ballTargetGO.GetComponent<Collider>());
         GameObject ballTargetGO = new GameObject();
@@ -61,7 +65,9 @@ public class MagnetoGlove : MonoBehaviour
 
                     ballHolder = gameObject.AddComponent<FixedJoint>();
                     ballHolder.connectedBody = ballRb;
-                    ballHolder.breakForce = 20.0f;
+                    ballHolder.breakForce = breakForce;
+                    Debug.Log("ATTACHED");
+                    Debug.Log(magneticCoeff / (constantRange * constantRange));
                 }
                 else
                 {
@@ -70,8 +76,8 @@ public class MagnetoGlove : MonoBehaviour
                     Vector3 r = ballRb.transform.position - ballTarget.position;
                     /* If ball is within 0.5f of glove, we do not increase
                      * magnetic field any further*/
-                    float rMag = Mathf.Max(r.magnitude, 0.5f);
-                    Vector3 fMagnetic = r * magneticCoeff / rMag;
+                    float rMag = Mathf.Max(r.magnitude, constantRange);
+                    Vector3 fMagnetic = (magneticCoeff / (rMag * rMag)) * r.normalized;
                     /* This will help the ball go directly to the glove without oscillating
                      * as much*/
                     Vector3 perpBallVel = Vector3.ProjectOnPlane(ballRb.velocity, r);
