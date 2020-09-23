@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// TODO: will treat ball as intelligent homing missile
 // TODO: make it adhere to IItem interface
 public class MagnetoGlove : MonoBehaviour
 {
@@ -14,7 +15,7 @@ public class MagnetoGlove : MonoBehaviour
 
     Rigidbody handRb;
 
-    float maxRange = 20.0f;
+    float maxRange = 40.0f;
     float constantRange = 0.5f;
     float magneticCoeff;
     float breakForce = 1000.0f;
@@ -66,15 +67,13 @@ public class MagnetoGlove : MonoBehaviour
                     ballHolder = gameObject.AddComponent<FixedJoint>();
                     ballHolder.connectedBody = ballRb;
                     ballHolder.breakForce = breakForce;
-                    Debug.Log("ATTACHED");
-                    Debug.Log(magneticCoeff / (constantRange * constantRange));
                 }
                 else
                 {
                     /* The ball only feels a force when within maxRange distance
                     * of glove */
                     Vector3 r = ballRb.transform.position - ballTarget.position;
-                    /* If ball is within 0.5f of glove, we do not increase
+                    /* If ball is within constantRange of glove, we do not increase
                      * magnetic field any further*/
                     float rMag = Mathf.Max(r.magnitude, constantRange);
                     Vector3 fMagnetic = (magneticCoeff / (rMag * rMag)) * r.normalized;

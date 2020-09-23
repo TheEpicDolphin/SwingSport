@@ -29,7 +29,7 @@ public class HookGun : MonoBehaviour
 
     float hookLaunchForce = 200.0f;
 
-    float hookZoomRateMultiplier = 100.0f;
+    float hookZoomRateMultiplier = 20.0f;
 
     public CameraWobbleDelegate camWobbleDelegate;
 
@@ -109,7 +109,7 @@ public class HookGun : MonoBehaviour
                     /* The hook has been detached */
                     isGrappled = false;
                     hook.transform.parent = null;
-                    Destroy(verletRope);
+                    Destroy(verletRope.gameObject);
                     state = HookState.Retracting;
                     StartCoroutine(RetractHookCoroutine());
 
