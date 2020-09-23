@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 // Make this a singleton
 public class PlayerInputManager : MonoBehaviour
@@ -17,9 +18,12 @@ public class PlayerInputManager : MonoBehaviour
     public bool spacebar;
     public bool spacebarDown;
     public bool leftCTRL;
-    public bool leftMouse;
-    public bool leftMouseDown;
-    
+
+    public UnityEvent leftMouseEvent = new UnityEvent();
+    public UnityEvent leftMouseDownEvent = new UnityEvent();
+
+    public UnityEvent rightMouseEvent = new UnityEvent();
+    public UnityEvent rightMouseDownEvent = new UnityEvent();
 
 
     private void Awake()
@@ -42,8 +46,6 @@ public class PlayerInputManager : MonoBehaviour
         Cursor.visible = false;
     }
 
-    // TODO: Use events in the future and have scripts listen to them
-
     // Update is called once per frame
     void Update()
     {
@@ -55,10 +57,24 @@ public class PlayerInputManager : MonoBehaviour
 
         spacebar = Input.GetKey(KeyCode.Space);
         spacebarDown = Input.GetKeyDown(KeyCode.Space);
-
-        leftMouse = Input.GetMouseButton(0);
-        leftMouseDown = Input.GetMouseButtonDown(0);
-
         leftCTRL = Input.GetKey(KeyCode.LeftControl);
+
+        if (Input.GetMouseButton(0))
+        {
+            leftMouseEvent.Invoke();
+        }
+        if (Input.GetMouseButtonDown(0))
+        {
+            leftMouseDownEvent.Invoke();
+        }
+
+        if (Input.GetMouseButton(1))
+        {
+            rightMouseEvent.Invoke();
+        }
+        if (Input.GetMouseButtonDown(1))
+        {
+            rightMouseDownEvent.Invoke();
+        }
     }
 }
