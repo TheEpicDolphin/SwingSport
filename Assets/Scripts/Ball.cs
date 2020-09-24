@@ -2,13 +2,46 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BallController : MonoBehaviour
+public class Ball : MonoBehaviour
 {
     public int numPlayers = 1;
     public float influnceRange = 40.0f;
 
     Rigidbody ballRb;
     SphereCollider ballCollider;
+
+    public bool IsPossessed
+    {
+        get
+        {
+            return transform.parent != null;
+        }
+    }
+
+    /*
+    MagnetoGlove possessor;
+    public MagnetoGlove Possessor
+    {
+        get
+        {
+            return possessor;
+        }
+        set
+        {
+            if(value)
+            {
+                transform.parent = value.transform;
+                possessor = value;
+            }
+            else
+            {
+                transform.parent = null;
+                possessor = null;
+            }
+            
+        }
+    }
+    */
 
     float maxSpeed = 20.0f;
     float kP = 5.0f;
@@ -29,7 +62,25 @@ public class BallController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        /*
+        if (hasBall)
+        {
+
+            currentGrabTime -= Time.deltaTime;
+
+            hasBallVisual.gameObject.GetComponent<Renderer>().material.color = Color.Lerp(Color.green, Color.red, 1.0f - (currentGrabTime / maxGrabTime));
+
+            if (Input.GetKeyDown(KeyCode.Q))
+            {
+                letGoOfBall(true);
+            }
+            else if (currentGrabTime < 0.0f)
+            {
+                letGoOfBall(false);
+            }
+
+        }
+        */
     }
 
     private void FixedUpdate()
@@ -72,33 +123,19 @@ public class BallController : MonoBehaviour
         return kP * error;
     }
 
-    private void OnTriggerStay(Collider other)
+    public void Grab(Transform parent, Vector3 position)
     {
-        if(transform.parent == null)
-        {
-            MagnetoGlove magnetoGlove = other.GetComponent<MagnetoGlove>();
-            ballCollider.enabled = false;
-
-            Vector3 ballVel = ballRb.velocity;
-
-            ballRb.isKinematic = true;
-            transform.position = magnetoGlove.ballTarget.position;
-            /* give triggering entity possession of ball */
-            transform.parent = other.transform;
-            /* Apply force to glove after catching */
-            magnetoGlove.ApplyForceOnHand(ballVel, ForceMode.Impulse);
-        }
+        ballCollider.enabled = false;
+        ballRb.isKinematic = true;
+        transform.position = position;
+        transform.parent = parent;
     }
 
-    private void OnTriggerExit(Collider other)
+    public void Release()
     {
-        /* Check if ball is leaving the entity that previously had possession of the ball */
-        if (other.transform == transform.parent)
-        {
-            ballRb.isKinematic = false;
-            transform.parent = null;
-
-            ballCollider.enabled = true;
-        }
+        transform.parent = null;
+        ballRb.isKinematic = false;
+        ballCollider.enabled = true;
     }
+
 }

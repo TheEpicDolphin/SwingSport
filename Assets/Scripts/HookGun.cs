@@ -92,7 +92,7 @@ public class HookGun : MonoBehaviour
                     /* Prevent raycast from hitting something in front of camera but behind gun */
                     float startT = Vector3.Dot(transform.position - camRay.origin, camRay.direction);
                     RaycastHit hit;
-                    if (Physics.Raycast(new Ray(camRay.GetPoint(startT), camRay.direction), out hit, 20.0f))
+                    if (Physics.Raycast(new Ray(camRay.GetPoint(startT), camRay.direction), out hit, maxRopeLength))
                     {
                         targetPos = hit.point;
                     }

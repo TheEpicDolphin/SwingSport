@@ -31,6 +31,12 @@ public class MagnetoGlove : MonoBehaviour
 
     SphereCollider sphereCollider;
 
+    float ballThrowStrength = 100.0f;
+
+    float maxThrowDistance = 100.0f;
+
+    Ball possessedBall;
+
     private void Awake()
     {
         GameObject ballTargetGO = GameObject.CreatePrimitive(PrimitiveType.Sphere);
@@ -69,9 +75,55 @@ public class MagnetoGlove : MonoBehaviour
         IsMagnetizing = PlayerInputManager.Instance.capsLock;
     }
 
+    private void FixedUpdate()
+    {
+        if (PlayerInputManager.Instance.QDown && possessedBall)
+        {
+            ThrowBall();
+        }
+    }
+
     private void OnDestroy()
     {
         Destroy(ballTarget.gameObject);
+    }
+
+    private void OnTriggerStay(Collider other)
+    {
+        if (!possessedBall)
+        {
+            Ball ball = other.GetComponent<Ball>();
+            if (ball && IsMagnetizing)
+            {
+                possessedBall = ball;
+                Rigidbody ballRb = possessedBall.GetComponent<Rigidbody>();
+                Vector3 ballVel = ballRb.velocity;
+                possessedBall.Grab(transform, ballTarget.position);
+                ApplyForceOnHand(ballVel, ForceMode.Impulse);
+            }
+        }
+    }
+
+    public void ThrowBall()
+    {
+        possessedBall.Release();
+
+        Ray camRay = Camera.main.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0));
+        float startT = Vector3.Dot(transform.position - camRay.origin, camRay.direction);
+        RaycastHit hit;
+        Vector3 targetPos = Vector3.zero;
+        if (Physics.Raycast(new Ray(camRay.GetPoint(startT), camRay.direction), out hit, maxThrowDistance))
+        {
+            targetPos = hit.point;
+        }
+        else
+        {
+            targetPos = camRay.GetPoint(maxThrowDistance);
+        }
+        Vector3 throwDirection = (targetPos - possessedBall.transform.position).normalized;
+        Rigidbody ballRb = possessedBall.GetComponent<Rigidbody>();
+        ballRb.AddForce(ballThrowStrength * throwDirection, ForceMode.Impulse);
+        possessedBall = null;
     }
 
 }

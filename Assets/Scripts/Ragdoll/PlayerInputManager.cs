@@ -18,6 +18,8 @@ public class PlayerInputManager : MonoBehaviour
     public bool spacebar;
     public bool spacebarDown;
     public bool capsLock;
+    public bool Q;
+    public bool QDown;
 
     public UnityEvent leftMouseEvent = new UnityEvent();
     public UnityEvent leftMouseDownEvent = new UnityEvent();
@@ -58,6 +60,7 @@ public class PlayerInputManager : MonoBehaviour
         spacebar = Input.GetKey(KeyCode.Space);
         spacebarDown = Input.GetKeyDown(KeyCode.Space);
         capsLock = Input.GetKey(KeyCode.CapsLock);
+        QDown = Input.GetKeyDown(KeyCode.Q);
 
         if (Input.GetMouseButton(0))
         {
