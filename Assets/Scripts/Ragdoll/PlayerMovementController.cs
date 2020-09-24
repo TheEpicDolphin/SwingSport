@@ -99,6 +99,7 @@ public class PlayerMovementController : MonoBehaviour
         //Vector3 turningTorque = 100.0f * Vector3.Cross(transform.forward, cameraTrans.forward);
         //rb.AddTorque(turningTorque, ForceMode.Acceleration);
 
+        Debug.Log(activeRagdoll.Velocity.magnitude);
         /* Rotates player to face in direction of camera */
         activeRagdoll.MatchRotation(Camera.main.transform.rotation);
     }

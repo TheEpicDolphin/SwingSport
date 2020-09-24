@@ -73,10 +73,8 @@ public class MagnetoGlove : MonoBehaviour
     {
         ballGrabbingRegionRenderer.enabled = visualizeGrabbingRegion;
         IsMagnetizing = PlayerInputManager.Instance.capsLock;
-    }
 
-    private void FixedUpdate()
-    {
+        /* This belongs in Update because FixedUpdate will sometimes miss the Q down press */
         if (PlayerInputManager.Instance.QDown && possessedBall)
         {
             ThrowBall();
@@ -98,7 +96,7 @@ public class MagnetoGlove : MonoBehaviour
                 possessedBall = ball;
                 Rigidbody ballRb = possessedBall.GetComponent<Rigidbody>();
                 Vector3 ballVel = ballRb.velocity;
-                possessedBall.Grab(transform, ballTarget.position);
+                Grab(ball);
                 ApplyForceOnHand(ballVel, ForceMode.Impulse);
             }
         }
@@ -106,7 +104,8 @@ public class MagnetoGlove : MonoBehaviour
 
     public void ThrowBall()
     {
-        possessedBall.Release();
+        Ball ball = possessedBall;
+        Release();
 
         Ray camRay = Camera.main.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0));
         float startT = Vector3.Dot(transform.position - camRay.origin, camRay.direction);
@@ -120,9 +119,21 @@ public class MagnetoGlove : MonoBehaviour
         {
             targetPos = camRay.GetPoint(maxThrowDistance);
         }
-        Vector3 throwDirection = (targetPos - possessedBall.transform.position).normalized;
-        Rigidbody ballRb = possessedBall.GetComponent<Rigidbody>();
+        Vector3 throwDirection = (targetPos - ball.transform.position).normalized;
+        Rigidbody ballRb = ball.GetComponent<Rigidbody>();
         ballRb.AddForce(ballThrowStrength * throwDirection, ForceMode.Impulse);
+    }
+
+    public void Grab(Ball ball)
+    {
+        possessedBall = ball;
+        ball.Possessor = this;
+        ball.transform.position = ballTarget.position;
+    }
+
+    public void Release()
+    {
+        possessedBall.Possessor = null;
         possessedBall = null;
     }
 

@@ -18,7 +18,7 @@ public class Ball : MonoBehaviour
         }
     }
 
-    /*
+    
     MagnetoGlove possessor;
     public MagnetoGlove Possessor
     {
@@ -30,20 +30,23 @@ public class Ball : MonoBehaviour
         {
             if(value)
             {
+                ballCollider.enabled = false;
+                ballRb.isKinematic = true;
                 transform.parent = value.transform;
                 possessor = value;
             }
             else
             {
                 transform.parent = null;
+                ballRb.isKinematic = false;
+                ballCollider.enabled = true;
                 possessor = null;
             }
-            
         }
     }
-    */
+    
 
-    float maxSpeed = 20.0f;
+    float maxSpeed = 35.0f;
     float kP = 5.0f;
 
     private void Awake()
@@ -122,20 +125,4 @@ public class Ball : MonoBehaviour
         Vector3 error = desiredVelocity - currentVelocity;
         return kP * error;
     }
-
-    public void Grab(Transform parent, Vector3 position)
-    {
-        ballCollider.enabled = false;
-        ballRb.isKinematic = true;
-        transform.position = position;
-        transform.parent = parent;
-    }
-
-    public void Release()
-    {
-        transform.parent = null;
-        ballRb.isKinematic = false;
-        ballCollider.enabled = true;
-    }
-
 }
