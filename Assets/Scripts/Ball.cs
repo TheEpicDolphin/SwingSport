@@ -44,9 +44,8 @@ public class Ball : MonoBehaviour
             }
         }
     }
-    
 
-    float maxSpeed = 35.0f;
+    float minHomingSpeed = 35.0f;
     float kP = 5.0f;
 
     private void Awake()
@@ -122,7 +121,7 @@ public class Ball : MonoBehaviour
     {
         Vector3 currentPosition = transform.position;
         Vector3 currentVelocity = ballRb.velocity;
-        Vector3 desiredVelocity = maxSpeed * (targetPosition - currentPosition).normalized;
+        Vector3 desiredVelocity = minHomingSpeed * (targetPosition - currentPosition).normalized;
         Vector3 error = desiredVelocity - currentVelocity;
         return kP * error;
     }
@@ -153,10 +152,15 @@ public class Ball : MonoBehaviour
          *  ...Solve for dt
          */
 
+        //float t = (targetPosition - transform.position).magnitude / minHomingSpeed;
+        //return PControllerForce(targetPosition + t * targetVelocity);
+
+
         //Vector3 vRel = targetVelocity - ballRb.velocity;
         Vector3 pRel = targetPosition - transform.position;
 
-        float a = (Vector3.Dot(targetVelocity, targetVelocity) - maxSpeed * maxSpeed);
+        float homingSpeed = Mathf.Max(minHomingSpeed, 4.0f * targetVelocity.magnitude);
+        float a = (Vector3.Dot(targetVelocity, targetVelocity) - homingSpeed * homingSpeed);
         float b = Vector3.Dot(pRel, targetVelocity);
         float c = Vector3.Dot(pRel, pRel);
 

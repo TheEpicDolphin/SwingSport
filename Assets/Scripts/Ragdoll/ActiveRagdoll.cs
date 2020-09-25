@@ -18,6 +18,10 @@ public class ActiveRagdoll : MonoBehaviour
     /* Determines if active ragdoll is affected by gravity */
     public bool useGravity = true;
 
+    float airDrag = 0.5f;
+
+    float maxSpeed = 60.0f;
+
     public Vector3 Velocity
     {
         get
@@ -153,4 +157,15 @@ public class ActiveRagdoll : MonoBehaviour
         // hip is moved to pos
         hipRb.MovePosition(pos);
     }
+
+    public void ApplyAirDrag()
+    {
+        foreach (Muscle muscle in ragdollMuscles)
+        {
+            Vector3 curVel = muscle.bone.velocity;
+            float curSpeed = curVel.magnitude;
+            muscle.bone.AddForce(-airDrag * Mathf.Max(0.0f, curSpeed - maxSpeed) * curVel);
+        }
+    }
+
 }
