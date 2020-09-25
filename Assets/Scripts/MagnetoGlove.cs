@@ -21,6 +21,8 @@ public class MagnetoGlove : MonoBehaviour
     /* Holds the ball in place when it is close enough to hand */
     FixedJoint ballHolder;
 
+    Rigidbody gloveRb;
+
     Rigidbody handRb;
 
     float constantRange = 1.0f;
@@ -36,6 +38,9 @@ public class MagnetoGlove : MonoBehaviour
     float maxThrowDistance = 100.0f;
 
     Ball possessedBall;
+
+    Vector3 lastBallTargetPosition = Vector3.zero;
+    public Vector3 ballTargetVelocity = Vector3.zero;
 
     private void Awake()
     {
@@ -72,13 +77,19 @@ public class MagnetoGlove : MonoBehaviour
     void Update()
     {
         ballGrabbingRegionRenderer.enabled = visualizeGrabbingRegion;
-        IsMagnetizing = PlayerInputManager.Instance.capsLock;
+        IsMagnetizing = Input.GetMouseButton(0);
 
         /* This belongs in Update because FixedUpdate will sometimes miss the Q down press */
         if (PlayerInputManager.Instance.QDown && possessedBall)
         {
             ThrowBall();
         }
+    }
+
+    private void FixedUpdate()
+    {
+        ballTargetVelocity = (ballTarget.position - lastBallTargetPosition) / Time.fixedDeltaTime;
+        lastBallTargetPosition = ballTarget.position;
     }
 
     private void OnDestroy()

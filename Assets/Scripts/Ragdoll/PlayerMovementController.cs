@@ -59,6 +59,16 @@ public class PlayerMovementController : MonoBehaviour
         
     }
 
+    private void Update()
+    {
+        /* This belongs here because FixedUpdate would sometimes miss the spacebarDown event */
+        if (isGrounded && PlayerInputManager.Instance.spacebarDown)
+        {
+            /* jump */
+            activeRagdoll.AddVelocityChange(10.0f * Vector3.up);
+        }
+    }
+
     private void FixedUpdate()
     {
         /* Checks if player is on the ground. Consider doing a spherecast for more accuracy */
@@ -77,12 +87,6 @@ public class PlayerMovementController : MonoBehaviour
             float k = (1 / Time.fixedDeltaTime) * 0.4f;
             Vector3 a = k * (vDesired - activeRagdoll.Velocity);
             activeRagdoll.AddAcceleration(a);
-
-            if (PlayerInputManager.Instance.spacebarDown)
-            {
-                /* jump */
-                activeRagdoll.AddVelocityChange(10.0f * Vector3.up);
-            }
         }
         else
         {
@@ -99,7 +103,7 @@ public class PlayerMovementController : MonoBehaviour
         //Vector3 turningTorque = 100.0f * Vector3.Cross(transform.forward, cameraTrans.forward);
         //rb.AddTorque(turningTorque, ForceMode.Acceleration);
 
-        Debug.Log(activeRagdoll.Velocity.magnitude);
+        //Debug.Log(activeRagdoll.Velocity.magnitude);
         /* Rotates player to face in direction of camera */
         activeRagdoll.MatchRotation(Camera.main.transform.rotation);
     }

@@ -13200,14 +13200,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75c40e280ca91b6439c0be4ade8d9128, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxBalls: 20
+  maxBalls: 10
   launchFrequency: 5
   minXVelocity: 0
-  minYVelocity: 50
+  minYVelocity: 30
   minZVelocity: 0
-  maxXVelocity: 10
-  maxYVelocity: 10
-  maxZVelocity: 10
+  maxXVelocity: 40
+  maxYVelocity: 40
+  maxZVelocity: 40
 --- !u!4 &706310966
 Transform:
   m_ObjectHideFlags: 0
@@ -19948,6 +19948,8 @@ MonoBehaviour:
   spacebar: 0
   spacebarDown: 0
   capsLock: 0
+  Q: 0
+  QDown: 0
   leftMouseEvent:
     m_PersistentCalls:
       m_Calls: []
