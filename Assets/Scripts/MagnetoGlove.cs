@@ -5,7 +5,7 @@ using UnityEngine;
 // TODO: make it adhere to IItem interface
 public class MagnetoGlove : MonoBehaviour
 {
-    public float shrunkBallRadius = 0.5f;
+    float shrunkBallRadius = 1.0f;
 
     public Transform ballTarget;
 

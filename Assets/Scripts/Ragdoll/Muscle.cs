@@ -75,6 +75,7 @@ public class Muscle
         joint.angularYZDrive = drive;
         joint.targetAngularVelocity = Vector3.zero;
 
+        
         SoftJointLimit lowAngXLim = joint.lowAngularXLimit;
         lowAngXLim.limit = -120.0f;
         SoftJointLimit highAngXLim = joint.highAngularXLimit;
@@ -89,6 +90,7 @@ public class Muscle
         SoftJointLimit angZLim = joint.angularZLimit;
         angZLim.limit = 120.0f;
         joint.angularZLimit = angZLim;
+        
     }
 
     public void SetParent(Muscle parentMuscle)

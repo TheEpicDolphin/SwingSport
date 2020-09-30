@@ -11,7 +11,9 @@ public class PlayerMovementController : MonoBehaviour
     public Transform cameraTrans;
 
     /* how fast player can move */
-    float movementSpeed = 12.0f;
+    float groundMovementSpeed = 12.0f;
+
+    float airMovementSpeed = 15.0f;
 
     /* movement vector of the player*/
     Vector3 movement = Vector3.zero;
@@ -83,7 +85,7 @@ public class PlayerMovementController : MonoBehaviour
         if (isGrounded)
         {
             /* Player is on the ground */
-            Vector3 vDesired = movementSpeed * movement.normalized;
+            Vector3 vDesired = groundMovementSpeed * movement.normalized;
             float k = (1 / Time.fixedDeltaTime) * 0.4f;
             Vector3 a = k * (vDesired - activeRagdoll.Velocity);
             activeRagdoll.AddAcceleration(a);

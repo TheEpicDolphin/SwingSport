@@ -59,12 +59,15 @@ public class HookGun : MonoBehaviour
         hookSlot = transform.Find("HookSlot");
 
         ropeMaterial = new Material(Shader.Find("Unlit/Color"));
-        
 
-        ropeRenderer = gameObject.AddComponent<LineRenderer>();
-        ropeRenderer.material = ropeMaterial;
-        ropeRenderer.widthMultiplier = 0.05f;
-        ropeRenderer.enabled = false;
+        ropeRenderer = gameObject.GetComponent<LineRenderer>();
+        if (!ropeRenderer)
+        {
+            ropeRenderer = gameObject.AddComponent<LineRenderer>();
+            ropeRenderer.material = ropeMaterial;
+            ropeRenderer.widthMultiplier = 0.05f;
+            ropeRenderer.enabled = false;
+        }
 
         cursor = new HookGunCursor();
 
@@ -130,7 +133,7 @@ public class HookGun : MonoBehaviour
                     /* The hook has been detached */
                     isGrappled = false;
                     hook.transform.parent = null;
-                    Destroy(verletRope.gameObject);
+                    Destroy(verletRope);
                     state = HookState.Retracting;
                     StartCoroutine(RetractHookCoroutine());
 
@@ -191,19 +194,18 @@ public class HookGun : MonoBehaviour
             LayerMask ballLayerMask = LayerMask.GetMask("Ball");
             if (Physics.OverlapSphereNonAlloc(hook.transform.position, 0.1f, colliders, hookableLayerMask | ballLayerMask) > 0)
             {
-                ropeRenderer.enabled = false;
+                //ropeRenderer.enabled = false;
                 if (colliders[0].tag == "Hookable" || colliders[0].tag == "BounceBall")
                 {
                     hook.GetComponent<Rigidbody>().isKinematic = true;
                     hook.transform.parent = colliders[0].transform;
 
                     isGrappled = true;
-                    GameObject verletRopeGO = new GameObject();
-                    verletRope = verletRopeGO.AddComponent<VerletRope>();
-                    float springConstant = 500.0f;
-                    /* Critically damped spring */
-                    float damper = Mathf.Sqrt(4 * 50.0f * springConstant);
-                    verletRope.BuildRope(this.gameObject, hook.gameObject, 6, maxRopeLength, ropeMaterial, springConstant, damper);
+
+                    verletRope = gameObject.AddComponent<VerletRope>();
+                    verletRope.BuildRope(hook.transform, 6, maxRopeLength, ropeMaterial);
+                    verletRope.Spring = 5000.0f;
+                    verletRope.Damper = 1000.0f;
                     state = HookState.Attached;
                 }
                 else
@@ -218,14 +220,14 @@ public class HookGun : MonoBehaviour
             yield return null;
         }
         state = HookState.Retracting;
-        ropeRenderer.enabled = false;
+        //ropeRenderer.enabled = false;
         StartCoroutine(RetractHookCoroutine());
         yield return null;
     }
 
     IEnumerator RetractHookCoroutine()
     {
-        ropeRenderer.enabled = true;
+        //ropeRenderer.enabled = true;
         ropeRenderer.positionCount = 2;
         float t = 0.0f;
         float animDuration = 0.3f;

@@ -8,41 +8,72 @@ public class VerletRope : MonoBehaviour
     LineRenderer ropeRenderer;
     public List<VerletRopeNode> ropeNodes = new List<VerletRopeNode>();
     private List<Vector3> ropeNodePositions;
-    private float restLength;
-    private float maxRestLength = 30.0f;
+    Transform connectedTrans;
+    private float maxRestLength;
 
-    public GameObject start;
-    public GameObject end;
+    private float RestLength
+    {
+        get
+        {
+            return ropeJoint.linearLimit.limit;
+        }
+        set
+        {
+            SoftJointLimit linearLimit = ropeJoint.linearLimit;
+            linearLimit.limit = value;
+            ropeJoint.linearLimit = linearLimit;
+        }
+    }
 
-    Rigidbody startLoad;
-    Rigidbody endLoad;
+    public float Spring
+    {
+        get
+        {
+            return ropeJoint.linearLimitSpring.spring;
+        }
+        set
+        {
+            SoftJointLimitSpring linearLimitSpring = ropeJoint.linearLimitSpring;
+            linearLimitSpring.spring = value;
+            ropeJoint.linearLimitSpring = linearLimitSpring;
+        }
+    }
 
-    public float springConstant = 500.0f;
-    public float damper = 0.0f;
+    public float Damper
+    {
+        get
+        {
+            return ropeJoint.linearLimitSpring.damper;
+        }
+        set
+        {
+            SoftJointLimitSpring linearLimitSpring = ropeJoint.linearLimitSpring;
+            linearLimitSpring.damper = value;
+            ropeJoint.linearLimitSpring = linearLimitSpring;
+        }
+    }
+
+    ConfigurableJoint ropeJoint;
 
     private void Awake()
     {
-        ropeRenderer = gameObject.AddComponent<LineRenderer>();
-        ropeRenderer.widthMultiplier = 0.05f;
+        ropeRenderer = gameObject.GetComponent<LineRenderer>();
+        if (!ropeRenderer)
+        {
+            ropeRenderer = gameObject.AddComponent<LineRenderer>();
+            ropeRenderer.widthMultiplier = 0.05f;
+        }
     }
 
-    private void Start()
+    public void BuildRope(Transform connectedTrans, int numSegments, float maxRestLength, Material ropeMat)
     {
-        //BuildRope(s, e, 3);
-    }
-
-    public void BuildRope(GameObject start, GameObject end, int numSegments, float maxRestLength, Material ropeMat, float springConstant, float damper)
-    {
-        this.start = start;
-        this.end = end;
-
-        restLength = Vector3.Distance(start.transform.position, end.transform.position);
-        float constraintLength = restLength / numSegments;
-        Vector3 direction = end.transform.position - start.transform.position;
+        float distance = Vector3.Distance(transform.position, connectedTrans.position);
+        float constraintLength = distance / numSegments;
+        Vector3 direction = connectedTrans.position - transform.position;
         for (int i = 1; i < numSegments; i++)
         {
-            Vector3 pos = Vector3.Lerp(start.transform.position, end.transform.position, 
-                i * constraintLength / restLength);
+            Vector3 pos = Vector3.Lerp(transform.position, connectedTrans.position, 
+                i * constraintLength / distance);
             GameObject ropeNodeGO = new GameObject();
             ropeNodeGO.transform.position = pos;
             VerletRopeNode ropeNode = ropeNodeGO.AddComponent<VerletRopeNode>();
@@ -52,11 +83,31 @@ public class VerletRope : MonoBehaviour
         this.maxRestLength = maxRestLength;
         ropeRenderer.material = ropeMat;
 
-        this.springConstant = springConstant;
-        this.damper = damper;
+        this.connectedTrans = connectedTrans;
+        Rigidbody sourceBody = GetNonKinematicRigidbodyInParent(transform);
+        Debug.Log(sourceBody);
+        Rigidbody connectedBody = GetNonKinematicRigidbodyInParent(connectedTrans);
+        Debug.Log(connectedBody);
+        ropeJoint = sourceBody.gameObject.AddComponent<ConfigurableJoint>();
+        ropeJoint.autoConfigureConnectedAnchor = false;
+        //ropeJoint.anchor = sourceBody.transform.InverseTransformPoint(transform.position);
+        ropeJoint.anchor = Vector3.zero;
+        if (connectedBody)
+        {
+            ropeJoint.connectedBody = connectedBody;
+            //ropeJoint.connectedAnchor = connectedBody.transform.InverseTransformPoint(connectedTrans.position);
+            ropeJoint.connectedAnchor = Vector3.zero;
+        }
+        else
+        {
+            /* Assume that this is a stationary transform */
+            ropeJoint.connectedAnchor = connectedTrans.position;
+        }
+        ropeJoint.xMotion = ConfigurableJointMotion.Limited;
+        ropeJoint.yMotion = ConfigurableJointMotion.Limited;
+        ropeJoint.zMotion = ConfigurableJointMotion.Limited;
 
-        startLoad = GetNonKinematicRigidbodyInParent(start.transform);
-        endLoad = GetNonKinematicRigidbodyInParent(end.transform);
+        RestLength = distance;
     }
 
     Rigidbody GetNonKinematicRigidbodyInParent(Transform trans)
@@ -88,59 +139,6 @@ public class VerletRope : MonoBehaviour
             if (i % 2 == 1)
             {
                 //AdjustCollisions();
-            }
-        }
-
-        if(start && end)
-        {
-            Vector3 startToEndVector = end.transform.position - start.transform.position;
-            Vector3 startToEndDirection = startToEndVector.normalized;
-
-            Vector3 ropeTension = Vector3.zero;
-            if (startLoad && endLoad)
-            {
-                // TODO: If both start and end are attached to rigidbodies, we will have to go back
-                // to college classical mechanics to model this 2-mass spring system
-
-                // TESTING: Just treat this as the only endRb case, see what it feels like
-                if (startToEndVector.magnitude > restLength)
-                {
-                    /* We only apply a restoring force when the length between the start and end
-                       is greater than the rest length of the rope. Ropes only pull you, never push you */
-                    ropeTension = springConstant * (restLength * startToEndDirection - startToEndVector)
-                                        + damper * (Vector3.zero - Vector3.Project(endLoad.velocity, startToEndDirection));
-                    endLoad.AddForce(ropeTension);
-                }
-            }
-            else if (startLoad)
-            {
-                /* endRb is null. This means that end does not have a rigidbody on any of its 
-                   ancestors. We treat it as though it has infinite mass */
-                if (startToEndVector.magnitude > restLength)
-                {
-                    /* We only apply a restoring force when the length between the start and end
-                       is greater than the rest length of the rope. Ropes only pull you, never push you */
-                    /* Treating rope like a spring */
-                    ropeTension = -springConstant * (restLength * startToEndDirection - startToEndVector)
-                                        + damper * (Vector3.zero - Vector3.Project(startLoad.velocity, startToEndDirection));
-                    startLoad.AddForceAtPosition(ropeTension, start.transform.position);
-                }
-            }
-            else if (endLoad)
-            {
-
-                /* startRb is null. This means that end does not have a rigidbody on any of its 
-                   ancestors. We treat it as though it has infinite mass */
-
-                if (startToEndVector.magnitude > restLength)
-                {
-                    /* We only apply a restoring force when the length between the start and end
-                       is greater than the rest length of the rope. Ropes only pull you, never push you */
-                    /* Treating rope like a spring */
-                    ropeTension = springConstant * (restLength * startToEndDirection - startToEndVector)
-                                        + damper * (Vector3.zero - Vector3.Project(endLoad.velocity, startToEndDirection));
-                    endLoad.AddForceAtPosition(ropeTension, end.transform.position);
-                }
             }
         }
     }
@@ -185,10 +183,10 @@ public class VerletRope : MonoBehaviour
 
     private void ApplyConstraints()
     {
-        float constraintLength = restLength / ((ropeNodes.Count - 1) + 2);
+        float constraintLength = RestLength / ((ropeNodes.Count - 1) + 2);
 
         VerletRopeNode n0 = this.ropeNodes[0];
-        Vector3 d1 = n0.transform.position - start.transform.position;
+        Vector3 d1 = n0.transform.position - transform.position;
         float d2 = d1.magnitude;
         float d3 = (d2 - constraintLength) / d2;
         n0.transform.position += -1.0f * d1 * d3;
@@ -208,7 +206,7 @@ public class VerletRope : MonoBehaviour
         }
 
         VerletRopeNode nLast = this.ropeNodes[this.ropeNodes.Count - 1];
-        d1 = end.transform.position - nLast.transform.position;
+        d1 = connectedTrans.position - nLast.transform.position;
         d2 = d1.magnitude;
         d3 = (d2 - constraintLength) / d2;
         nLast.transform.position += 1.0f * d1 * d3;
@@ -216,15 +214,15 @@ public class VerletRope : MonoBehaviour
 
     private void DrawRope()
     {
-        if (start != null && end != null)
+        if (connectedTrans != null)
         {
             ropeNodePositions = new List<Vector3>();
-            ropeNodePositions.Add(start.transform.position);
+            ropeNodePositions.Add(transform.position);
             for (int i = 0; i < ropeNodes.Count; i++)
             {
                 ropeNodePositions.Add(ropeNodes[i].transform.position);
             }
-            ropeNodePositions.Add(end.transform.position);
+            ropeNodePositions.Add(connectedTrans.position);
             ropeRenderer.positionCount = ropeNodePositions.Count;
             ropeRenderer.SetPositions(ropeNodePositions.ToArray());
         }
@@ -234,20 +232,20 @@ public class VerletRope : MonoBehaviour
        between two objects */
     public void IncreaseRestLength(float amount)
     {
-        restLength = Mathf.Min(restLength + amount, maxRestLength);
+        RestLength = Mathf.Min(RestLength + amount, maxRestLength);
     }
 
     /* This can be used for decreasing the rest length of the rope. For example, when we want
        to pull two objects closer together */
     public void DecreaseRestLength(float amount)
     {
-        restLength = Mathf.Max(restLength - amount, 0.0f);
+        /* Setting minimum to 0.1f removes jittering */
+        RestLength = Mathf.Max(RestLength - amount, 0.1f);
     }
-
 
     private void OnDestroy()
     {
-        Destroy(ropeRenderer);
+        Destroy(ropeJoint);
         for(int i = 0; i < ropeNodes.Count; i++)
         {
             Destroy(ropeNodes[i].gameObject);
