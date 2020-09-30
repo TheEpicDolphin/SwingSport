@@ -36,7 +36,7 @@ public class ActiveRagdoll : MonoBehaviour
              * be visually jarring and can create insanely large collision forces*/
             foreach(Muscle muscle in ragdollMuscles)
             {
-                muscle.bone.velocity = value;
+                muscle.boneRb.velocity = value;
             }
         }
     }
@@ -58,11 +58,6 @@ public class ActiveRagdoll : MonoBehaviour
 
         hipRb = GetComponent<Rigidbody>();
         hipConfJoint = gameObject.GetComponent<ConfigurableJoint>();
-    }
-
-    private void LateUpdate()
-    {
-        MatchRagdollToAnimatedRig();
     }
 
     int CountBones(Transform bone)
@@ -100,35 +95,36 @@ public class ActiveRagdoll : MonoBehaviour
         return animBone;
     }
 
-    Muscle CreateAndConnectMuscles(Transform ragdollBone, Transform animBone)
+    void CreateAndConnectMuscles(Transform ragdollBone, Transform animBone)
     {
-        Rigidbody boneRb = ragdollBone.GetComponent<Rigidbody>();
-        if (!boneRb)
+        if(ragdollBone.tag == "RagdollBone")
         {
-            boneRb = ragdollBone.gameObject.AddComponent<Rigidbody>();
-        }
-        boneRb.mass = boneMass;
-        boneRb.drag = 0.0f;
-        boneRb.angularDrag = 0.0f;
-        boneRb.useGravity = useGravity;
+            Rigidbody boneRb = ragdollBone.GetComponent<Rigidbody>();
+            if (!boneRb)
+            {
+                boneRb = ragdollBone.gameObject.AddComponent<Rigidbody>();
+            }
+            boneRb.mass = boneMass;
+            boneRb.drag = 0.0f;
+            boneRb.angularDrag = 0.0f;
+            boneRb.useGravity = useGravity;
 
-        Muscle muscle = new Muscle(boneRb, animBone);
-        for (int i = 0; i < ragdollBone.childCount; i++)
-        {
-            Transform childRagdollBone = ragdollBone.GetChild(i);
-            Transform childAnimBone = animBone.GetChild(i);
-            Muscle childMuscle = CreateAndConnectMuscles(childRagdollBone, childAnimBone);
-            childMuscle.SetParent(muscle);
-        }
-        this.ragdollMuscles.Add(muscle);
-        return muscle;
-    }
+            Muscle muscle = ragdollBone.gameObject.AddComponent<Muscle>();
+            muscle.SetAnimationTarget(animBone);
+            Muscle parentMuscle = ragdollBone.parent.GetComponent<Muscle>();
+            if (parentMuscle)
+            {
+                muscle.SetParent(parentMuscle);
+            }
+            this.ragdollMuscles.Add(muscle);
 
-    void MatchRagdollToAnimatedRig()
-    {
-        foreach(Muscle muscle in ragdollMuscles)
-        {
-            muscle.MatchAnimationTarget();
+            for (int i = 0; i < ragdollBone.childCount; i++)
+            {
+                Transform childRagdollBone = ragdollBone.GetChild(i);
+                Transform childAnimBone = animBone.GetChild(i);
+                CreateAndConnectMuscles(childRagdollBone, childAnimBone);
+            }
+            
         }
     }
 
@@ -162,9 +158,9 @@ public class ActiveRagdoll : MonoBehaviour
     {
         foreach (Muscle muscle in ragdollMuscles)
         {
-            Vector3 curVel = muscle.bone.velocity;
+            Vector3 curVel = muscle.boneRb.velocity;
             float curSpeed = curVel.magnitude;
-            muscle.bone.AddForce(-airDrag * Mathf.Max(0.0f, curSpeed - maxSpeed) * curVel);
+            muscle.boneRb.AddForce(-airDrag * Mathf.Max(0.0f, curSpeed - maxSpeed) * curVel);
         }
     }
 

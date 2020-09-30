@@ -2,57 +2,20 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Muscle
+public class Muscle : MonoBehaviour
 {
     public ConfigurableJoint joint;
-    public Rigidbody bone;
+    public Rigidbody boneRb;
     Transform animTarget;
 
-    /*
-    private List<Muscle> children;
-    private Muscle parent;
-    public Muscle Parent
+    private void Awake()
     {
-        get
-        {
-            return parent;
-        }
-        set
-        {
-            if (value != null)
-            {
-                joint.xMotion = ConfigurableJointMotion.Locked;
-                joint.yMotion = ConfigurableJointMotion.Locked;
-                joint.zMotion = ConfigurableJointMotion.Locked;
-                joint.connectedBody = value.bone;
-                value.children.Add(this);
-                parent = value;
-            }
-            else
-            {
-                joint.xMotion = ConfigurableJointMotion.Free;
-                joint.yMotion = ConfigurableJointMotion.Free;
-                joint.zMotion = ConfigurableJointMotion.Free;
-                joint.connectedBody = null;
-                if (parent != null)
-                {
-                    parent.children.Remove(this);
-                }
-                parent = null;
-            }
-        }
-    }
-    */
+        boneRb = GetComponent<Rigidbody>();
 
-    public Muscle(Rigidbody bone, Transform animTarget)
-    {
-        this.bone = bone;
-        this.animTarget = animTarget;
-
-        joint = bone.gameObject.GetComponent<ConfigurableJoint>();
+        joint = GetComponent<ConfigurableJoint>();
         if (!joint)
         {
-            joint = bone.gameObject.AddComponent<ConfigurableJoint>();
+            joint = gameObject.AddComponent<ConfigurableJoint>();
         }
 
         joint.anchor = Vector3.zero;
@@ -75,7 +38,7 @@ public class Muscle
         joint.angularYZDrive = drive;
         joint.targetAngularVelocity = Vector3.zero;
 
-        
+
         SoftJointLimit lowAngXLim = joint.lowAngularXLimit;
         lowAngXLim.limit = -120.0f;
         SoftJointLimit highAngXLim = joint.highAngularXLimit;
@@ -90,7 +53,6 @@ public class Muscle
         SoftJointLimit angZLim = joint.angularZLimit;
         angZLim.limit = 120.0f;
         joint.angularZLimit = angZLim;
-        
     }
 
     public void SetParent(Muscle parentMuscle)
@@ -98,7 +60,12 @@ public class Muscle
         joint.xMotion = ConfigurableJointMotion.Locked;
         joint.yMotion = ConfigurableJointMotion.Locked;
         joint.zMotion = ConfigurableJointMotion.Locked;
-        joint.connectedBody = parentMuscle.bone;
+        joint.connectedBody = parentMuscle.boneRb;
+    }
+
+    public void SetAnimationTarget(Transform animTarget)
+    {
+        this.animTarget = animTarget;
     }
 
     public void MatchAnimationTarget()
@@ -109,7 +76,14 @@ public class Muscle
         }
         else
         {
-            joint.targetRotation = Quaternion.Inverse(animTarget.localRotation) * bone.rotation;
+            joint.targetRotation = Quaternion.Inverse(animTarget.localRotation) * boneRb.rotation;
         }
     }
+
+    private void LateUpdate()
+    {
+        MatchAnimationTarget();
+    }
+
+
 }
