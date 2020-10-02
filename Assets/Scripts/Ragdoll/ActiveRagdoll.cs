@@ -62,22 +62,16 @@ public class ActiveRagdoll : MonoBehaviour
 
     int CountBones(Transform bone)
     {
+        if (bone.tag != "RagdollBone")
+        {
+            return 0;
+        }
         int count = 1;
         for (int i = 0; i < bone.childCount; i++)
         {
             count += CountBones(bone.GetChild(i));
         }
         return count;
-    }
-
-    List<Transform> FlattenedBoneHeirarchy(Transform bone)
-    {
-        List<Transform> flattened = new List<Transform>() { bone };
-        for(int i = 0; i < bone.childCount; i++)
-        {
-            flattened.AddRange(FlattenedBoneHeirarchy(bone.GetChild(i)));
-        }
-        return flattened;
     }
 
     Transform CreateAnimatedTargetRig(Transform bone)
