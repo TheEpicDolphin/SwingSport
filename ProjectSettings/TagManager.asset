@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Hookable
   - BounceBall
+  - RagdollBone
   layers:
   - Default
   - TransparentFX
