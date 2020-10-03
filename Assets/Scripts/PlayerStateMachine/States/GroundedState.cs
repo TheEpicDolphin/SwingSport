@@ -20,10 +20,9 @@ public class GroundedState : PlayerState
         }
 
         Vector3 vDesired = player.groundMovementSpeed * player.CameraRelativeInputDirection();
-        float k = (1 / Time.fixedDeltaTime) * 0.4f;
-        Vector3 a = k * (vDesired - player.activeRagdoll.Velocity);
+        Vector3 a = 10.0f * (vDesired - player.activeRagdoll.Velocity);
+        a = Vector3.ClampMagnitude(a, 100.0f);
         player.activeRagdoll.AddAcceleration(a);
-
 
         /* Rotating character is done in RagdollAnimController */
         //Vector3 turningTorque = 100.0f * Vector3.Cross(transform.forward, cameraTrans.forward);

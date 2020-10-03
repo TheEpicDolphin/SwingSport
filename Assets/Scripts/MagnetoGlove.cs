@@ -77,14 +77,18 @@ public class MagnetoGlove : MonoBehaviour
     void Update()
     {
         ballGrabbingRegionRenderer.enabled = visualizeGrabbingRegion;
+    }
+
+    public void Handle(Player player)
+    {
         IsMagnetizing = Input.GetMouseButton(0);
 
         /* This belongs in Update because FixedUpdate will sometimes miss the Q down press */
-        if (PlayerInputManager.Instance.QDown && possessedBall)
+        if (player.input.QDown && possessedBall)
         {
             ThrowBall();
         }
-    }
+    } 
 
     private void FixedUpdate()
     {

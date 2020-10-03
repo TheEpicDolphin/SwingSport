@@ -28,6 +28,8 @@ public class Player : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        currentState = new GroundedState();
+
         input = gameObject.AddComponent<PlayerInputManager>();
         activeRagdoll = GetComponent<ActiveRagdoll>();
 
@@ -64,6 +66,13 @@ public class Player : MonoBehaviour
     {
         currentState = currentState.UpdateStep(this);
         playerCamera.UpdateCameraTargetRotation(input.mouseXDelta, input.mouseYDelta);
+
+        MagnetoGlove magnetoGlove = handL.GetComponent<MagnetoGlove>();
+        if (magnetoGlove)
+        {
+            magnetoGlove.Handle(this);
+        }
+        
     }
 
     private void FixedUpdate()
