@@ -6,7 +6,7 @@ public class ActiveRagdoll : MonoBehaviour
 {
     List<Muscle> ragdollMuscles = new List<Muscle>();
 
-    /* Animated rig that the active ragdoll tries to copy */
+    /* Hip transform of the animated rig that the active ragdoll tries to copy */
     Transform animatedTargetRigHip;
 
     /* Rigidbody of hip */
@@ -49,13 +49,20 @@ public class ActiveRagdoll : MonoBehaviour
 
     private void Awake()
     {
-        animatedTargetRigHip = CreateAnimatedTargetRig(transform);
-        animatedTargetRigHip.parent = transform.parent;
-
+        Transform animatedRig = transform.parent.Find("AnimatedTargetRig");
+        if (animatedRig)
+        {
+            // Animated rig already exists. We are probably using Unity's animation system in this case
+            animatedTargetRigHip = animatedRig.GetChild(0);
+        }
+        else
+        {
+            animatedTargetRigHip = CreateAnimatedTargetRig(transform);
+            animatedTargetRigHip.parent = transform.parent;
+        }
+        
         boneMass = totalMass / CountBones(transform);
-
         CreateAndConnectMuscles(transform, animatedTargetRigHip);
-
         hipRb = GetComponent<Rigidbody>();
         hipConfJoint = gameObject.GetComponent<ConfigurableJoint>();
     }

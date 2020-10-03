@@ -38287,5 +38287,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: ybot
       objectReference: {fileID: 0}
+    - target: {fileID: 6627672691291034733, guid: 9fe0d029eeaf02b4c825820ec8b82476,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9fe0d029eeaf02b4c825820ec8b82476, type: 3}

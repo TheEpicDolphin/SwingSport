@@ -6,7 +6,7 @@ public class Muscle : MonoBehaviour
 {
     public ConfigurableJoint joint;
     public Rigidbody boneRb;
-    Transform animTarget;
+    public Transform animTarget;
 
     private void Awake()
     {
