@@ -6,10 +6,6 @@ using UnityEngine.Events;
 // Make this a singleton
 public class PlayerInputManager : MonoBehaviour
 {
-    private static PlayerInputManager _instance;
-
-    public static PlayerInputManager Instance { get { return _instance; } }
-
     public float horizontal;
     public float vertical;
     public float mouseXDelta;
@@ -27,18 +23,6 @@ public class PlayerInputManager : MonoBehaviour
     public UnityEvent rightMouseEvent = new UnityEvent();
     public UnityEvent rightMouseDownEvent = new UnityEvent();
 
-
-    private void Awake()
-    {
-        if (_instance != null && _instance != this)
-        {
-            Destroy(this.gameObject);
-        }
-        else
-        {
-            _instance = this;
-        }
-    }
 
     // Start is called before the first frame update
     void Start()

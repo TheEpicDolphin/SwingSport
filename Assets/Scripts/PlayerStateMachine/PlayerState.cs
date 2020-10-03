@@ -2,24 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerState
+public abstract class PlayerState
 {
-    List<PlayerStateTransition> transitions;
-    public PlayerState()
-    {
+    public abstract void OnEnter();
 
-    }
+    public abstract PlayerState UpdateStep(Player player);
 
-    public void Run()
-    {
-        /* Check to see if any transitions should occur */
-        foreach(PlayerStateTransition transition in transitions)
-        {
-            
-        }
-
-        /* Perform state action */
-    }
-
-    
+    public abstract PlayerState FixedUpdateStep(Player player);
 }

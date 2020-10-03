@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerCameraController : MonoBehaviour
+public class PlayerCamera : MonoBehaviour
 {
 
     /* mouse position on screen */
@@ -19,23 +19,25 @@ public class PlayerCameraController : MonoBehaviour
     /* camera is a child of view. view is always constrained to at the position of the player */
     Transform view;
 
+    Quaternion targetRotation = Quaternion.identity;
+
     // Start is called before the first frame update
     void Start()
     {
         view = transform.parent;
     }
 
-    // Update is called once per frame
-    void Update()
+    public void UpdateCameraTargetRotation(float mouseXDelta, float mouseYDelta)
     {
-        mouseX += PlayerInputManager.Instance.mouseXDelta * mouseSensitivity;
-        mouseY += PlayerInputManager.Instance.mouseYDelta * mouseSensitivity;
+        mouseX += mouseXDelta * mouseSensitivity;
+        mouseY += mouseYDelta * mouseSensitivity;
         mouseY = Mathf.Clamp(mouseY, -80, 80);
+        targetRotation = Quaternion.Euler(-mouseY, mouseX, 0);
     }
 
     private void FixedUpdate()
     {
         view.position = ragdollTrans.position;
-        view.rotation = Quaternion.Slerp(view.rotation, Quaternion.Euler(-mouseY, mouseX, 0), cameraFluidity);
+        view.rotation = Quaternion.Slerp(view.rotation, targetRotation, cameraFluidity);
     }
 }
