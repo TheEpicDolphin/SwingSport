@@ -22,6 +22,8 @@ public class ActiveRagdoll : MonoBehaviour
 
     float maxSpeed = 60.0f;
 
+    public Animator animator;
+
     public Vector3 Velocity
     {
         get
@@ -54,6 +56,7 @@ public class ActiveRagdoll : MonoBehaviour
         {
             // Animated rig already exists. We are probably using Unity's animation system in this case
             animatedTargetRigHip = animatedRig.GetChild(0);
+            animator = animatedRig.GetComponent<Animator>();
         }
         else
         {

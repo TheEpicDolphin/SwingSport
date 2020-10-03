@@ -16,6 +16,7 @@ public class GroundedState : PlayerState
 
         if (!isGrounded)
         {
+            player.activeRagdoll.animator.CrossFade("Falling", 0.1f);
             return new AerialState();
         }
 
@@ -42,6 +43,7 @@ public class GroundedState : PlayerState
             player.activeRagdoll.AddVelocityChange(10.0f * Vector3.up);
 
             // TODO: Delay for a bit to allow for player to take off ground
+            player.activeRagdoll.animator.CrossFade("Falling", 0.25f);
             return new JumpingState(0.25f);
         }
         return this;
