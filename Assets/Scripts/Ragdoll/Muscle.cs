@@ -8,7 +8,7 @@ public class Muscle : MonoBehaviour
     public Rigidbody boneRb;
     public Transform animTarget;
 
-    public Transform ragdollRoot;
+    public Rigidbody ragdollRootRb;
     public Transform animatedRigRoot;
     public JointDrive positionMatchingSpring = new JointDrive();
 
@@ -87,9 +87,10 @@ public class Muscle : MonoBehaviour
     private void FixedUpdate()
     {
         Vector3 relAnimTargetPos = animatedRigRoot.InverseTransformPoint(animTarget.position);
-        Vector3 targetPos = ragdollRoot.TransformPoint(relAnimTargetPos);
+        Vector3 targetPos = ragdollRootRb.transform.TransformPoint(relAnimTargetPos);
+        Vector3 relVel = boneRb.velocity - ragdollRootRb.velocity;
         Vector3 f = positionMatchingSpring.positionSpring * (targetPos - boneRb.position)
-                        - positionMatchingSpring.positionDamper * (boneRb.velocity);
+                        - positionMatchingSpring.positionDamper * (relVel);
         boneRb.AddForce(f);
     }
 

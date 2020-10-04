@@ -114,7 +114,7 @@ public class ActiveRagdoll : MonoBehaviour
             boneRb.useGravity = useGravity;
 
             Muscle muscle = ragdollBone.gameObject.AddComponent<Muscle>();
-            muscle.ragdollRoot = transform;
+            muscle.ragdollRootRb = GetComponent<Rigidbody>();
             muscle.animatedRigRoot = animatedTargetRigHip;
             muscle.SetAnimationTarget(animBone);
             Muscle parentMuscle = ragdollBone.parent.GetComponent<Muscle>();
