@@ -8,6 +8,10 @@ public class Muscle : MonoBehaviour
     public Rigidbody boneRb;
     public Transform animTarget;
 
+    public Transform ragdollRoot;
+    public Transform animatedRigRoot;
+    public JointDrive positionMatchingSpring = new JointDrive();
+
     private void Awake()
     {
         boneRb = GetComponent<Rigidbody>();
@@ -78,6 +82,15 @@ public class Muscle : MonoBehaviour
         {
             joint.targetRotation = Quaternion.Inverse(animTarget.localRotation) * boneRb.rotation;
         }
+    }
+
+    private void FixedUpdate()
+    {
+        //Vector3 relRagdollBonePos = ragdollRoot.InverseTransformPoint(boneRb.position);
+        //Vector3 relAnimTargetPos = animatedRigRoot.InverseTransformPoint(animTarget.position);
+        //Vector3 f = positionMatchingSpring.positionSpring * (relAnimTargetPos - relRagdollBonePos)
+        //                - positionMatchingSpring.positionDamper * (boneRb.velocity);
+        //boneRb.AddForce(f);
     }
 
     private void LateUpdate()

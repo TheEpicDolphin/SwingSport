@@ -114,11 +114,19 @@ public class ActiveRagdoll : MonoBehaviour
             boneRb.useGravity = useGravity;
 
             Muscle muscle = ragdollBone.gameObject.AddComponent<Muscle>();
+            muscle.ragdollRoot = transform;
+            muscle.animatedRigRoot = animatedTargetRigHip;
             muscle.SetAnimationTarget(animBone);
             Muscle parentMuscle = ragdollBone.parent.GetComponent<Muscle>();
             if (parentMuscle)
             {
                 muscle.SetParent(parentMuscle);
+
+                JointDrive posMatchingSpring = new JointDrive();
+                posMatchingSpring.positionSpring = 1000.0f;
+                posMatchingSpring.positionDamper = 100.0f;
+                posMatchingSpring.maximumForce = Mathf.Infinity;
+                muscle.positionMatchingSpring = posMatchingSpring;
             }
             this.ragdollMuscles.Add(muscle);
 

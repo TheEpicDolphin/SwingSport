@@ -85,9 +85,7 @@ public class VerletRope : MonoBehaviour
 
         this.connectedTrans = connectedTrans;
         Rigidbody sourceBody = GetNonKinematicRigidbodyInParent(transform);
-        Debug.Log(sourceBody);
         Rigidbody connectedBody = GetNonKinematicRigidbodyInParent(connectedTrans);
-        Debug.Log(connectedBody);
         ropeJoint = sourceBody.gameObject.AddComponent<ConfigurableJoint>();
         ropeJoint.autoConfigureConnectedAnchor = false;
         //ropeJoint.anchor = sourceBody.transform.InverseTransformPoint(transform.position);
