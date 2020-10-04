@@ -86,11 +86,11 @@ public class Muscle : MonoBehaviour
 
     private void FixedUpdate()
     {
-        //Vector3 relRagdollBonePos = ragdollRoot.InverseTransformPoint(boneRb.position);
-        //Vector3 relAnimTargetPos = animatedRigRoot.InverseTransformPoint(animTarget.position);
-        //Vector3 f = positionMatchingSpring.positionSpring * (relAnimTargetPos - relRagdollBonePos)
-        //                - positionMatchingSpring.positionDamper * (boneRb.velocity);
-        //boneRb.AddForce(f);
+        Vector3 relAnimTargetPos = animatedRigRoot.InverseTransformPoint(animTarget.position);
+        Vector3 targetPos = ragdollRoot.TransformPoint(relAnimTargetPos);
+        Vector3 f = positionMatchingSpring.positionSpring * (targetPos - boneRb.position)
+                        - positionMatchingSpring.positionDamper * (boneRb.velocity);
+        boneRb.AddForce(f);
     }
 
     private void LateUpdate()
