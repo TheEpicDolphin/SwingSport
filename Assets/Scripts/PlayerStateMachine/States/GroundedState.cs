@@ -52,6 +52,7 @@ public class GroundedState : PlayerState
         /* This belongs here because FixedUpdate would sometimes miss the spacebarDown event */
         if (player.input.spacebarDown)
         {
+            player.surfaceConstrainer.enabled = false;
             /* jump */
             player.activeRagdoll.AddVelocityChange(10.0f * Vector3.up);
 
