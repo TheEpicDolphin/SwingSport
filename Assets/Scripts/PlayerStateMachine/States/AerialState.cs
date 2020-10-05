@@ -17,7 +17,7 @@ public class AerialState : PlayerState
         if (isGrounded)
         {
             player.activeRagdoll.animator.CrossFade("Running", 0.1f);
-            return new GroundedState();
+            return new GroundedState(player);
         }
 
         /* Player is in the air. Allow jetpack-like movement */

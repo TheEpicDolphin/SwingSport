@@ -25,11 +25,12 @@ public class Player : MonoBehaviour
 
     PlayerState currentState;
 
+    public AxialSpringJoint surfaceConstrainer;
+
     // Start is called before the first frame update
     void Start()
     {
-        currentState = new GroundedState();
-
+        surfaceConstrainer = gameObject.AddComponent<AxialSpringJoint>();
         input = gameObject.AddComponent<PlayerInputManager>();
         activeRagdoll = GetComponent<ActiveRagdoll>();
 
@@ -59,7 +60,9 @@ public class Player : MonoBehaviour
             ballHookGun.cursor.cursorImage = cursorImage;
             */
         }
-        
+
+        currentState = new GroundedState(this);
+
     }
 
     private void Update()

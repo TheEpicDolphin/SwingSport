@@ -176,4 +176,9 @@ public class ActiveRagdoll : MonoBehaviour
         }
     }
 
+    public float AnimatedHipTargetY()
+    {
+        return animatedTargetRigHip.position.y;
+    }
+
 }
