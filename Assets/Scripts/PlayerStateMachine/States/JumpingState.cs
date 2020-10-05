@@ -23,7 +23,8 @@ public class JumpingState : PlayerState
         {
             player.activeRagdoll.AddAcceleration(100.0f * Vector3.up);
         }
-        player.activeRagdoll.MatchRotation(player.playerCamera.transform.rotation);
+        //player.activeRagdoll.MatchRotation(player.playerCamera.transform.rotation);
+        player.activeRagdoll.MatchRotation(Quaternion.LookRotation(player.CameraRelativeInputDirection(), Vector3.up));
         return this;
     }
 

@@ -30,7 +30,8 @@ public class AerialState : PlayerState
         player.activeRagdoll.AddAcceleration(10.0f * player.CameraRelativeInputDirection());
         player.activeRagdoll.ApplyAirDrag();
 
-        player.activeRagdoll.MatchRotation(player.playerCamera.transform.rotation);
+        //player.activeRagdoll.MatchRotation(player.playerCamera.transform.rotation);
+        player.activeRagdoll.MatchRotation(Quaternion.LookRotation(player.CameraRelativeInputDirection(), Vector3.up));
         return this;
     }
 

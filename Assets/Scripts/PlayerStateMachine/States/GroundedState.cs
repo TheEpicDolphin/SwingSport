@@ -30,7 +30,9 @@ public class GroundedState : PlayerState
         //rb.AddTorque(turningTorque, ForceMode.Acceleration);
 
         /* Rotates player to face in direction of camera */
-        player.activeRagdoll.MatchRotation(player.playerCamera.transform.rotation);
+        //player.activeRagdoll.MatchRotation(player.playerCamera.transform.rotation);
+        
+        player.activeRagdoll.MatchRotation(Quaternion.LookRotation(player.CameraRelativeInputDirection(), Vector3.up));
         return this;
     }
 
