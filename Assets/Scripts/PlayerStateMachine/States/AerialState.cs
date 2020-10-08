@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class AerialState : PlayerState
 {
+    public AerialState(Player player)
+    {
+        player.activeRagdoll.animator.CrossFade("Falling", 0.1f);
+    }
 
     public override void OnEnter()
     {
@@ -13,10 +17,10 @@ public class AerialState : PlayerState
     public override PlayerState FixedUpdateStep(Player player)
     {
         /* Checks if player is touching ground */
-        bool isGrounded = Physics.Raycast(player.transform.position, Vector3.down, 1.3f, ~LayerMask.GetMask("Player"));
-        if (isGrounded)
+        bool willLand = Physics.Raycast(player.transform.position, Vector3.down, 1.6f, ~LayerMask.GetMask("Player"));
+        if (willLand)
         {
-            player.activeRagdoll.animator.CrossFade("Running", 0.1f);
+            //return new LandingState(player, 0.15f);
             return new GroundedState(player);
         }
 

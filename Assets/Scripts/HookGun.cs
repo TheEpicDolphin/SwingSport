@@ -17,9 +17,9 @@ public class HookGun : MonoBehaviour
 
     Transform hookSlot;
 
-    Hook hook;
-
     Rigidbody hookGunRb;
+
+    Hook hook;
 
     FixedJoint attachJoint;
 
@@ -68,9 +68,7 @@ public class HookGun : MonoBehaviour
         }
 
         cursor = new HookGunCursor();
-
         hookGunRb = GetComponent<Rigidbody>();
-        hookGunRb.isKinematic = false;
     }
     // Start is called before the first frame update
     void Start()
@@ -244,22 +242,11 @@ public class HookGun : MonoBehaviour
         yield return null;
     }
 
-    public void Equip(Transform parent, Vector3 position, Quaternion rotation, bool usePhysics)
+    public void Equip(Transform parent, Vector3 position, Quaternion rotation)
     {
         transform.position = position;
         transform.rotation = rotation;
-        if (usePhysics)
-        {
-            hookGunRb.isKinematic = false;
-            Rigidbody parentRb = parent.GetComponent<Rigidbody>();
-            attachJoint = gameObject.AddComponent<FixedJoint>();
-            attachJoint.connectedBody = parentRb;
-            attachJoint.breakForce = float.PositiveInfinity;
-        }
-        else
-        {
-            hookGunRb.isKinematic = true;
-        }
+        hookGunRb.isKinematic = true;
         transform.parent = parent;
     }
 

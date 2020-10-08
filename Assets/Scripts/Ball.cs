@@ -65,25 +65,7 @@ public class Ball : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        /*
-        if (hasBall)
-        {
 
-            currentGrabTime -= Time.deltaTime;
-
-            hasBallVisual.gameObject.GetComponent<Renderer>().material.color = Color.Lerp(Color.green, Color.red, 1.0f - (currentGrabTime / maxGrabTime));
-
-            if (Input.GetKeyDown(KeyCode.Q))
-            {
-                letGoOfBall(true);
-            }
-            else if (currentGrabTime < 0.0f)
-            {
-                letGoOfBall(false);
-            }
-
-        }
-        */
     }
 
     private void FixedUpdate()
@@ -97,10 +79,10 @@ public class Ball : MonoBehaviour
             MagnetoGlove magnetoGlove = collider.GetComponent<MagnetoGlove>();
             if (collider.transform != transform.parent && magnetoGlove.IsMagnetizing)
             {
-                Vector3 r = magnetoGlove.ballTarget.position - transform.position;
+                Vector3 r = magnetoGlove.ballSocket.position - transform.position;
                 //Vector3 homingForce = InverseSquareForceLaw(magnetoGlove.Strength, r);
                 //Vector3 homingForce = InverseForceLaw(magnetoGlove.Strength, r);
-                Vector3 homingForce = PControllerWithPredictionForce(magnetoGlove.ballTarget.position, magnetoGlove.ballTargetVelocity);
+                Vector3 homingForce = PControllerWithPredictionForce(magnetoGlove.ballSocket.position, magnetoGlove.ballTargetVelocity);
                 ballRb.AddForce(homingForce);
                 magnetoGlove.ApplyForceOnHand(-homingForce, ForceMode.Force);
             }

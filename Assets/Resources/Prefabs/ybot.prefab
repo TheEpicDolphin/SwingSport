@@ -3230,7 +3230,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe6d3bd141493de4eb1e8fa2f2c53c14, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  useGravity: 1
+  animator: {fileID: 0}
 --- !u!114 &6285706642020936402
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3251,6 +3251,7 @@ MonoBehaviour:
   handR: {fileID: 5660739034919687924}
   handL: {fileID: 938776449364147455}
   input: {fileID: 0}
+  surfaceConstrainer: {fileID: 0}
 --- !u!1 &6437119527770685513
 GameObject:
   m_ObjectHideFlags: 0

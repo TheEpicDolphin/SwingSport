@@ -25,12 +25,12 @@ public class Player : MonoBehaviour
 
     PlayerState currentState;
 
-    public AxialSpringJoint surfaceConstrainer;
+    public PlanarSpringConstraint surfaceConstrainer;
 
     // Start is called before the first frame update
     void Start()
     {
-        surfaceConstrainer = gameObject.AddComponent<AxialSpringJoint>();
+        surfaceConstrainer = gameObject.AddComponent<PlanarSpringConstraint>();
         input = gameObject.AddComponent<PlayerInputManager>();
         activeRagdoll = GetComponent<ActiveRagdoll>();
 
@@ -39,7 +39,7 @@ public class Player : MonoBehaviour
             GameObject hookGunGO = (GameObject)Instantiate(Resources.Load("Prefabs/HookGun"));
             HookGun hookGun = hookGunGO.GetComponent<HookGun>();
             hookGun.Equip(handR, handR.position + 0.25f * handR.transform.forward,
-                            handR.rotation, false);
+                            handR.rotation);
             hookGun.setControls(1);
             hookGun.setColor(Color.red);
             hookGun.cursor.cursorImage = cursorImage;
@@ -47,9 +47,9 @@ public class Player : MonoBehaviour
 
         if (handL)
         {
-            GameObject magnetoGloveGO = new GameObject();
-            MagnetoGlove magnetoGlove = magnetoGloveGO.AddComponent<MagnetoGlove>();
-            magnetoGlove.Equip(handL, handL.position, handL.rotation, false);
+            //GameObject magnetoGloveGO = new GameObject();
+            //MagnetoGlove magnetoGlove = magnetoGloveGO.AddComponent<MagnetoGlove>();
+            //magnetoGlove.Equip(handL, handL.position, handL.rotation, false);
             /*
             GameObject ballHookGunGO = (GameObject)Instantiate(Resources.Load("Prefabs/HookGun"));
             HookGun ballHookGun = ballHookGunGO.GetComponent<HookGun>();

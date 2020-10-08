@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AxialSpringJoint : MonoBehaviour
+public class PlanarSpringConstraint : MonoBehaviour
 {
     Rigidbody rb;
 
@@ -10,11 +10,11 @@ public class AxialSpringJoint : MonoBehaviour
 
     public float Cd = 0.1f;
 
-    public Vector3 axis;
+    public Vector3 normal;
     
-    public Vector3 connectedAnchor;
+    public Vector3 planePoint;
 
-    public float restDistance;
+    public float distance;
     // Start is called before the first frame update
     void Start()
     {
@@ -30,13 +30,13 @@ public class AxialSpringJoint : MonoBehaviour
          */
         Ck = Mathf.Clamp(Ck, 0, 1);
         Cd = Mathf.Clamp(Cd, 0, 1);
-        axis.Normalize();
+        normal.Normalize();
 
         float m = rb.mass;
-        float v = Vector3.Dot(rb.velocity, axis);
-        float x = Vector3.Dot(transform.position - connectedAnchor, axis) - restDistance;
+        float v = Vector3.Dot(rb.velocity, normal);
+        float x = Vector3.Dot(transform.position - planePoint, normal) - distance;
         float dt = Time.fixedDeltaTime;
-        Vector3 f = (-(m * Ck / (dt * dt)) * x - (m * Cd / dt) * v) * axis.normalized;
+        Vector3 f = (-(m * Ck / (dt * dt)) * x - (m * Cd / dt) * v) * normal.normalized;
         rb.AddForce(f);
     }
 }

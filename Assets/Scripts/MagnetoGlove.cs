@@ -5,9 +5,9 @@ using UnityEngine;
 // TODO: make it adhere to IItem interface
 public class MagnetoGlove : MonoBehaviour
 {
-    float shrunkBallRadius = 1.0f;
+    float shrunkBallRadius = 0.5f;
 
-    public Transform ballTarget;
+    public Transform ballSocket;
 
     Renderer ballGrabbingRegionRenderer;
 
@@ -17,11 +17,6 @@ public class MagnetoGlove : MonoBehaviour
     public bool IsMagnetizing { get; private set; } = false;
 
     public bool visualizeGrabbingRegion = false;
-
-    /* Holds the ball in place when it is close enough to hand */
-    FixedJoint ballHolder;
-
-    Rigidbody gloveRb;
 
     Rigidbody handRb;
 
@@ -44,14 +39,14 @@ public class MagnetoGlove : MonoBehaviour
 
     private void Awake()
     {
-        GameObject ballTargetGO = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        Destroy(ballTargetGO.GetComponent<Collider>());
-        ballGrabbingRegionRenderer = ballTargetGO.GetComponent<Renderer>();
+        GameObject ballSocketGO = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        Destroy(ballSocketGO.GetComponent<Collider>());
+        ballGrabbingRegionRenderer = ballSocketGO.GetComponent<Renderer>();
 
-        ballTarget = ballTargetGO.transform;
-        ballTarget.parent = transform;
-        ballTarget.position = transform.position + shrunkBallRadius * transform.forward;
-        ballTarget.rotation = Quaternion.identity;
+        ballSocket = ballSocketGO.transform;
+        ballSocket.parent = transform;
+        ballSocket.position = transform.position + shrunkBallRadius * transform.forward;
+        ballSocket.rotation = Quaternion.identity;
 
         sphereCollider = gameObject.AddComponent<SphereCollider>();
         sphereCollider.radius = 0.5f;
@@ -76,6 +71,24 @@ public class MagnetoGlove : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        LayerMask ballLayerMask = LayerMask.GetMask("Ball");
+        Collider[] colliders = new Collider[1];
+        if(Physics.OverlapSphereNonAlloc(ballSocket.position, shrunkBallRadius, colliders, ballLayerMask) > 0)
+        {
+            if (!possessedBall)
+            {
+                Ball ball = colliders[0].GetComponent<Ball>();
+                if (ball && IsMagnetizing)
+                {
+                    possessedBall = ball;
+                    Rigidbody ballRb = possessedBall.GetComponent<Rigidbody>();
+                    Vector3 ballVel = ballRb.velocity;
+                    Grab(ball);
+                    ApplyForceOnHand(ballVel, ForceMode.Impulse);
+                }
+            }
+        }
+
         ballGrabbingRegionRenderer.enabled = visualizeGrabbingRegion;
     }
 
@@ -92,29 +105,13 @@ public class MagnetoGlove : MonoBehaviour
 
     private void FixedUpdate()
     {
-        ballTargetVelocity = (ballTarget.position - lastBallTargetPosition) / Time.fixedDeltaTime;
-        lastBallTargetPosition = ballTarget.position;
+        ballTargetVelocity = (ballSocket.position - lastBallTargetPosition) / Time.fixedDeltaTime;
+        lastBallTargetPosition = ballSocket.position;
     }
 
     private void OnDestroy()
     {
-        Destroy(ballTarget.gameObject);
-    }
-
-    private void OnTriggerStay(Collider other)
-    {
-        if (!possessedBall)
-        {
-            Ball ball = other.GetComponent<Ball>();
-            if (ball && IsMagnetizing)
-            {
-                possessedBall = ball;
-                Rigidbody ballRb = possessedBall.GetComponent<Rigidbody>();
-                Vector3 ballVel = ballRb.velocity;
-                Grab(ball);
-                ApplyForceOnHand(ballVel, ForceMode.Impulse);
-            }
-        }
+        Destroy(ballSocket.gameObject);
     }
 
     public void ThrowBall()
@@ -143,7 +140,7 @@ public class MagnetoGlove : MonoBehaviour
     {
         possessedBall = ball;
         ball.Possessor = this;
-        ball.transform.position = ballTarget.position;
+        ball.transform.position = ballSocket.position;
     }
 
     public void Release()

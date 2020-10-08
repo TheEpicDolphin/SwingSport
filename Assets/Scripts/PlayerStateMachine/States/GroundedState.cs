@@ -6,6 +6,7 @@ public class GroundedState : PlayerState
 {
     public GroundedState(Player player)
     {
+        player.activeRagdoll.animator.CrossFade("GroundedMovement", 0.1f);
         player.surfaceConstrainer.enabled = true;
     }
 
@@ -32,18 +33,21 @@ public class GroundedState : PlayerState
             /* Rotates player to face in direction of camera */
             //player.activeRagdoll.MatchRotation(player.playerCamera.transform.rotation);
 
-            player.surfaceConstrainer.connectedAnchor = hit.point;
-            player.surfaceConstrainer.axis = hit.normal;
-            player.surfaceConstrainer.restDistance = hit.point.y + player.activeRagdoll.AnimatedHipTargetY();
+            player.surfaceConstrainer.planePoint = hit.point;
+            player.surfaceConstrainer.normal = hit.normal;
+            player.surfaceConstrainer.distance = 2.5f * (hit.point.y + player.activeRagdoll.AnimatedHipTargetY());
 
-            player.activeRagdoll.MatchRotation(Quaternion.LookRotation(player.CameraRelativeInputDirection(), Vector3.up));
+            Vector3 movementDir = player.CameraRelativeInputDirection();
+            if(movementDir.magnitude > 1e-4f)
+            {
+                player.activeRagdoll.MatchRotation(Quaternion.LookRotation(movementDir, Vector3.up));
+            }
             return this;
         }
         else
         {
             player.surfaceConstrainer.enabled = false;
-            player.activeRagdoll.animator.CrossFade("Falling", 0.1f);
-            return new AerialState();
+            return new AerialState(player);
         }
     }
 
@@ -53,13 +57,13 @@ public class GroundedState : PlayerState
         if (player.input.spacebarDown)
         {
             player.surfaceConstrainer.enabled = false;
-            /* jump */
-            player.activeRagdoll.AddVelocityChange(10.0f * Vector3.up);
-
             // TODO: Delay for a bit to allow for player to take off ground
-            player.activeRagdoll.animator.CrossFade("Falling", 0.25f);
-            return new JumpingState(0.25f);
+            player.activeRagdoll.animator.CrossFade("Falling", 0.1f);
+            return new JumpingState(0.1f);
         }
+        Vector3 groundNormal = player.surfaceConstrainer.normal;
+        float groundSpeed = Vector3.ProjectOnPlane(player.activeRagdoll.Velocity, groundNormal).magnitude;
+        player.activeRagdoll.animator.SetFloat("GroundSpeed", groundSpeed / player.groundMovementSpeed);
         return this;
     }
 

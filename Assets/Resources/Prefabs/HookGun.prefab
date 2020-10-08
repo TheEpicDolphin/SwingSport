@@ -91,7 +91,7 @@ GameObject:
   m_Component:
   - component: {fileID: 483345885859186859}
   - component: {fileID: 483345885859186860}
-  - component: {fileID: 4245166405311246210}
+  - component: {fileID: 6003023608867137179}
   m_Layer: 0
   m_Name: HookGun
   m_TagString: Untagged
@@ -129,7 +129,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cursor: {fileID: 0}
   ropeMaterial: {fileID: 0}
---- !u!54 &4245166405311246210
+--- !u!54 &6003023608867137179
 Rigidbody:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

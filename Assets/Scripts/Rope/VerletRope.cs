@@ -88,12 +88,10 @@ public class VerletRope : MonoBehaviour
         Rigidbody connectedBody = GetNonKinematicRigidbodyInParent(connectedTrans);
         ropeJoint = sourceBody.gameObject.AddComponent<ConfigurableJoint>();
         ropeJoint.autoConfigureConnectedAnchor = false;
-        //ropeJoint.anchor = sourceBody.transform.InverseTransformPoint(transform.position);
         ropeJoint.anchor = Vector3.zero;
         if (connectedBody)
         {
             ropeJoint.connectedBody = connectedBody;
-            //ropeJoint.connectedAnchor = connectedBody.transform.InverseTransformPoint(connectedTrans.position);
             ropeJoint.connectedAnchor = Vector3.zero;
         }
         else
@@ -108,12 +106,14 @@ public class VerletRope : MonoBehaviour
         RestLength = distance;
     }
 
-    Rigidbody GetNonKinematicRigidbodyInParent(Transform trans)
+    Rigidbody GetNonKinematicRigidbodyInParent(Transform start)
     {
-        Rigidbody currentRb = trans.GetComponent<Rigidbody>();
-        while (currentRb && currentRb.isKinematic)
+        Transform currentTrans = start;
+        Rigidbody currentRb = currentTrans.GetComponent<Rigidbody>();
+        while ((!currentRb || currentRb.isKinematic) && (currentTrans.parent != null))
         {
-            currentRb = currentRb.transform.parent.GetComponent<Rigidbody>();
+            currentTrans = currentTrans.parent;
+            currentRb = currentTrans.GetComponent<Rigidbody>();
         }
         return currentRb;
     }

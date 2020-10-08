@@ -10,7 +10,10 @@ public class Muscle : MonoBehaviour
 
     public Rigidbody ragdollRootRb;
     public Transform animatedRigRoot;
+
     public JointDrive positionMatchingSpring = new JointDrive();
+
+    Quaternion startLocalRotation;
 
     private void Awake()
     {
@@ -42,7 +45,7 @@ public class Muscle : MonoBehaviour
         joint.angularYZDrive = drive;
         joint.targetAngularVelocity = Vector3.zero;
 
-
+        /*
         SoftJointLimit lowAngXLim = joint.lowAngularXLimit;
         lowAngXLim.limit = -120.0f;
         SoftJointLimit highAngXLim = joint.highAngularXLimit;
@@ -57,6 +60,8 @@ public class Muscle : MonoBehaviour
         SoftJointLimit angZLim = joint.angularZLimit;
         angZLim.limit = 120.0f;
         joint.angularZLimit = angZLim;
+        */
+        
     }
 
     public void SetParent(Muscle parentMuscle)
@@ -65,6 +70,7 @@ public class Muscle : MonoBehaviour
         joint.yMotion = ConfigurableJointMotion.Locked;
         joint.zMotion = ConfigurableJointMotion.Locked;
         joint.connectedBody = parentMuscle.boneRb;
+        startLocalRotation = transform.localRotation;
     }
 
     public void SetAnimationTarget(Transform animTarget)
@@ -72,32 +78,37 @@ public class Muscle : MonoBehaviour
         this.animTarget = animTarget;
     }
 
-    public void MatchAnimationTarget()
+    public void MatchAnimationTargetRotation()
     {
         if (joint.connectedBody)
         {
-            joint.targetRotation = Quaternion.Inverse(animTarget.localRotation);
+            ConfigurableJointExtensions.SetTargetRotationLocal(joint, animTarget.localRotation, startLocalRotation);
         }
         else
         {
-            joint.targetRotation = Quaternion.Inverse(animTarget.localRotation) * boneRb.rotation;
+
         }
+    }
+
+    public void MatchAnimationTargetPosition()
+    {
+        float Ck = 0.25f;
+        float Cd = 0.25f;
+
+        Vector3 relAnimTargetPos = animatedRigRoot.InverseTransformPoint(animTarget.position);
+        Vector3 targetPos = ragdollRootRb.transform.TransformPoint(relAnimTargetPos);
+        float m = boneRb.mass;
+        float dt = Time.fixedDeltaTime;
+        Vector3 targetToBone = boneRb.position - targetPos;
+        Vector3 v = Vector3.Project(boneRb.velocity - ragdollRootRb.velocity, targetToBone.normalized);
+        Vector3 f = -(m * Ck / (dt * dt)) * targetToBone - (m * Cd / dt) * v;
+        boneRb.AddForce(f);
     }
 
     private void FixedUpdate()
     {
-        Vector3 relAnimTargetPos = animatedRigRoot.InverseTransformPoint(animTarget.position);
-        Vector3 targetPos = ragdollRootRb.transform.TransformPoint(relAnimTargetPos);
-        Vector3 relVel = boneRb.velocity - ragdollRootRb.velocity;
-        Vector3 f = positionMatchingSpring.positionSpring * (targetPos - boneRb.position)
-                        - positionMatchingSpring.positionDamper * (relVel);
-        boneRb.AddForce(f);
+        MatchAnimationTargetPosition();
+        MatchAnimationTargetRotation();
     }
-
-    private void LateUpdate()
-    {
-        MatchAnimationTarget();
-    }
-
 
 }

@@ -4,11 +4,15 @@ using UnityEngine;
 
 public class JumpingState : PlayerState
 {
-    float minJumpDuration;
+    float jumpDuration;
+    float t;
+    float spacebarTime;
 
-    public JumpingState(float minJumpDuration)
+    public JumpingState(float jumpDuration)
     {
-        this.minJumpDuration = minJumpDuration;
+        this.jumpDuration = jumpDuration;
+        this.t = 0.0f;
+        this.spacebarTime = 0.0f;
     }
 
     public override void OnEnter()
@@ -18,23 +22,26 @@ public class JumpingState : PlayerState
 
     public override PlayerState FixedUpdateStep(Player player)
     {
-        /* If player is holding down spacebar while jumping, he/she will jump higher */
-        if (player.input.spacebar)
-        {
-            player.activeRagdoll.AddAcceleration(100.0f * Vector3.up);
-        }
         //player.activeRagdoll.MatchRotation(player.playerCamera.transform.rotation);
-        player.activeRagdoll.MatchRotation(Quaternion.LookRotation(player.CameraRelativeInputDirection(), Vector3.up));
+        //player.activeRagdoll.MatchRotation(Quaternion.LookRotation(player.CameraRelativeInputDirection(), Vector3.up));
+        player.activeRagdoll.AddAcceleration(20.0f * Vector3.up);
         return this;
     }
 
     public override PlayerState UpdateStep(Player player)
     {
-        if (minJumpDuration < 0)
+        if (t >= jumpDuration)
         {
-            return new AerialState();
+            float jumpPower = Mathf.Lerp(5.0f, 20.0f, spacebarTime / jumpDuration);
+            player.activeRagdoll.AddVelocityChange(jumpPower * Vector3.up);
+            return new AerialState(player);
         }
-        minJumpDuration -= Time.deltaTime;
+        if (player.input.spacebar)
+        {
+            /* If player is holding down spacebar while jumping, he/she will jump higher */
+            spacebarTime += Time.deltaTime;
+        }
+        t += Time.deltaTime;
         return this;
     }
 }

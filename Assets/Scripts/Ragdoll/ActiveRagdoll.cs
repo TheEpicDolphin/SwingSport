@@ -16,7 +16,7 @@ public class ActiveRagdoll : MonoBehaviour
     ConfigurableJoint hipConfJoint;
 
     /* Determines if active ragdoll is affected by gravity */
-    public bool useGravity = true;
+    bool useGravity = true;
 
     float airDrag = 0.5f;
 
@@ -56,7 +56,9 @@ public class ActiveRagdoll : MonoBehaviour
         {
             // Animated rig already exists. We are probably using Unity's animation system in this case
             animatedTargetRigHip = animatedRig.GetChild(0);
+            SetAnimatedRigToTPose(animatedTargetRigHip, transform);
             animator = animatedRig.GetComponent<Animator>();
+            
         }
         else
         {
@@ -140,6 +142,16 @@ public class ActiveRagdoll : MonoBehaviour
         }
     }
 
+    public void SetAnimatedRigToTPose(Transform animBone, Transform ragdollBone)
+    {
+        animBone.position = ragdollBone.position;
+        animBone.rotation = ragdollBone.rotation;
+        for(int i = 0; i < animBone.childCount; i++)
+        {
+            SetAnimatedRigToTPose(animBone.GetChild(i), ragdollBone.GetChild(i));
+        }
+    }
+
     public void AddAcceleration(Vector3 acceleration)
     {
         hipRb.AddForce(totalMass * acceleration, ForceMode.Force);
@@ -179,6 +191,21 @@ public class ActiveRagdoll : MonoBehaviour
     public float AnimatedHipTargetY()
     {
         return animatedTargetRigHip.position.y;
+    }
+
+    public void DrawAnimatedRig(Transform animBone)
+    {
+        for(int i = 0; i < animBone.childCount; i++)
+        {
+            Transform childAnimBone = animBone.GetChild(i);
+            Debug.DrawLine(animBone.transform.position, childAnimBone.transform.position, Color.cyan, 0.0f, false);
+            DrawAnimatedRig(childAnimBone);
+        }
+    }
+
+    private void Update()
+    {
+        DrawAnimatedRig(animatedTargetRigHip);
     }
 
 }
