@@ -7,9 +7,7 @@ public class CameraShake : MonoBehaviour
 	// Transform of the camera to shake. Grabs the gameObject's transform
 	// if null.
 	public Transform camTransform;
-
-	// Amplitude of the shake. A larger value shakes the camera harder.
-	public float shakeAmount = 0.7f;
+	private float currentShakeAmount;
 
 	Vector3 originalPos;
 
@@ -32,7 +30,7 @@ public class CameraShake : MonoBehaviour
 	{
 		if (shouldShake)
 		{
-			camTransform.localPosition = originalPos + Random.insideUnitSphere * shakeAmount;
+			camTransform.localPosition = originalPos + Random.insideUnitSphere * currentShakeAmount;
 		}
 		else
 		{
@@ -40,8 +38,14 @@ public class CameraShake : MonoBehaviour
 		}
 	}
 
-	public void setShouldShake(bool val)
+	public void stopShaking()
     {
-		shouldShake = val;
+		shouldShake = false;
+    }
+
+	public void startShaking(float shakeAmount)
+    {
+		currentShakeAmount = shakeAmount;
+		shouldShake = true;
     }
 }
