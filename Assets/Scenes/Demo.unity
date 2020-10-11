@@ -764,6 +764,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ragdollTrans: {fileID: 5465940246874357380}
+  firstPersonTurnSpeed: 4
+  firstPersonMinTurnAngle: -90
+  firstPersonMaxTurnAngle: 90
+  firstTimeCameraSwitch: 1
 --- !u!81 &690456787
 AudioListener:
   m_ObjectHideFlags: 0
@@ -1227,6 +1231,7 @@ MonoBehaviour:
   playerHipsGO: {fileID: 716529914}
   playerBody: {fileID: 2076103583}
   cameraScript: {fileID: 690456786}
+  attachmentTime: 4
 --- !u!1 &1503825178
 GameObject:
   m_ObjectHideFlags: 0

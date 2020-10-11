@@ -16,16 +16,17 @@ public class VehicleAttachment : MonoBehaviour
 
     private ActiveRagdoll playerRagdollScript;
 
+    public float attachmentTime = 30.0f;
+
     // Start is called before the first frame update
     void Start()
     {
-        playerRagdollScript = playerHipsGO.GetComponent<ActiveRagdoll>();
 
         playerBodyRenderers = playerBody.GetComponentsInChildren(typeof(Renderer));
 
         IEnumerator attach = AttachCharacterToVehicle(0);
         StartCoroutine(attach);
-        IEnumerator detach = DetachCharacterFromVehicle(30);
+        IEnumerator detach = DetachCharacterFromVehicle(attachmentTime);
         StartCoroutine(detach);
     }
 
@@ -41,7 +42,6 @@ public class VehicleAttachment : MonoBehaviour
 
         viewGO.transform.parent = vehicleGO.transform;
         playerGO.transform.parent = vehicleGO.transform;
-        playerRagdollScript.enabled = false;
         cameraScript.setThirdPerson(false);
         playerBody.SetActive(false);
     }
@@ -52,24 +52,7 @@ public class VehicleAttachment : MonoBehaviour
 
         viewGO.transform.parent = null;
         playerGO.transform.parent = null;
-        playerRagdollScript.enabled = true;
         cameraScript.setThirdPerson(true);
         playerBody.SetActive(true);
-    }
-
-    private void makePlayerInvisible()
-    {
-        foreach (Renderer renderer in playerBodyRenderers)
-        {
-            renderer.enabled = false;
-        }
-    }
-
-    private void makePlayerVisible()
-    {
-        foreach (Renderer renderer in playerBodyRenderers)
-        {
-            renderer.enabled = true;
-        }
     }
 }
