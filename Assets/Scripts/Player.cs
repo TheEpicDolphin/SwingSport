@@ -8,7 +8,7 @@ public class Player : MonoBehaviour
     public ActiveRagdoll activeRagdoll;
 
     /* Camera that is following player */
-    public PlayerCamera playerCamera;
+    public PlayerCamera followingCamera;
 
     /* how fast player can move */
     public float groundMovementSpeed = 12.0f;
@@ -17,39 +17,62 @@ public class Player : MonoBehaviour
 
     public Image cursorImage;
 
-    public Transform handR;
+    public Transform ragdollHandR;
 
-    public Transform handL;
+    public Transform ragdollHandL;
 
     public PlayerInputManager input;
 
     PlayerState currentState;
 
-    public PlanarSpringConstraint surfaceConstrainer;
+    CapsuleCollider bumper;
 
-    // Start is called before the first frame update
-    void Start()
+    public Animator animator;
+
+    private Rigidbody playerRb;
+
+    float airDrag = 0.5f;
+
+    float maxSpeed = 60.0f;
+
+    private Transform animatedRigHip;
+
+    public Vector3 Velocity
     {
-        surfaceConstrainer = gameObject.AddComponent<PlanarSpringConstraint>();
-        input = gameObject.AddComponent<PlayerInputManager>();
-        activeRagdoll = GetComponent<ActiveRagdoll>();
+        get
+        {
+            return playerRb.velocity;
+        }
+    }
 
-        if (handR)
+    private void Awake()
+    {
+        input = gameObject.AddComponent<PlayerInputManager>();
+
+        bumper = GetComponent<CapsuleCollider>();
+        gameObject.layer = LayerMask.NameToLayer("Bumper");
+        animator = GetComponent<Animator>();
+        playerRb = GetComponent<Rigidbody>();
+
+        animatedRigHip = transform.GetChild(0);
+        activeRagdoll.CreateActiveRagdoll(animatedRigHip, playerRb.mass);
+
+        if (ragdollHandR)
         {
             GameObject hookGunGO = (GameObject)Instantiate(Resources.Load("Prefabs/HookGun"));
             HookGun hookGun = hookGunGO.GetComponent<HookGun>();
-            hookGun.Equip(handR, handR.position + 0.25f * handR.transform.forward,
-                            handR.rotation);
+            hookGun.Equip(ragdollHandR, ragdollHandR.position + 0.25f * ragdollHandR.transform.forward,
+                            ragdollHandR.rotation);
             hookGun.setControls(1);
             hookGun.setColor(Color.red);
             hookGun.cursor.cursorImage = cursorImage;
         }
 
-        if (handL)
+        if (ragdollHandL)
         {
             //GameObject magnetoGloveGO = new GameObject();
             //MagnetoGlove magnetoGlove = magnetoGloveGO.AddComponent<MagnetoGlove>();
-            //magnetoGlove.Equip(handL, handL.position, handL.rotation, false);
+            //magnetoGlove.Equip(ragdollHandL, ragdollHandL.position, ragdollHandL.rotation, false);
             /*
             GameObject ballHookGunGO = (GameObject)Instantiate(Resources.Load("Prefabs/HookGun"));
             HookGun ballHookGun = ballHookGunGO.GetComponent<HookGun>();
@@ -60,22 +83,37 @@ public class Player : MonoBehaviour
             ballHookGun.cursor.cursorImage = cursorImage;
             */
         }
+    }
 
+    // Start is called before the first frame update
+    void Start()
+    {
         currentState = new GroundedState(this);
-
     }
 
     private void Update()
     {
         currentState = currentState.UpdateStep(this);
-        playerCamera.UpdateCameraTargetRotation(input.mouseXDelta, input.mouseYDelta);
+        followingCamera.UpdateCameraTargetRotation(input.mouseXDelta, input.mouseYDelta);
 
-        MagnetoGlove magnetoGlove = handL.GetComponent<MagnetoGlove>();
+        /*
+        MagnetoGlove magnetoGlove = ragdollHandL.GetComponent<MagnetoGlove>();
         if (magnetoGlove)
         {
             magnetoGlove.Handle(this);
         }
-        
+        */
+
+        DrawAnimatedRig(animatedRigHip);
+    }
+
+    private void OnAnimatorMove()
+    {
+        //Debug.Log(animator.deltaPosition.ToString("F4"));
+        //animatedRigHip.rotation *= animator.deltaRotation;
+
+
+        Debug.Log(animatedRigHip.rotation);
     }
 
     private void FixedUpdate()
@@ -87,8 +125,61 @@ public class Player : MonoBehaviour
     {
         float moveHorizontal = input.horizontal;
         float moveVertical = input.vertical;
-        Vector3 movement = moveVertical * Vector3.ProjectOnPlane(playerCamera.transform.forward, Vector3.up).normalized +
-                            moveHorizontal * playerCamera.transform.right;
+        Vector3 movement = moveVertical * Vector3.ProjectOnPlane(followingCamera.transform.forward, Vector3.up).normalized +
+                            moveHorizontal * followingCamera.transform.right;
         return movement.normalized;
+    }
+
+    public void AddForce(Vector3 force, ForceMode mode)
+    {
+        playerRb.AddForce(force, mode);
+    }
+
+    public void RotateCharacterToFace(Vector3 forward, Vector3 upwards)
+    {
+        animatedRigHip.rotation = Quaternion.LookRotation(forward, upwards);
+        Debug.Log(animatedRigHip.rotation);
+    }
+
+    public void ApplyAirDrag()
+    {
+        Vector3 curVel = playerRb.velocity;
+        float curSpeed = curVel.magnitude;
+        playerRb.AddForce(-airDrag * Mathf.Max(0.0f, curSpeed - maxSpeed) * curVel);
+    }
+
+    public Vector3 AnimatedRigHipPosition()
+    {
+        return animatedRigHip.position;
+    }
+
+    public float AnimatedHipTargetY()
+    {
+        return animatedRigHip.position.y;
+    }
+
+    public void DrawAnimatedRig(Transform animBone)
+    {
+        for (int i = 0; i < animBone.childCount; i++)
+        {
+            Transform childAnimBone = animBone.GetChild(i);
+            Debug.DrawLine(animBone.transform.position, childAnimBone.transform.position, Color.cyan, 0.0f, false);
+            DrawAnimatedRig(childAnimBone);
+        }
+    }
+
+    private void OnCollisionStay(Collision collision)
+    {
+        //Debug.Log("STAY");
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        //Debug.Log("ENTERED");
+    }
+
+    private void OnCollisionExit(Collision collision)
+    {
+        //Debug.Log("EXIT");
     }
 }

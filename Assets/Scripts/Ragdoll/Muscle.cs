@@ -8,9 +8,6 @@ public class Muscle : MonoBehaviour
     public Rigidbody boneRb;
     public Transform animTarget;
 
-    public Rigidbody ragdollRootRb;
-    public Transform animatedRigRoot;
-
     public JointDrive positionMatchingSpring = new JointDrive();
 
     Quaternion startLocalRotation;
@@ -78,31 +75,22 @@ public class Muscle : MonoBehaviour
         this.animTarget = animTarget;
     }
 
-    public void MatchAnimationTargetRotation()
-    {
-        if (joint.connectedBody)
-        {
-            ConfigurableJointExtensions.SetTargetRotationLocal(joint, animTarget.localRotation, startLocalRotation);
-        }
-        else
-        {
-
-        }
-    }
-
     public void MatchAnimationTargetPosition()
     {
         float Ck = 0.25f;
         float Cd = 0.25f;
 
-        Vector3 relAnimTargetPos = animatedRigRoot.InverseTransformPoint(animTarget.position);
-        Vector3 targetPos = ragdollRootRb.transform.TransformPoint(relAnimTargetPos);
         float m = boneRb.mass;
         float dt = Time.fixedDeltaTime;
-        Vector3 targetToBone = boneRb.position - targetPos;
-        Vector3 v = Vector3.Project(boneRb.velocity - ragdollRootRb.velocity, targetToBone.normalized);
+        Vector3 targetToBone = boneRb.position - animTarget.position;
+        Vector3 v = boneRb.velocity;
         Vector3 f = -(m * Ck / (dt * dt)) * targetToBone - (m * Cd / dt) * v;
         boneRb.AddForce(f);
+    }
+
+    public void MatchAnimationTargetRotation()
+    {
+        ConfigurableJointExtensions.SetTargetRotationLocal(joint, animTarget.localRotation, startLocalRotation);
     }
 
     private void FixedUpdate()

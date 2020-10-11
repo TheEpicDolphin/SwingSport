@@ -13,7 +13,7 @@ public class LandingState : PlayerState
         this.landDuration = landDuration;
         this.t = 0.0f;
         this.landed = false;
-        player.activeRagdoll.animator.CrossFade("GroundedMovement", 0.1f);
+        player.animator.CrossFade("GroundedMovement", 0.1f);
     }
 
     public override void OnEnter()
@@ -24,11 +24,11 @@ public class LandingState : PlayerState
     public override PlayerState FixedUpdateStep(Player player)
     {
         /* Checks if player is touching ground */
-        bool landed = Physics.Raycast(player.transform.position, Vector3.down, 1.3f, ~LayerMask.GetMask("Player"));
+        bool landed = Physics.Raycast(player.AnimatedRigHipPosition(), Vector3.down, 1.3f, ~LayerMask.GetMask("Player"));
         if (!landed)
         {
             /* TODO: use PID controller to slow player down to reasonable speed for landing */
-            player.activeRagdoll.AddAcceleration(25.0f * Vector3.up);
+            player.AddForce(25.0f * Vector3.up, ForceMode.Acceleration);
             t = 0.0f;
         }
         return this;

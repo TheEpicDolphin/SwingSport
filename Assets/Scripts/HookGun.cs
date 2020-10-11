@@ -185,9 +185,9 @@ public class HookGun : MonoBehaviour
         while (Vector3.Distance(transform.position, hook.transform.position) < maxRopeLength)
         {
             Collider[] colliders = new Collider[1];
-            LayerMask hookableLayerMask = LayerMask.GetMask("HookableLayer");
+            LayerMask obstacleMask = LayerMask.GetMask("Obstacle");
             LayerMask ballLayerMask = LayerMask.GetMask("Ball");
-            if (Physics.OverlapSphereNonAlloc(hook.transform.position, 0.1f, colliders, hookableLayerMask | ballLayerMask) > 0)
+            if (Physics.OverlapSphereNonAlloc(hook.transform.position, 0.1f, colliders, obstacleMask | ballLayerMask) > 0)
             {
                 //ropeRenderer.enabled = false;
                 if (colliders[0].tag == "Hookable" || colliders[0].tag == "BounceBall")

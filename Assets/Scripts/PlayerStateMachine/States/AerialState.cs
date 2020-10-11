@@ -6,7 +6,7 @@ public class AerialState : PlayerState
 {
     public AerialState(Player player)
     {
-        player.activeRagdoll.animator.CrossFade("Falling", 0.1f);
+        player.animator.CrossFade("Falling", 0.1f);
     }
 
     public override void OnEnter()
@@ -17,7 +17,7 @@ public class AerialState : PlayerState
     public override PlayerState FixedUpdateStep(Player player)
     {
         /* Checks if player is touching ground */
-        bool willLand = Physics.Raycast(player.transform.position, Vector3.down, 1.6f, ~LayerMask.GetMask("Player"));
+        bool willLand = Physics.Raycast(player.AnimatedRigHipPosition(), Vector3.down, 1.6f, ~LayerMask.GetMask("Player"));
         if (willLand)
         {
             //return new LandingState(player, 0.15f);
@@ -28,14 +28,13 @@ public class AerialState : PlayerState
         if (player.input.spacebar)
         {
             /* Propels player upwards */
-            player.activeRagdoll.AddAcceleration(-1.1f * Physics.gravity);
+            //player.AddForce(-1.1f * Physics.gravity, ForceMode.Acceleration);
         }
         /* Propels player left, right, forwards, and backwards */
-        player.activeRagdoll.AddAcceleration(10.0f * player.CameraRelativeInputDirection());
-        player.activeRagdoll.ApplyAirDrag();
+        player.AddForce(10.0f * player.CameraRelativeInputDirection(), ForceMode.Acceleration);
+        player.ApplyAirDrag();
 
-        //player.activeRagdoll.MatchRotation(player.playerCamera.transform.rotation);
-        player.activeRagdoll.MatchRotation(Quaternion.LookRotation(player.CameraRelativeInputDirection(), Vector3.up));
+        player.RotateCharacterToFace(player.followingCamera.transform.forward, Vector3.up);
         return this;
     }
 

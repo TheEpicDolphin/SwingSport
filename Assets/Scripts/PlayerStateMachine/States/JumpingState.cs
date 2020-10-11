@@ -22,9 +22,7 @@ public class JumpingState : PlayerState
 
     public override PlayerState FixedUpdateStep(Player player)
     {
-        //player.activeRagdoll.MatchRotation(player.playerCamera.transform.rotation);
-        //player.activeRagdoll.MatchRotation(Quaternion.LookRotation(player.CameraRelativeInputDirection(), Vector3.up));
-        player.activeRagdoll.AddAcceleration(20.0f * Vector3.up);
+        player.AddForce(20.0f * Vector3.up, ForceMode.Acceleration);
         return this;
     }
 
@@ -32,8 +30,8 @@ public class JumpingState : PlayerState
     {
         if (t >= jumpDuration)
         {
-            float jumpPower = Mathf.Lerp(5.0f, 20.0f, spacebarTime / jumpDuration);
-            player.activeRagdoll.AddVelocityChange(jumpPower * Vector3.up);
+            float jumpPower = Mathf.Lerp(5.0f, 15.0f, spacebarTime / jumpDuration);
+            player.AddForce(jumpPower * Vector3.up, ForceMode.VelocityChange);
             return new AerialState(player);
         }
         if (player.input.spacebar)
