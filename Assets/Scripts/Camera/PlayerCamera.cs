@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -15,6 +16,8 @@ public class PlayerCamera : MonoBehaviour
     float cameraFluidity = 0.8f;
 
     public Transform ragdollTrans;
+
+    private bool isThirdPerson;
 
     /* camera is a child of view. view is always constrained to at the position of the player */
     Transform view;
@@ -37,7 +40,20 @@ public class PlayerCamera : MonoBehaviour
 
     private void FixedUpdate()
     {
-        view.position = ragdollTrans.position;
+        if (isThirdPerson)
+        {
+            view.position = ragdollTrans.position;
+        } else
+        {
+            // TODO: Actually implement a first person camera
+            view.position = ragdollTrans.position;
+        }
         view.rotation = Quaternion.Slerp(view.rotation, targetRotation, cameraFluidity);
     }
+
+    public void setThirdPerson(bool b)
+    {
+        isThirdPerson = b;
+    }
+
 }
