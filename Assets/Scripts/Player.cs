@@ -37,6 +37,8 @@ public class Player : MonoBehaviour
 
     private Transform animatedRigHip;
 
+    Quaternion characterRotation = Quaternion.identity;
+
     public Vector3 Velocity
     {
         get
@@ -109,11 +111,16 @@ public class Player : MonoBehaviour
 
     private void OnAnimatorMove()
     {
-        //Debug.Log(animator.deltaPosition.ToString("F4"));
-        //animatedRigHip.rotation *= animator.deltaRotation;
+        characterRotation *= animator.deltaRotation;
+    }
 
+    private void LateUpdate()
+    {
+        /* It is important that we set the hip rotation here before we do any IK */
+        animatedRigHip.localRotation = characterRotation;
 
-        Debug.Log(animatedRigHip.rotation);
+        // TODO: Perform IK below
+
     }
 
     private void FixedUpdate()
@@ -137,8 +144,7 @@ public class Player : MonoBehaviour
 
     public void RotateCharacterToFace(Vector3 forward, Vector3 upwards)
     {
-        animatedRigHip.rotation = Quaternion.LookRotation(forward, upwards);
-        Debug.Log(animatedRigHip.rotation);
+        characterRotation = Quaternion.LookRotation(forward, upwards);
     }
 
     public void ApplyAirDrag()
@@ -163,7 +169,7 @@ public class Player : MonoBehaviour
         for (int i = 0; i < animBone.childCount; i++)
         {
             Transform childAnimBone = animBone.GetChild(i);
-            Debug.DrawLine(animBone.transform.position, childAnimBone.transform.position, Color.cyan, 0.0f, false);
+            Debug.DrawLine(animBone.transform.position, childAnimBone.transform.position, Color.red, 0.0f, false);
             DrawAnimatedRig(childAnimBone);
         }
     }

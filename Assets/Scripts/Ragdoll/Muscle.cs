@@ -58,7 +58,8 @@ public class Muscle : MonoBehaviour
         angZLim.limit = 120.0f;
         joint.angularZLimit = angZLim;
         */
-        
+
+        startLocalRotation = transform.localRotation;
     }
 
     public void SetParent(Muscle parentMuscle)
@@ -67,7 +68,6 @@ public class Muscle : MonoBehaviour
         joint.yMotion = ConfigurableJointMotion.Locked;
         joint.zMotion = ConfigurableJointMotion.Locked;
         joint.connectedBody = parentMuscle.boneRb;
-        startLocalRotation = transform.localRotation;
     }
 
     public void SetAnimationTarget(Transform animTarget)
