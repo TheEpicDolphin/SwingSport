@@ -37,6 +37,10 @@ public class Player : MonoBehaviour
 
     private Transform animatedRigHip;
 
+    private Quaternion characterRotation = Quaternion.identity;
+
+    private Material animatedBonesMat;
+
     public Vector3 Velocity
     {
         get
@@ -47,6 +51,8 @@ public class Player : MonoBehaviour
 
     private void Awake()
     {
+        animatedBonesMat = new Material(Shader.Find("Unlit/Color"));
+        animatedBonesMat.color = Color.cyan;
         input = gameObject.AddComponent<PlayerInputManager>();
 
         bumper = GetComponent<CapsuleCollider>();
@@ -110,7 +116,8 @@ public class Player : MonoBehaviour
     private void LateUpdate()
     {
         /* It is important that we set the hip rotation here before we do any IK */
-        
+        Quaternion animationOffset = animatedRigHip.localRotation;
+        animatedRigHip.localRotation = characterRotation * animationOffset;
         // TODO: Perform IK below
 
     }
@@ -136,8 +143,8 @@ public class Player : MonoBehaviour
 
     public void RotateCharacterToFace(Vector3 forward, Vector3 upwards)
     {
-        //characterDeltaRotation = Quaternion.Slerp(animatedRigHip.localRotation, Quaternion.LookRotation(forward, upwards), 10.0f * Time.deltaTime);
-        animatedRigHip.parent.rotation = Quaternion.LookRotation(forward, upwards);
+        //characterRotation = Quaternion.Slerp(animatedRigHip.localRotation, Quaternion.LookRotation(forward, upwards), 10.0f * Time.deltaTime);
+        characterRotation = Quaternion.LookRotation(forward, upwards);
     }
 
     public void ApplyAirDrag()
@@ -155,16 +162,6 @@ public class Player : MonoBehaviour
     public float AnimatedHipTargetY()
     {
         return animatedRigHip.position.y;
-    }
-
-    public void DrawAnimatedRig(Transform animBone)
-    {
-        for (int i = 0; i < animBone.childCount; i++)
-        {
-            Transform childAnimBone = animBone.GetChild(i);
-            Debug.DrawLine(animBone.transform.position, childAnimBone.transform.position, Color.red, 0.0f, false);
-            DrawAnimatedRig(childAnimBone);
-        }
     }
 
     private void OnCollisionStay(Collision collision)
@@ -191,6 +188,37 @@ public class Player : MonoBehaviour
         {
             Debug.Log("EXIT");
         }
-        
     }
+
+    public void Draw()
+    {
+        if (!animatedBonesMat)
+        {
+            Debug.LogError("Please Assign a material on the inspector");
+            return;
+        }
+        GL.PushMatrix();
+        animatedBonesMat.SetPass(0);
+        //GL.LoadOrtho();
+
+        GL.Begin(GL.LINES);
+        GL.Color(Color.cyan);
+        DrawAnimatedRig(animatedRigHip);
+        GL.End();
+
+        GL.PopMatrix();
+    }
+
+    private void DrawAnimatedRig(Transform animBone)
+    {
+        for (int i = 0; i < animBone.childCount; i++)
+        {
+            Transform childAnimBone = animBone.GetChild(i);
+            GL.Vertex(animBone.transform.position);
+            GL.Vertex(childAnimBone.transform.position);
+            //Debug.DrawLine(animBone.transform.position, childAnimBone.transform.position, Color.red, 0.0f, false);
+            DrawAnimatedRig(childAnimBone);
+        }
+    }
+
 }

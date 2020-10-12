@@ -14,7 +14,7 @@ public class PlayerCamera : MonoBehaviour
     /* How responsive the camera feels. [0, 1]*/
     float cameraFluidity = 0.8f;
 
-    public Transform ragdollTrans;
+    public Player player;
 
     /* camera is a child of view. view is always constrained to at the position of the player */
     Transform view;
@@ -37,7 +37,12 @@ public class PlayerCamera : MonoBehaviour
 
     private void FixedUpdate()
     {
-        view.position = ragdollTrans.position;
+        view.position = player.transform.position;
         view.rotation = Quaternion.Slerp(view.rotation, targetRotation, cameraFluidity);
+    }
+
+    private void OnPostRender()
+    {
+        player.Draw();
     }
 }

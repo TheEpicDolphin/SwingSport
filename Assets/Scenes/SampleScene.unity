@@ -9266,12 +9266,6 @@ Transform:
   m_Father: {fileID: 1249961794}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!4 &500201513 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 4594537812825040638, guid: 9fe0d029eeaf02b4c825820ec8b82476,
-    type: 3}
-  m_PrefabInstance: {fileID: 6285706642306584775}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &502423277
 GameObject:
   m_ObjectHideFlags: 0
@@ -12953,7 +12947,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 690456784}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.888, z: -2.982}
+  m_LocalPosition: {x: 1, y: 1.5, z: -3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1712272945}
@@ -12971,7 +12965,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 22c79bb9f63eba54d846f062c20bee77, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ragdollTrans: {fileID: 500201513}
+  player: {fileID: 933439182}
 --- !u!81 &690456787
 AudioListener:
   m_ObjectHideFlags: 0
@@ -16927,6 +16921,18 @@ Transform:
   m_Father: {fileID: 1067375916}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &933439182 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 143766947489274323, guid: 9fe0d029eeaf02b4c825820ec8b82476,
+    type: 3}
+  m_PrefabInstance: {fileID: 6285706642306584775}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0297179541f410b41826527d5f8cfe0a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &933676569
 GameObject:
   m_ObjectHideFlags: 0
