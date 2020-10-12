@@ -37,8 +37,6 @@ public class Player : MonoBehaviour
 
     private Transform animatedRigHip;
 
-    Quaternion characterRotation = Quaternion.identity;
-
     public Vector3 Velocity
     {
         get
@@ -53,10 +51,10 @@ public class Player : MonoBehaviour
 
         bumper = GetComponent<CapsuleCollider>();
         gameObject.layer = LayerMask.NameToLayer("Bumper");
-        animator = GetComponent<Animator>();
+        animator = GetComponentInChildren<Animator>();
         playerRb = GetComponent<Rigidbody>();
 
-        animatedRigHip = transform.GetChild(0);
+        animatedRigHip = transform.GetChild(0).GetChild(0);
         activeRagdoll.CreateActiveRagdoll(animatedRigHip, playerRb.mass);
 
         if (ragdollHandR)
@@ -109,16 +107,10 @@ public class Player : MonoBehaviour
         DrawAnimatedRig(animatedRigHip);
     }
 
-    private void OnAnimatorMove()
-    {
-        characterRotation *= animator.deltaRotation;
-    }
-
     private void LateUpdate()
     {
         /* It is important that we set the hip rotation here before we do any IK */
-        animatedRigHip.localRotation = characterRotation;
-
+        
         // TODO: Perform IK below
 
     }
@@ -144,7 +136,8 @@ public class Player : MonoBehaviour
 
     public void RotateCharacterToFace(Vector3 forward, Vector3 upwards)
     {
-        characterRotation = Quaternion.LookRotation(forward, upwards);
+        //characterDeltaRotation = Quaternion.Slerp(animatedRigHip.localRotation, Quaternion.LookRotation(forward, upwards), 10.0f * Time.deltaTime);
+        animatedRigHip.parent.rotation = Quaternion.LookRotation(forward, upwards);
     }
 
     public void ApplyAirDrag()
@@ -176,16 +169,28 @@ public class Player : MonoBehaviour
 
     private void OnCollisionStay(Collision collision)
     {
-        //Debug.Log("STAY");
+        if(collision.gameObject.tag == "Hookable")
+        {
+            Debug.Log("STAY");
+        }
+        
     }
 
     private void OnCollisionEnter(Collision collision)
     {
-        //Debug.Log("ENTERED");
+        if (collision.gameObject.tag == "Hookable")
+        {
+            Debug.Log("ENTERED");
+        }
+        
     }
 
     private void OnCollisionExit(Collision collision)
     {
-        //Debug.Log("EXIT");
+        if (collision.gameObject.tag == "Hookable")
+        {
+            Debug.Log("EXIT");
+        }
+        
     }
 }

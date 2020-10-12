@@ -9266,6 +9266,12 @@ Transform:
   m_Father: {fileID: 1249961794}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &500201513 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4594537812825040638, guid: 9fe0d029eeaf02b4c825820ec8b82476,
+    type: 3}
+  m_PrefabInstance: {fileID: 6285706642306584775}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &502423277
 GameObject:
   m_ObjectHideFlags: 0
@@ -12947,7 +12953,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 690456784}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.691, y: 0.96, z: -2.383}
+  m_LocalPosition: {x: 0, y: 1.888, z: -2.982}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1712272945}
@@ -12965,7 +12971,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 22c79bb9f63eba54d846f062c20bee77, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ragdollTrans: {fileID: 5465940246874357380}
+  ragdollTrans: {fileID: 500201513}
 --- !u!81 &690456787
 AudioListener:
   m_ObjectHideFlags: 0
@@ -30302,7 +30308,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1712272944}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.1, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 690456785}
@@ -38315,12 +38321,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2147173644}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!4 &5465940246874357380 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 2081150465873784387, guid: 9fe0d029eeaf02b4c825820ec8b82476,
-    type: 3}
-  m_PrefabInstance: {fileID: 6285706642306584775}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &6285706642306584775
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -38328,6 +38328,36 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 143766947489274323, guid: 9fe0d029eeaf02b4c825820ec8b82476,
+        type: 3}
+      propertyPath: activeRagdoll
+      value: 
+      objectReference: {fileID: 2089175304}
+    - target: {fileID: 143766947489274323, guid: 9fe0d029eeaf02b4c825820ec8b82476,
+        type: 3}
+      propertyPath: followingCamera
+      value: 
+      objectReference: {fileID: 690456786}
+    - target: {fileID: 143766947489274323, guid: 9fe0d029eeaf02b4c825820ec8b82476,
+        type: 3}
+      propertyPath: cursorImage
+      value: 
+      objectReference: {fileID: 1579430425}
+    - target: {fileID: 143766947489274323, guid: 9fe0d029eeaf02b4c825820ec8b82476,
+        type: 3}
+      propertyPath: ragdollHandR
+      value: 
+      objectReference: {fileID: 595628800}
+    - target: {fileID: 143766947489274323, guid: 9fe0d029eeaf02b4c825820ec8b82476,
+        type: 3}
+      propertyPath: ragdollHandL
+      value: 
+      objectReference: {fileID: 989021560}
+    - target: {fileID: 1292888627932318794, guid: 9fe0d029eeaf02b4c825820ec8b82476,
+        type: 3}
+      propertyPath: m_IsKinematic
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2081150465873784387, guid: 9fe0d029eeaf02b4c825820ec8b82476,
         type: 3}
       propertyPath: m_LocalPosition.x

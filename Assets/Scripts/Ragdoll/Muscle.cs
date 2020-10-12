@@ -90,7 +90,15 @@ public class Muscle : MonoBehaviour
 
     public void MatchAnimationTargetRotation()
     {
-        ConfigurableJointExtensions.SetTargetRotationLocal(joint, animTarget.localRotation, startLocalRotation);
+        if (joint.connectedBody)
+        {
+            ConfigurableJointExtensions.SetTargetRotationLocal(joint, animTarget.localRotation, startLocalRotation);
+        }
+        else
+        {
+            ConfigurableJointExtensions.SetTargetRotationLocal(joint, animTarget.rotation, startLocalRotation);
+        }
+
     }
 
     private void FixedUpdate()
