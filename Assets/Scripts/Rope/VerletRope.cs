@@ -8,52 +8,16 @@ public class VerletRope : MonoBehaviour
     LineRenderer ropeRenderer;
     public List<VerletRopeNode> ropeNodes = new List<VerletRopeNode>();
     private List<Vector3> ropeNodePositions;
-    Transform connectedTrans;
+
+    Transform connection1;
+    Transform connection2;
+
+    Rigidbody connection1Rb;
+    Rigidbody connection2Rb;
+
     private float maxRestLength;
 
-    private float RestLength
-    {
-        get
-        {
-            return ropeJoint.linearLimit.limit;
-        }
-        set
-        {
-            SoftJointLimit linearLimit = ropeJoint.linearLimit;
-            linearLimit.limit = value;
-            ropeJoint.linearLimit = linearLimit;
-        }
-    }
-
-    public float Spring
-    {
-        get
-        {
-            return ropeJoint.linearLimitSpring.spring;
-        }
-        set
-        {
-            SoftJointLimitSpring linearLimitSpring = ropeJoint.linearLimitSpring;
-            linearLimitSpring.spring = value;
-            ropeJoint.linearLimitSpring = linearLimitSpring;
-        }
-    }
-
-    public float Damper
-    {
-        get
-        {
-            return ropeJoint.linearLimitSpring.damper;
-        }
-        set
-        {
-            SoftJointLimitSpring linearLimitSpring = ropeJoint.linearLimitSpring;
-            linearLimitSpring.damper = value;
-            ropeJoint.linearLimitSpring = linearLimitSpring;
-        }
-    }
-
-    ConfigurableJoint ropeJoint;
+    private float restLength;
 
     private void Awake()
     {
@@ -124,8 +88,25 @@ public class VerletRope : MonoBehaviour
         DrawRope();
     }
 
+    private void ApplyForceOnConnections()
+    {
+        Ck = Mathf.Clamp(Ck, 0, 1);
+        Cd = Mathf.Clamp(Cd, 0, 1);
+
+        Vector3 forceDirection = (connection2.position - connection1.position);
+
+        float m = rb.mass;
+        float v = Vector3.Dot(rb.velocity, normal);
+        float x = Vector3.Dot(transform.position - planePoint, normal) - distance;
+        float dt = Time.fixedDeltaTime;
+        Vector3 f = (-(m * Ck / (dt * dt)) * x - (m * Cd / dt) * v) * normal.normalized;
+        rb.AddForce(f);
+    }
+
     private void FixedUpdate()
     {
+        ApplyForceOnConnections();
+
         Simulate();
 
         /* Higher iteration results in stiffer ropes and stable simulation */
@@ -230,7 +211,7 @@ public class VerletRope : MonoBehaviour
        between two objects */
     public void IncreaseRestLength(float amount)
     {
-        RestLength = Mathf.Min(RestLength + amount, maxRestLength);
+        restLength = Mathf.Min(restLength + amount, maxRestLength);
     }
 
     /* This can be used for decreasing the rest length of the rope. For example, when we want
@@ -238,12 +219,11 @@ public class VerletRope : MonoBehaviour
     public void DecreaseRestLength(float amount)
     {
         /* Setting minimum to 0.1f removes jittering */
-        RestLength = Mathf.Max(RestLength - amount, 0.1f);
+        restLength = Mathf.Max(restLength - amount, 0.1f);
     }
 
     private void OnDestroy()
     {
-        Destroy(ropeJoint);
         for(int i = 0; i < ropeNodes.Count; i++)
         {
             Destroy(ropeNodes[i].gameObject);
