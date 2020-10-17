@@ -4,15 +4,17 @@ using UnityEngine;
 
 public class VerletParticle : RopeNode
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    public Vector3 previousPosition;
 
-    // Update is called once per frame
-    void Update()
+    public override void Simulate()
     {
-        
+        // derive the velocity from previous frame
+        Vector3 velocity = transform.position - previousPosition;
+        previousPosition = transform.position;
+
+        // calculate new position
+        Vector3 newPos = transform.position + velocity;
+        newPos += Physics.gravity * Time.fixedDeltaTime * Time.fixedDeltaTime;
+        transform.position = newPos;
     }
 }

@@ -6,28 +6,71 @@ public class Rope : MonoBehaviour
 {
     LinkedList<RopeNode> ropeNodes = new LinkedList<RopeNode>();
 
-    // Start is called before the first frame update
-    void Start()
+    float maxSpaceBetweenNodes = 2.0f;
+    float minSpaceBetweenNodes = 0.8f;
+
+    private void Awake()
+    {
+        
+    }
+
+    private void Update()
+    {
+        Draw();
+    }
+
+    private void Draw()
     {
         
     }
 
     private void FixedUpdate()
     {
-        Utils.InsertionSort(ropeAttachments);
+        /* Sort rope nodes just in case they switched order since the last fixed update */
+        Utils.InsertionSort(ropeNodes);
 
+        //TODO: perform raycasting along rope to allow wrapping around objects
 
-        for(int i = 0; i < ropeAttachments.Count - 1; i++)
+        /* Simulate rope nodes */
+        foreach (RopeNode node in ropeNodes)
         {
-
+            node.Simulate();
         }
+
+        /* Apply constraints */
+        LinkedListNode<RopeNode> currentNode = ropeNodes.First;
+        while (currentNode != null && currentNode.Next != null)
+        {
+            RopeNode.ApplyConstraint(currentNode.Value, currentNode.Next.Value);
+            currentNode = currentNode.Next;
+        }
+
+        LinkedList<RopeAttachment> ropeAttachments = new LinkedList<RopeAttachment>();
+
+
+        while (currentNode != null && currentNode.Next != null)
+        {
+            RopeNode.ApplyConstraint(currentNode.Value, currentNode.Next.Value);
+            currentNode = currentNode.Next;
+        }
+
+        /* Add/remove verlet particles if there is too little/much space between nodes */
+
+
     }
 
     public void AttachToRope(Rigidbody attachedRb, Transform attachedTransform)
     {
         RopeAttachment newRopeAttachment = new RopeAttachment(attachedRb, attachedTransform);
+    }
+
+    private void InsertVerletParticle()
+    {
 
     }
 
-    
+    private void RemoveVerletParticle()
+    {
+
+    }
 }

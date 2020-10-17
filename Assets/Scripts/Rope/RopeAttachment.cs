@@ -2,20 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RopeAttachment
+public class RopeAttachment : RopeNode
 {
-    /* Location on rope when unstretched */
-    public float ropeLocation;
-
     public Rigidbody rb;
 
-    public Transform transform;
-
-    public RopeAttachment(float ropeLocation, Rigidbody rb, Transform transform)
+    private void Awake()
     {
-        this.ropeLocation = ropeLocation;
-        this.rb = rb;
-        this.transform = transform;
+        rb = GetComponent<Rigidbody>();
+    }
+
+    public override void Simulate()
+    {
+        //Do nothing
     }
 
 }
