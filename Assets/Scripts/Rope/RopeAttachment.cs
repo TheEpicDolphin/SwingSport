@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class RopeAttachment : RopeNode
 {
-    public Rigidbody rb;
-
     public Transform attachmentTransform;
+
+    public Rigidbody rb;
 
     private void Awake()
     {
@@ -37,14 +37,28 @@ public class RopeAttachment : RopeNode
         float Cd = 0.1f;
 
         Vector3 x = ra2.attachmentTransform.position - ra1.attachmentTransform.position;
-        Vector3 forceDirection = x.normalized;
-
-        float m_red = 1.0f / (1 / ra1.Mass() + 1 / ra2.Mass());
-        Vector3 v_rel = Vector3.Project(ra2.Velocity() - ra1.Velocity(), forceDirection);
-        float dt = Time.fixedDeltaTime;
-        Vector3 f = (-(m_red * Ck / (dt * dt)) * x - (m_red * Cd / dt) * v_rel);
-        ra1.AddForce(f, ForceMode.Force);
-        ra2.AddForce(-f, ForceMode.Force);
+        Vector3 direction = x.normalized;
+        Vector3 x0 = (ra2.ropeLocation - ra1.ropeLocation) * direction;
+        if (x.sqrMagnitude > x0.sqrMagnitude)
+        {
+            float m_red = 1.0f / (1 / ra1.Mass() + 1 / ra2.Mass());
+            Vector3 v_rel = Vector3.Project(ra1.Velocity() - ra2.Velocity(), direction);
+            float dt = Time.fixedDeltaTime;
+            float k = m_red * Ck / (dt * dt);
+            float b = m_red * Cd / dt;
+            Vector3 f1 = k * (x - x0) - b * v_rel;
+            Vector3 f2 = -k * (x - x0) + b * v_rel;
+            ra1.AddForce(f1, ForceMode.Force);
+            ra2.AddForce(f2, ForceMode.Force);
+        }
     }
 
+    public void ApplyConstraint(VerletParticle vp)
+    {
+        float constraintLength = vp.ropeLocation - ropeLocation;
+        Vector3 d1 = vp.transform.position - transform.position;
+        float d2 = d1.magnitude;
+        float d3 = (d2 - constraintLength) / d2;
+        vp.transform.position += -1.0f * d1 * d3;
+    }
 }

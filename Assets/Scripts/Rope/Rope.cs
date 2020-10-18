@@ -41,20 +41,41 @@ public class Rope : MonoBehaviour
             vp.Simulate();
         }
 
-        /* Apply constraints */
-        LinkedListNode<ropeAttachments> currentNode = ropeNodes.First;
-        while (currentNode != null && currentNode.Next != null)
+        /* Apply vp--vp, vp--ra, and ra--vp constraints */
+        LinkedListNode<VerletParticle> currentVPNode = verletParticles.First;
+        LinkedListNode<RopeAttachment> currentRANode = ropeAttachments.First;
+        RopeNode lastRopeNode;
+        if (currentVPNode.Value.ropeLocation < currentRANode.Value.ropeLocation)
         {
-            RopeNode.ApplyConstraint(currentNode.Value, currentNode.Next.Value);
-            currentNode = currentNode.Next;
+            lastRopeNode = currentVPNode.Value;
+            currentVPNode = currentVPNode.Next;
+        }
+        else
+        {
+            lastRopeNode = currentRANode.Value;
+            currentRANode = currentRANode.Next;
+        }
+        while (currentVPNode != null)
+        {
+            if (currentRANode == null || currentVPNode.Value.ropeLocation < currentRANode.Value.ropeLocation)
+            {
+                lastRopeNode.ApplyConstraint(currentVPNode.Value);
+                lastRopeNode = currentVPNode.Value;
+                currentVPNode = currentVPNode.Next;
+            }
+            else
+            {
+                lastRopeNode.ApplyConstraint(currentRANode.Value);
+                lastRopeNode = currentRANode.Value;
+                currentRANode = currentRANode.Next;
+            }
         }
 
-        LinkedList<RopeAttachment> ropeAttachments = new LinkedList<RopeAttachment>();
-
-
+        /* Apply ra--ra constraints */
+        LinkedListNode<RopeAttachment> currentNode = ropeAttachments.First;
         while (currentNode != null && currentNode.Next != null)
         {
-            RopeNode.ApplyConstraint(currentNode.Value, currentNode.Next.Value);
+            RopeAttachment.ApplyConstraint(currentNode.Value, currentNode.Next.Value);
             currentNode = currentNode.Next;
         }
 
@@ -65,13 +86,34 @@ public class Rope : MonoBehaviour
         {
             if (d >= 0)
             {
-                verletParticles.AddLast();
+                GameObject vpGOToAdd = new GameObject();
+                
+                vpGOToAdd.transform.position = 
+                VerletParticle vpToAdd = vpGOToAdd.AddComponent<VerletParticle>();
+                verletParticles.AddBefore(verletParticles.Last, vpToAdd);
             }
             else
             {
+                VerletParticle vpToRemove = verletParticles.Last.Value;
                 verletParticles.RemoveLast();
+                Destroy(vpToRemove.gameObject);
             }
         }        
+    }
+
+    public void CreateRope(RopeAttachment ra1, RopeAttachment ra2)
+    {
+        CreateVerletParticles(ra1.attachmentTransform.position, ra2.attachmentTransform.position);
+        ropeAttachments.AddLast(ra1);
+        ropeAttachments.AddLast(ra2);
+    }
+
+    public void CreateVerletParticles(Vector3 start, Vector3 end)
+    {
+        for ()
+        {
+            verletParticles.AddLast();
+        }
     }
 
     public void AttachToRope(Rigidbody attachedRb, Transform attachedTransform)

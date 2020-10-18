@@ -29,4 +29,13 @@ public class VerletParticle : RopeNode
         vp1.transform.position = x1 + 0.5f * d1 * d3;
         vp2.transform.position = x2 - 0.5f * d1 * d3;
     }
+
+    public void ApplyConstraint(RopeAttachment ra)
+    {
+        float constraintLength = ra.ropeLocation - ropeLocation;
+        Vector3 d1 = ra.transform.position - transform.position;
+        float d2 = d1.magnitude;
+        float d3 = (d2 - constraintLength) / d2;
+        transform.position += 1.0f * d1 * d3;
+    }
 }
