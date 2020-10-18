@@ -31,7 +31,7 @@ public class RopeAttachment : RopeNode
         return rb != null ? rb.velocity : Vector3.zero;
     }
 
-    public static void ApplyConstraint(RopeAttachment ra1, RopeAttachment ra2)
+    public static void ApplyTension(RopeAttachment ra1, RopeAttachment ra2)
     {
         float Ck = 0.1f;
         float Cd = 0.1f;
@@ -53,12 +53,17 @@ public class RopeAttachment : RopeNode
         }
     }
 
-    public void ApplyConstraint(VerletParticle vp)
+    public override void ApplyConstraint(VerletParticle vp)
     {
         float constraintLength = vp.ropeLocation - ropeLocation;
         Vector3 d1 = vp.transform.position - transform.position;
         float d2 = d1.magnitude;
         float d3 = (d2 - constraintLength) / d2;
         vp.transform.position += -1.0f * d1 * d3;
+    }
+
+    public override void ApplyConstraint(RopeAttachment ra)
+    {
+        //Do nothing. We handle forces in ApplyTension
     }
 }

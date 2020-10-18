@@ -75,7 +75,7 @@ public class Rope : MonoBehaviour
         LinkedListNode<RopeAttachment> currentNode = ropeAttachments.First;
         while (currentNode != null && currentNode.Next != null)
         {
-            RopeAttachment.ApplyConstraint(currentNode.Value, currentNode.Next.Value);
+            RopeAttachment.ApplyTension(currentNode.Value, currentNode.Next.Value);
             currentNode = currentNode.Next;
         }
 
@@ -87,10 +87,10 @@ public class Rope : MonoBehaviour
             if (d >= 0)
             {
                 GameObject vpGOToAdd = new GameObject();
-                
-                vpGOToAdd.transform.position = 
+                vpGOToAdd.transform.position = verletParticles.Last.Value.transform.position;
+                vpGOToAdd.transform.rotation = Quaternion.identity;
                 VerletParticle vpToAdd = vpGOToAdd.AddComponent<VerletParticle>();
-                verletParticles.AddBefore(verletParticles.Last, vpToAdd);
+                verletParticles.AddLast(vpToAdd);
             }
             else
             {
@@ -108,12 +108,25 @@ public class Rope : MonoBehaviour
         ropeAttachments.AddLast(ra2);
     }
 
-    public void CreateVerletParticles(Vector3 start, Vector3 end)
+    public void CreateVerletParticles(Vector3 startPos, Vector3 endPos)
     {
-        for ()
+        length = Vector3.Distance(startPos, endPos);
+        float t = 0.0f;
+        int n = Mathf.FloorToInt(length / verletParticleSpacing);
+        for (int i = 0; i < n; i++)
         {
-            verletParticles.AddLast();
+            t += i * verletParticleSpacing;
+            GameObject vpGO = new GameObject();
+            vpGO.transform.position = Vector3.Lerp(startPos, endPos, t); ;
+            vpGO.transform.rotation = Quaternion.identity;
+            VerletParticle vp = vpGO.AddComponent<VerletParticle>();
+            verletParticles.AddLast(vp);
         }
+        GameObject endVPGO = new GameObject();
+        endVPGO.transform.position = endPos;
+        endVPGO.transform.rotation = Quaternion.identity;
+        VerletParticle endVP = endVPGO.AddComponent<VerletParticle>();
+        verletParticles.AddLast(endVP);
     }
 
     public void AttachToRope(Rigidbody attachedRb, Transform attachedTransform)
