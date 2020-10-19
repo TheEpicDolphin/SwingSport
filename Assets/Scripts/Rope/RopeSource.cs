@@ -5,10 +5,26 @@ using UnityEngine;
 public class RopeSource
 {
     Rope rope;
-    RopeAttachment ra;
-
-    private void FixedUpdate()
+    private float ropeLocation;
+    public float RopeLocation
     {
-        rope.SimulateWithSource(ra);
+        get
+        {
+            return ropeLocation;
+        }
+        set
+        {
+            ropeLocation = Mathf.Clamp(value, 0.0f, rope.RestLength);
+        }
+    }
+
+    public void InsertRope(float amount)
+    {
+        rope.InsertRope(ropeLocation, amount);
+    }
+
+    public void RemoveRope(float amount)
+    {
+        rope.RemoveRope(ropeLocation, amount);
     }
 }

@@ -11,8 +11,15 @@ public class Rope : MonoBehaviour
     LinkedList<VerletParticle> verletParticles = new LinkedList<VerletParticle>();
     const float verletParticleSpacing = 1.0f;
 
-    /* Rope lenth does not officially change, what changes is the amount visible */
-    float length;
+    /* Rope rest lenth does not officially change, what changes is the amount visible */
+    private float restLength;
+    public float RestLength
+    {
+        get
+        {
+            return restLength;
+        }
+    }
 
     private void Awake()
     {
@@ -29,7 +36,7 @@ public class Rope : MonoBehaviour
         
     }
 
-    public void Simulate()
+    private void FixedUpdate()
     {
         /* Sort rope attachments just in case they switched order since the last fixed update */
         Utils.InsertionSort(ropeAttachments);
@@ -139,6 +146,71 @@ public class Rope : MonoBehaviour
             currentNode = currentNode.Next;
         }
     }
+
+    public void InsertRope(float ropeLocation, float amount)
+    {
+        LinkedListNode<VerletParticle> closestVerletParticleAfterLocation = FindClosestRopeNodeAfter(ropeLocation);
+        LinkedListNode<RopeAttachment> closestRopeAttachmentAfterLocation = FindClosestRopeNodeAfter(ropeLocation);
+        OffsetRopeNodeLocationsBeginningFrom(closestVerletParticleAfterLocation.Next, amount);
+        OffsetRopeNodeLocationsBeginningFrom(closestRopeAttachmentAfterLocation.Next, amount);
+
+        //TODO: Finish this
+        Vector3 startPos = closestVerletParticleAfterLocation.Next.Value.ropeLocation;
+        float fillLength = closestVerletParticleAfterLocation.Next.Value.ropeLocation - 
+            closestVerletParticleAfterLocation.Value.ropeLocation;
+        float t = 0.0f;
+        int n = Mathf.FloorToInt(length / verletParticleSpacing);
+        for (int i = 0; i < n; i++)
+        {
+            t += i * verletParticleSpacing;
+            GameObject vpGO = new GameObject();
+            vpGO.transform.position = Vector3.Lerp(startPos, endPos, t); ;
+            VerletParticle vp = vpGO.AddComponent<VerletParticle>();
+            verletParticles.AddBefore(, vp);
+        }
+    }
+
+    public void RemoveRope(float ropeLocation, float amount)
+    {        
+        LinkedListNode<VerletParticle> closestVerletParticleAfterLocation = FindClosestRopeNodeAfter(ropeLocation);
+        LinkedListNode<RopeAttachment> closestRopeAttachmentAfterLocation = FindClosestRopeNodeAfter(ropeLocation);
+        OffsetRopeNodeLocationsBeginningFrom(closestVerletParticleAfterLocation.Next, amount);
+        OffsetRopeNodeLocationsBeginningFrom(closestRopeAttachmentAfterLocation.Next, amount);
+        LinkedListNode<VerletParticle> currentVPNode = closestVerletParticleAfterLocation.Next;
+        while (currentVPNode != null && 
+            closestVerletParticleAfterLocation.Value.ropeLocation > currentVPNode.Value.ropeLocation)
+        {
+            VerletParticle vp = currentVPNode.Value;
+            verletParticles.Remove(currentVPNode);
+            Destroy(vp);
+            currentVPNode = currentVPNode.Next;
+        }
+        LinkedListNode<RopeAttachment> currentRANode = closestRopeAttachmentAfterLocation.Next;
+        while (currentRANode != null && ropeLocation > currentRANode.Value.ropeLocation)
+        {
+            RopeAttachment ra = currentRANode.Value;
+            ropeAttachments.Remove(currentRANode);
+            Destroy(ra);
+            currentRANode = currentRANode.Next;
+        }
+    }
+
+    private void OffsetRopeNodeLocationsBeginningFrom<T>(LinkedListNode<T> ropeNode, float offset) where T : RopeNode
+    {
+        LinkedListNode<T> currentNode = ropeNode;
+        while (currentNode != null)
+        {
+            currentNode.Value.ropeLocation += offset;
+            currentNode = currentNode.Next;
+        }
+    }
+
+    private LinkedListNode<RopeNode> FindClosestRopeNodeAfter(float ropeLocation)
+    {
+        
+    }
+
+
 
     public void CreateRope(Vector3 startPos, Vector3 endPos, float sourceBuffer)
     {
