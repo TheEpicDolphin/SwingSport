@@ -7,6 +7,8 @@ public abstract class RopeNode : MonoBehaviour
     /* Smaller t is closer to start of rope */
     public float ropeLocation;
 
+    public Rope rope;
+
     public abstract void ApplyConstraint(RopeAttachment ra);
 
     public abstract void ApplyConstraint(VerletParticle vp);

@@ -66,4 +66,9 @@ public class RopeAttachment : RopeNode
     {
         //Do nothing. We handle forces in ApplyTension
     }
+
+    public void MoveAlongRope(float dt)
+    {
+        
+    }
 }
