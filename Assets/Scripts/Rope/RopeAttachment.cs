@@ -38,7 +38,7 @@ public class RopeAttachment : RopeNode
 
         Vector3 x = ra2.attachmentTransform.position - ra1.attachmentTransform.position;
         Vector3 direction = x.normalized;
-        Vector3 x0 = (ra2.ropeLocation - ra1.ropeLocation) * direction;
+        Vector3 x0 = (ra2.restPosition - ra1.restPosition) * direction;
         if (x.sqrMagnitude > x0.sqrMagnitude)
         {
             float m_red = 1.0f / (1 / ra1.Mass() + 1 / ra2.Mass());
@@ -55,7 +55,7 @@ public class RopeAttachment : RopeNode
 
     public override void ApplyConstraint(VerletParticle vp)
     {
-        float constraintLength = vp.ropeLocation - ropeLocation;
+        float constraintLength = vp.restPosition - restPosition;
         Vector3 d1 = vp.transform.position - transform.position;
         float d2 = d1.magnitude;
         float d3 = (d2 - constraintLength) / d2;
@@ -67,9 +67,17 @@ public class RopeAttachment : RopeNode
         //Do nothing. We handle forces in ApplyTension
     }
 
-    public void MoveAlongRope(float dt)
+    public void MoveRestPosition(float dt)
     {
-        rope.ChangeRopeLocation(this, dt);
+        restPosition += dt;
+        if(dt > 0)
+        {
+            rope.SortUp(this);
+        }
+        else
+        {
+            rope.SortDown(this);
+        }
     }
 
     private void OnDestroy()

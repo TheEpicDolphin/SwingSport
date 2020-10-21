@@ -4,8 +4,8 @@ using UnityEngine;
 
 public abstract class RopeNode : MonoBehaviour
 {
-    /* Smaller t is closer to start of rope */
-    public float ropeLocation;
+    /* Smaller restPosition is closer to start of rope */
+    public float restPosition;
 
     public Rope rope;
 
