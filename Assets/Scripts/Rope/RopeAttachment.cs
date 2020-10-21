@@ -69,6 +69,11 @@ public class RopeAttachment : RopeNode
 
     public void MoveAlongRope(float dt)
     {
-        
+        rope.ChangeRopeLocation(this, dt);
+    }
+
+    private void OnDestroy()
+    {
+        rope.Detach(this);
     }
 }

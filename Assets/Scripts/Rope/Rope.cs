@@ -4,20 +4,24 @@ using UnityEngine;
 
 public class Rope : MonoBehaviour
 {
+    /* Any objects that are attached to this rope */
     LinkedList<RopeAttachment> ropeAttachments = new LinkedList<RopeAttachment>();
-    /* The verlet particles that make up the rope.
-       These will never be out of order. We're just pushing to and popping from this */
+
+    /* The verlet particles that make up the rope structure */
     LinkedList<VerletParticle> verletParticles = new LinkedList<VerletParticle>();
+
+    /* The preferred spacing between verlet particles */
     const float verletParticleSpacing = 1.0f;
+
+    /* Small float value */
     const float delta = 1e-4f;
 
-    /* Rope rest lenth does not officially change, what changes is the amount visible */
-    private float restLength;
+    /* The length of the rope when not stretched */
     public float RestLength
     {
         get
         {
-            return restLength;
+            return verletParticles.Last.Value.ropeLocation;
         }
     }
 
@@ -38,8 +42,11 @@ public class Rope : MonoBehaviour
 
     private void FixedUpdate()
     {
-        /* Now sort them because their rope locations have changed */
-        Utils.InsertionSort(ropeAttachments);
+        /* Check if verlet particles should be spaced out more evenly */
+        if (Mathf.Abs(RestLength - (verletParticleSpacing * verletParticles.Count)) > 5.0f)
+        {
+            RecalculateVerletParticles();
+        }
 
         //TODO: perform raycasting along rope to allow wrapping around objects
 
@@ -88,17 +95,37 @@ public class Rope : MonoBehaviour
         }      
     }
 
-    public void QueueMovement(RopeAttachment ra, float dt)
+    public void ChangeRopeLocation(RopeAttachment ra, float dt)
     {
-        
+        LinkedListNode<RopeAttachment> ropeAttachmentNode = ropeAttachments.Find(ra);
+        ropeAttachments.Remove(ropeAttachmentNode);
+        ra.ropeLocation += dt;
+        if(dt > 0)
+        {
+            LinkedListNode<RopeAttachment> nextRANode = ropeAttachmentNode.Next;
+            while (nextRANode != null && ra.ropeLocation > nextRANode.Value.ropeLocation)
+            {
+                nextRANode = nextRANode.Next;
+            }
+            ropeAttachments.AddBefore(nextRANode, ra);
+        }
+        else
+        {
+            LinkedListNode<RopeAttachment> previousRANode = ropeAttachmentNode.Previous;
+            while (previousRANode != null && ra.ropeLocation < previousRANode.Value.ropeLocation)
+            {
+                previousRANode = previousRANode.Previous;
+            }
+            ropeAttachments.AddAfter(previousRANode, ra);
+        }
     }
 
     public void InsertRope(float ropeLocation, float amount)
     {
         LinkedListNode<VerletParticle> nextVP = FindClosestRopeNodeAfter(verletParticles, ropeLocation);
         LinkedListNode<RopeAttachment> nextRA = FindClosestRopeNodeAfter(ropeAttachments, ropeLocation);
-        OffsetRopeNodeLocationsBeginningFrom(nextVP, amount);
-        OffsetRopeNodeLocationsBeginningFrom(nextRA, amount);
+        OffsetRopeLocationsBeginningFrom(nextVP, amount);
+        OffsetRopeLocationsBeginningFrom(nextRA, amount);
 
         LinkedListNode<VerletParticle> previousVP = nextVP.Previous;
         Vector3 startPos = Vector3.Lerp(previousVP.Value.transform.position, nextVP.Value.transform.position, (ropeLocation - previousVP.Value.ropeLocation) / (nextVP.Value.ropeLocation - previousVP.Value.ropeLocation));
@@ -121,7 +148,7 @@ public class Rope : MonoBehaviour
         LinkedListNode<VerletParticle> nextVP = FindClosestRopeNodeAfter(verletParticles, ropeLocation);
         LinkedListNode<RopeAttachment> nextRA = FindClosestRopeNodeAfter(ropeAttachments, ropeLocation);
 
-        OffsetRopeNodeLocationsBeginningFrom(nextVP, amount);
+        OffsetRopeLocationsBeginningFrom(nextVP, amount);
         LinkedListNode<VerletParticle> currentVPNode = nextVP;
         while (currentVPNode != null &&
             nextVP.Value.ropeLocation > currentVPNode.Value.ropeLocation)
@@ -132,18 +159,17 @@ public class Rope : MonoBehaviour
             currentVPNode = currentVPNode.Next;
         }
 
-        OffsetRopeNodeLocationsBeginningFrom(nextRA, amount);
+        OffsetRopeLocationsBeginningFrom(nextRA, amount);
         LinkedListNode<RopeAttachment> currentRANode = nextRA.Next;
         while (currentRANode != null && ropeLocation > currentRANode.Value.ropeLocation)
         {
             RopeAttachment ra = currentRANode.Value;
-            ropeAttachments.Remove(currentRANode);
             Destroy(ra);
             currentRANode = currentRANode.Next;
         }
     }
 
-    private void OffsetRopeNodeLocationsBeginningFrom<T>(LinkedListNode<T> ropeNode, float offset) where T : RopeNode
+    private void OffsetRopeLocationsBeginningFrom<T>(LinkedListNode<T> ropeNode, float offset) where T : RopeNode
     {
         LinkedListNode<T> currentNode = ropeNode;
         while (currentNode != null)
@@ -167,9 +193,14 @@ public class Rope : MonoBehaviour
         return null;
     }
 
+    private void RecalculateVerletParticles()
+    {
+
+    }
+
     public void CreateRope(Vector3 startPos, Vector3 endPos, float sourceBuffer)
     {
-        length = Vector3.Distance(startPos, endPos);
+        float length = Vector3.Distance(startPos, endPos);
         float t = 0.0f;
         int n = Mathf.FloorToInt(length / verletParticleSpacing);
         for (int i = 0; i < n; i++)
@@ -186,8 +217,23 @@ public class Rope : MonoBehaviour
         verletParticles.AddLast(endVP);
     }
 
-    public void Attach(Rigidbody attachedRb, Transform attachedTransform)
+    public void Detach(RopeAttachment ra)
     {
-        RopeAttachment newRopeAttachment = new RopeAttachment(attachedRb, attachedTransform);
+        ropeAttachments.Remove(ra);
+    }
+
+    public void Attach(RopeAttachment ra)
+    {
+        LinkedListNode<RopeAttachment> currentNode = ropeAttachments.First;
+        while (currentNode != null)
+        {
+            if (ra.ropeLocation < currentNode.Value.ropeLocation)
+            {
+                ropeAttachments.AddBefore(currentNode, ra);
+                return;
+            }
+            currentNode = currentNode.Next;
+        }
+        ropeAttachments.AddLast(ra);
     }
 }
