@@ -4,6 +4,12 @@ using UnityEngine;
 
 public class Rope : MonoBehaviour
 {
+    /* For drawing the rope */
+    LineRenderer ropeRenderer;
+
+    /* This list will be used to draw the rope */
+    private List<Vector3> ropeNodePositions;
+
     /* Any objects that are attached to this rope */
     LinkedList<RopeAttachment> ropeAttachments = new LinkedList<RopeAttachment>();
 
@@ -27,7 +33,8 @@ public class Rope : MonoBehaviour
 
     private void Awake()
     {
-        
+        ropeRenderer = gameObject.AddComponent<LineRenderer>();
+        ropeRenderer.widthMultiplier = 0.05f;
     }
 
     private void Update()
@@ -37,7 +44,25 @@ public class Rope : MonoBehaviour
 
     private void Draw()
     {
-        
+        ropeNodePositions = new List<Vector3>();
+        LinkedListNode<VerletParticle> currentVPNode = verletParticles.First;
+        LinkedListNode<RopeAttachment> currentRANode = ropeAttachments.First;
+        while (currentVPNode != null && currentRANode != null)
+        {
+            if (currentRANode == null || 
+                currentVPNode.Value.restPosition < currentRANode.Value.restPosition)
+            {
+                ropeNodePositions.Add(currentVPNode.Value.transform.position);
+                currentVPNode = currentVPNode.Next;
+            }
+            else
+            {
+                ropeNodePositions.Add(currentRANode.Value.transform.position);
+                currentRANode = currentRANode.Next;
+            }
+        }
+        ropeRenderer.positionCount = ropeNodePositions.Count;
+        ropeRenderer.SetPositions(ropeNodePositions.ToArray());
     }
 
     private void FixedUpdate()
