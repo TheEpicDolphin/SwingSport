@@ -175,16 +175,6 @@ public class Rope : MonoBehaviour
         LinkedListNode<VerletParticle> nextVP = FindClosestRopeNodeAfter(verletParticles, removalPosition);
         LinkedListNode<RopeAttachment> nextRA = FindClosestRopeNodeAfter(ropeAttachments, removalPosition);
 
-        OffsetRestPositionsBeginningFrom(nextVP, amount);
-        LinkedListNode<VerletParticle> currentVPNode = nextVP;
-        while (currentVPNode != null && nextVP.Value.restPosition > currentVPNode.Value.restPosition)
-        {
-            VerletParticle vp = currentVPNode.Value;
-            verletParticles.Remove(currentVPNode);
-            Destroy(vp);
-            currentVPNode = currentVPNode.Next;
-        }
-
         OffsetRestPositionsBeginningFrom(nextRA, amount);
         LinkedListNode<RopeAttachment> currentRANode = nextRA;
         while (currentRANode != null && removalPosition > currentRANode.Value.restPosition)
@@ -192,6 +182,21 @@ public class Rope : MonoBehaviour
             RopeAttachment ra = currentRANode.Value;
             Destroy(ra);
             currentRANode = currentRANode.Next;
+        }
+
+        OffsetRestPositionsBeginningFrom(nextVP, amount);
+        LinkedListNode<VerletParticle> currentVPNode = nextVP;
+        while (removalPosition > currentVPNode.Value.restPosition)
+        {
+            if (currentVPNode.Next == null)
+            {
+                currentVPNode.Value.restPosition = removalPosition + delta;
+                break;
+            }
+            VerletParticle vp = currentVPNode.Value;
+            verletParticles.Remove(currentVPNode);
+            Destroy(vp);
+            currentVPNode = currentVPNode.Next;
         }
     }
 
@@ -241,6 +246,11 @@ public class Rope : MonoBehaviour
         endVPGO.transform.position = endPos;
         VerletParticle endVP = endVPGO.AddComponent<VerletParticle>();
         verletParticles.AddLast(endVP);
+    }
+
+    public float ClampPositionToRopeExtents(float position)
+    {
+        return Mathf.Clamp(position, delta, RestLength - delta);
     }
 
     public void Detach(RopeAttachment ra)

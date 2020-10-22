@@ -69,7 +69,7 @@ public class RopeAttachment : RopeNode
 
     public void MoveRestPosition(float dt)
     {
-        restPosition += dt;
+        restPosition = rope.ClampPositionToRopeExtents(restPosition + dt);
         if(dt > 0)
         {
             rope.SortUp(this);
