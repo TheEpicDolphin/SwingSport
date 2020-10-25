@@ -5,22 +5,22 @@ using UnityEngine;
 public class Rope : MonoBehaviour
 {
     /* For drawing the rope */
-    LineRenderer ropeRenderer;
+    private LineRenderer ropeRenderer;
 
     /* This list will be used to draw the rope */
     private List<Vector3> ropeNodePositions;
 
     /* Any objects that are attached to this rope */
-    LinkedList<RopeAttachment> ropeAttachments = new LinkedList<RopeAttachment>();
+    private LinkedList<RopeAttachment> ropeAttachments = new LinkedList<RopeAttachment>();
 
     /* The verlet particles that make up the rope structure */
-    LinkedList<VerletParticle> verletParticles = new LinkedList<VerletParticle>();
+    private LinkedList<VerletParticle> verletParticles = new LinkedList<VerletParticle>();
 
     /* The preferred spacing between verlet particles */
-    const float verletParticleSpacing = 1.0f;
+    private const float verletParticleSpacing = 1.0f;
 
     /* Small float value */
-    const float delta = 1e-4f;
+    private const float delta = 1e-4f;
 
     /* The length of the rope when not stretched */
     public float RestLength
@@ -146,15 +146,23 @@ public class Rope : MonoBehaviour
 
     public void InsertRope(float insertionPosition, float amount)
     {
+        insertionPosition = ClampPositionToRopeExtents(insertionPosition);
         LinkedListNode<VerletParticle> nextVP = FindClosestRopeNodeAfter(verletParticles, insertionPosition);
         LinkedListNode<RopeAttachment> nextRA = FindClosestRopeNodeAfter(ropeAttachments, insertionPosition);
+        if (nextVP == verletParticles.First || nextVP == null)
+        {
+            //This should never happen
+            Debug.LogError("Insertion rope position is out of bounds!");
+            return;
+        }
+        LinkedListNode<VerletParticle> previousVP = nextVP.Previous;
+        Vector3 startPos = Vector3.Lerp(previousVP.Value.transform.position,
+                                        nextVP.Value.transform.position,
+                                        (insertionPosition - previousVP.Value.restPosition) / (nextVP.Value.restPosition - previousVP.Value.restPosition));
+
         OffsetRestPositionsBeginningFrom(nextVP, amount);
         OffsetRestPositionsBeginningFrom(nextRA, amount);
 
-        LinkedListNode<VerletParticle> previousVP = nextVP.Previous;
-        Vector3 startPos = Vector3.Lerp(previousVP.Value.transform.position, 
-                                        nextVP.Value.transform.position, 
-                                        (insertionPosition - previousVP.Value.restPosition) / (nextVP.Value.restPosition - previousVP.Value.restPosition));
         Vector3 endPos = nextVP.Value.transform.position;
         float fillLength = nextVP.Value.restPosition - insertionPosition;
         float currentPosition = nextVP.Value.restPosition - verletParticleSpacing;
@@ -163,17 +171,25 @@ public class Rope : MonoBehaviour
         {
             GameObject vpGO = new GameObject();
             float t = (currentPosition - insertionPosition) / fillLength;
-            vpGO.transform.position = Vector3.Lerp(startPos, endPos, t); ;
             VerletParticle vp = vpGO.AddComponent<VerletParticle>();
+            vp.transform.position = Vector3.Lerp(startPos, endPos, t);
+            vp.previousPosition = vp.transform.position;
             ceiling = verletParticles.AddBefore(ceiling, vp);
             currentPosition -= verletParticleSpacing;
         }
     }
 
     public void RemoveRope(float removalPosition, float amount)
-    {        
+    {
+        removalPosition = ClampPositionToRopeExtents(removalPosition);
         LinkedListNode<VerletParticle> nextVP = FindClosestRopeNodeAfter(verletParticles, removalPosition);
         LinkedListNode<RopeAttachment> nextRA = FindClosestRopeNodeAfter(ropeAttachments, removalPosition);
+        if (nextVP == verletParticles.First || nextVP == null)
+        {
+            //This should never happen
+            Debug.LogError("Insertion rope position is out of bounds!");
+            return;
+        }
 
         OffsetRestPositionsBeginningFrom(nextRA, amount);
         LinkedListNode<RopeAttachment> currentRANode = nextRA;
@@ -229,23 +245,31 @@ public class Rope : MonoBehaviour
         // TODO: Code this later
     }
 
-    public void CreateRope(Vector3 startPos, Vector3 endPos)
+    public static Rope CreateTautRope(Vector3 startPos, Vector3 endPos)
     {
+        GameObject ropeGO = new GameObject();
+        Rope rope = ropeGO.AddComponent<Rope>();
         float length = Vector3.Distance(startPos, endPos);
         float t = 0.0f;
         int n = Mathf.FloorToInt(length / verletParticleSpacing);
-        for (int i = 0; i < n; i++)
+
+        GameObject startVPGO = new GameObject();
+        startVPGO.transform.position = startPos;
+        VerletParticle startVP = startVPGO.AddComponent<VerletParticle>();
+        rope.verletParticles.AddLast(startVP);
+        for (int i = 1; i <= n; i++)
         {
             t += i * verletParticleSpacing;
             GameObject vpGO = new GameObject();
             vpGO.transform.position = Vector3.Lerp(startPos, endPos, t); ;
             VerletParticle vp = vpGO.AddComponent<VerletParticle>();
-            verletParticles.AddLast(vp);
+            rope.verletParticles.AddLast(vp);
         }
         GameObject endVPGO = new GameObject();
         endVPGO.transform.position = endPos;
         VerletParticle endVP = endVPGO.AddComponent<VerletParticle>();
-        verletParticles.AddLast(endVP);
+        rope.verletParticles.AddLast(endVP);
+        return rope;
     }
 
     public float ClampPositionToRopeExtents(float position)
