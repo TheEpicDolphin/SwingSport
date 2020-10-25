@@ -56,10 +56,13 @@ public class RopeAttachment : RopeNode
     public override void ApplyConstraint(VerletParticle vp)
     {
         float constraintLength = vp.restPosition - restPosition;
-        Vector3 d1 = vp.transform.position - transform.position;
+        Vector3 d1 = vp.transform.position - attachmentTransform.position;
         float d2 = d1.magnitude;
-        float d3 = (d2 - constraintLength) / d2;
-        vp.transform.position += -1.0f * d1 * d3;
+        if(d2 > Mathf.Epsilon)
+        {
+            float d3 = (d2 - constraintLength) / d2;
+            vp.transform.position += -1.0f * d1 * d3;
+        }
     }
 
     public override void ApplyConstraint(RopeAttachment ra)

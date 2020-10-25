@@ -66,7 +66,7 @@ public class Rope : MonoBehaviour
             }
             else
             {
-                ropeNodePositions.Add(currentRANode.Value.transform.position);
+                ropeNodePositions.Add(currentRANode.Value.attachmentTransform.position);
                 currentRANode = currentRANode.Next;
             }
         }
@@ -298,11 +298,13 @@ public class Rope : MonoBehaviour
 
     public void Detach(RopeAttachment ra)
     {
+        ra.rope = null;
         ropeAttachments.Remove(ra);
     }
 
     public void Attach(RopeAttachment ra)
     {
+        ra.rope = this;
         LinkedListNode<RopeAttachment> currentNode = ropeAttachments.First;
         while (currentNode != null)
         {
@@ -315,4 +317,5 @@ public class Rope : MonoBehaviour
         }
         ropeAttachments.AddLast(ra);
     }
+
 }
