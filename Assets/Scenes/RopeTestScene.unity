@@ -451,7 +451,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7f451373a34ee85449fb1fe7e1e5601a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  restPosition: 1
+  restPosition: 2
   rope: {fileID: 0}
   attachmentTransform: {fileID: 2109990874}
   rb: {fileID: 0}
