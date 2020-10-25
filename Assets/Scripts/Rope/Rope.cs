@@ -27,7 +27,14 @@ public class Rope : MonoBehaviour
     {
         get
         {
-            return verletParticles.Last.Value.restPosition;
+            if (verletParticles.Last != null)
+            {
+                return verletParticles.Last.Value.restPosition;
+            }
+            else
+            {
+                return 0.0f;
+            }
         }
     }
 
@@ -35,6 +42,8 @@ public class Rope : MonoBehaviour
     {
         ropeRenderer = gameObject.AddComponent<LineRenderer>();
         ropeRenderer.widthMultiplier = 0.05f;
+        ropeRenderer.material = new Material(Shader.Find("Unlit/Color"));
+        ropeRenderer.material.color = Color.red;
     }
 
     private void Update()
@@ -47,7 +56,7 @@ public class Rope : MonoBehaviour
         ropeNodePositions = new List<Vector3>();
         LinkedListNode<VerletParticle> currentVPNode = verletParticles.First;
         LinkedListNode<RopeAttachment> currentRANode = ropeAttachments.First;
-        while (currentVPNode != null && currentRANode != null)
+        while (currentVPNode != null)
         {
             if (currentRANode == null || 
                 currentVPNode.Value.restPosition < currentRANode.Value.restPosition)
@@ -81,6 +90,22 @@ public class Rope : MonoBehaviour
             vp.Simulate();
         }
 
+        for(int i = 0; i < 80; i++)
+        {
+            ApplyConstraints();
+        }
+
+        /* Apply ra--ra forces */
+        LinkedListNode<RopeAttachment> currentNode = ropeAttachments.First;
+        while (currentNode != null && currentNode.Next != null)
+        {
+            RopeAttachment.ApplyTension(currentNode.Value, currentNode.Next.Value);
+            currentNode = currentNode.Next;
+        }      
+    }
+
+    private void ApplyConstraints()
+    {
         /* Apply vp--vp, vp--ra, and ra--vp constraints */
         LinkedListNode<VerletParticle> currentVPNode = verletParticles.First;
         LinkedListNode<RopeAttachment> currentRANode = ropeAttachments.First;
@@ -106,14 +131,6 @@ public class Rope : MonoBehaviour
                 currentRANode = currentRANode.Next;
             }
         }
-
-        /* Apply ra--ra constraints */
-        LinkedListNode<RopeAttachment> currentNode = ropeAttachments.First;
-        while (currentNode != null && currentNode.Next != null)
-        {
-            RopeAttachment.ApplyTension(currentNode.Value, currentNode.Next.Value);
-            currentNode = currentNode.Next;
-        }      
     }
 
     public void SortUp(RopeAttachment ra)
@@ -246,24 +263,30 @@ public class Rope : MonoBehaviour
         GameObject ropeGO = new GameObject();
         Rope rope = ropeGO.AddComponent<Rope>();
         float length = Vector3.Distance(startPos, endPos);
-        float t = 0.0f;
+        float x = 0.0f;
         int n = Mathf.FloorToInt(length / verletParticleSpacing);
 
         GameObject startVPGO = new GameObject();
-        startVPGO.transform.position = startPos;
         VerletParticle startVP = startVPGO.AddComponent<VerletParticle>();
+        startVP.transform.position = startPos;
+        startVP.previousPosition = startVP.transform.position;
+        startVP.restPosition = x;
         rope.verletParticles.AddLast(startVP);
         for (int i = 1; i <= n; i++)
         {
-            t += i * verletParticleSpacing;
+            x += verletParticleSpacing;
             GameObject vpGO = new GameObject();
-            vpGO.transform.position = Vector3.Lerp(startPos, endPos, t); ;
             VerletParticle vp = vpGO.AddComponent<VerletParticle>();
+            vp.transform.position = Vector3.Lerp(startPos, endPos, x / length);
+            vp.previousPosition = vp.transform.position;
+            vp.restPosition = x;
             rope.verletParticles.AddLast(vp);
         }
         GameObject endVPGO = new GameObject();
-        endVPGO.transform.position = endPos;
         VerletParticle endVP = endVPGO.AddComponent<VerletParticle>();
+        endVP.transform.position = endPos;
+        endVP.previousPosition = endVP.transform.position;
+        endVP.restPosition = length;
         rope.verletParticles.AddLast(endVP);
         return rope;
     }

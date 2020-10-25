@@ -6,11 +6,6 @@ public class VerletParticle : RopeNode
 {
     public Vector3 previousPosition;
 
-    private void Awake()
-    {
-        previousPosition = transform.position;
-    }
-
     public void Simulate()
     {
         // derive the velocity from previous frame
