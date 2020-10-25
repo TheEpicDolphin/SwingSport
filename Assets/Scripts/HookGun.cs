@@ -35,7 +35,7 @@ public class HookGun : MonoBehaviour
 
     private LineRenderer ropeRenderer;
 
-    private VerletRope verletRope;
+    private Rope rope;
 
     public Material ropeMaterial;
 
@@ -123,7 +123,7 @@ public class HookGun : MonoBehaviour
                     // if the hook was deleted, treat it as if the hook is retracted
                     /* The hook has been detached */
                     isGrappled = false;
-                    Destroy(verletRope);
+                    Destroy(rope);
                     state = HookState.Retracted;
                 }
                 else if (!Input.GetMouseButton(mouseLaunchButton))
@@ -131,7 +131,7 @@ public class HookGun : MonoBehaviour
                     /* The hook has been detached */
                     isGrappled = false;
                     hook.transform.parent = null;
-                    Destroy(verletRope);
+                    Destroy(rope);
                     state = HookState.Retracting;
                     StartCoroutine(RetractHookCoroutine());
 
@@ -139,12 +139,12 @@ public class HookGun : MonoBehaviour
                 else if (Input.GetKey(KeyCode.LeftShift))
                 {
                     /* Reduce rope length so that player zooms to hook point*/
-                    verletRope.DecreaseRestLength(hookZoomRateMultiplier * Time.fixedDeltaTime);
+                    //verletRope.DecreaseRestLength(hookZoomRateMultiplier * Time.fixedDeltaTime);
                 }
                 else if (Input.GetKey("q"))
                 {
                     /* Increase rope length so that player gets farther from hook point */
-                    verletRope.IncreaseRestLength(10.0f * Time.fixedDeltaTime);
+                    //verletRope.IncreaseRestLength(10.0f * Time.fixedDeltaTime);
                 }
                 break;
             case HookState.Retracting:
@@ -199,10 +199,7 @@ public class HookGun : MonoBehaviour
 
                     isGrappled = true;
 
-                    verletRope = gameObject.AddComponent<VerletRope>();
-                    verletRope.BuildRope(hook.transform, 6, maxRopeLength, ropeMaterial);
-                    verletRope.Spring = 5000.0f;
-                    verletRope.Damper = 1000.0f;
+                    rope = Rope.CreateTautRope(transform.position, hook.transform.position);
                     state = HookState.Attached;
                 }
                 else

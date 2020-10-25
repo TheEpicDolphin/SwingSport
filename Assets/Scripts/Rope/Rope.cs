@@ -84,28 +84,24 @@ public class Rope : MonoBehaviour
         /* Apply vp--vp, vp--ra, and ra--vp constraints */
         LinkedListNode<VerletParticle> currentVPNode = verletParticles.First;
         LinkedListNode<RopeAttachment> currentRANode = ropeAttachments.First;
-        RopeNode previousRopeNode;
-        if (currentVPNode.Value.restPosition < currentRANode.Value.restPosition)
-        {
-            previousRopeNode = currentVPNode.Value;
-            currentVPNode = currentVPNode.Next;
-        }
-        else
-        {
-            previousRopeNode = currentRANode.Value;
-            currentRANode = currentRANode.Next;
-        }
+        RopeNode previousRopeNode = null;
         while (currentVPNode != null)
         {
             if (currentRANode == null || currentVPNode.Value.restPosition < currentRANode.Value.restPosition)
             {
-                previousRopeNode.ApplyConstraint(currentVPNode.Value);
+                if (previousRopeNode)
+                {
+                    previousRopeNode.ApplyConstraint(currentVPNode.Value);
+                }
                 previousRopeNode = currentVPNode.Value;
                 currentVPNode = currentVPNode.Next;
             }
             else
             {
-                previousRopeNode.ApplyConstraint(currentRANode.Value);
+                if (previousRopeNode)
+                {
+                    previousRopeNode.ApplyConstraint(currentRANode.Value);
+                }
                 previousRopeNode = currentRANode.Value;
                 currentRANode = currentRANode.Next;
             }
