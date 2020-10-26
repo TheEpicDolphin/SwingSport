@@ -148,6 +148,7 @@ public class Rope : MonoBehaviour
 
     public void InsertRope(float insertionPosition, float amount)
     {
+        amount = Mathf.Abs(amount);
         insertionPosition = ClampPositionToRopeExtents(insertionPosition);
         LinkedListNode<VerletParticle> nextVP = FindClosestRopeNodeAfter(verletParticles, insertionPosition);
         LinkedListNode<RopeAttachment> nextRA = FindClosestRopeNodeAfter(ropeAttachments, insertionPosition);
@@ -176,6 +177,7 @@ public class Rope : MonoBehaviour
             VerletParticle vp = vpGO.AddComponent<VerletParticle>();
             vp.transform.position = Vector3.Lerp(startPos, endPos, t);
             vp.previousPosition = vp.transform.position;
+            vp.restPosition = currentPosition;
             ceiling = verletParticles.AddBefore(ceiling, vp);
             currentPosition -= verletParticleSpacing;
         }
@@ -183,6 +185,7 @@ public class Rope : MonoBehaviour
 
     public void RemoveRope(float removalPosition, float amount)
     {
+        amount = -Mathf.Abs(amount);
         removalPosition = ClampPositionToRopeExtents(removalPosition);
         LinkedListNode<VerletParticle> nextVP = FindClosestRopeNodeAfter(verletParticles, removalPosition);
         LinkedListNode<RopeAttachment> nextRA = FindClosestRopeNodeAfter(ropeAttachments, removalPosition);
@@ -211,10 +214,11 @@ public class Rope : MonoBehaviour
                 currentVPNode.Value.restPosition = removalPosition + delta;
                 break;
             }
+            LinkedListNode<VerletParticle> temp = currentVPNode.Next;
             VerletParticle vp = currentVPNode.Value;
             verletParticles.Remove(currentVPNode);
-            Destroy(vp);
-            currentVPNode = currentVPNode.Next;
+            Destroy(vp.gameObject);
+            currentVPNode = temp;
         }
     }
 
@@ -355,6 +359,17 @@ public class Rope : MonoBehaviour
                 yield return currentRANode.Value;
                 currentRANode = currentRANode.Next;
             }
+        }
+    }
+
+    private void OnDrawGizmos()
+    {
+        LinkedListNode<VerletParticle> currentVPNode = verletParticles.First;
+        Gizmos.color = Color.blue;
+        while (currentVPNode != null)
+        {
+            Gizmos.DrawSphere(currentVPNode.Value.AttachmentPoint(), 0.1f);
+            currentVPNode = currentVPNode.Next;
         }
     }
 

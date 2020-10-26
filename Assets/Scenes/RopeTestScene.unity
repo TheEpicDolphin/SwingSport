@@ -342,6 +342,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ra: {fileID: 1324833256}
+  hangerRA: {fileID: 1841448084}
+  sphereRA: {fileID: 1554167618}
 --- !u!1 &1324833251
 GameObject:
   m_ObjectHideFlags: 0
@@ -468,6 +470,7 @@ GameObject:
   - component: {fileID: 1554167614}
   - component: {fileID: 1554167613}
   - component: {fileID: 1554167617}
+  - component: {fileID: 1554167618}
   m_Layer: 0
   m_Name: Sphere
   m_TagString: Untagged
@@ -567,6 +570,22 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &1554167618
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1554167612}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f451373a34ee85449fb1fe7e1e5601a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  restPosition: 0
+  rope: {fileID: 0}
+  attachmentTransform: {fileID: 1554167616}
+  rb: {fileID: 0}
 --- !u!1 &1841448079
 GameObject:
   m_ObjectHideFlags: 0
@@ -579,6 +598,7 @@ GameObject:
   - component: {fileID: 1841448082}
   - component: {fileID: 1841448081}
   - component: {fileID: 1841448080}
+  - component: {fileID: 1841448084}
   m_Layer: 0
   m_Name: Hanger
   m_TagString: Untagged
@@ -662,6 +682,22 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1841448084
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1841448079}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f451373a34ee85449fb1fe7e1e5601a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  restPosition: 0
+  rope: {fileID: 0}
+  attachmentTransform: {fileID: 1841448083}
+  rb: {fileID: 0}
 --- !u!1 &2109990873
 GameObject:
   m_ObjectHideFlags: 0
