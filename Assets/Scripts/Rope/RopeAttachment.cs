@@ -88,6 +88,16 @@ public class RopeAttachment : RopeNode
         return attachmentTransform.position;
     }
 
+    public void InsertRopeAbove(float amount)
+    {
+        rope.InsertRope(restPosition + 1e-4f, amount);
+    }
+
+    public void RemoveRopeAbove(float amount)
+    {
+        rope.RemoveRope(restPosition + 1e-4f, amount);
+    }
+
     private void OnDestroy()
     {
         rope.Detach(this);

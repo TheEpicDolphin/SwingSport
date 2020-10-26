@@ -24,11 +24,11 @@ public class RopeTest : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.W))
         {
-            rope.RemoveRope(sphereRA.restPosition + 1e-4f, Time.deltaTime);
+            sphereRA.RemoveRopeAbove(Time.deltaTime);
         }
         if (Input.GetKey(KeyCode.S))
         {
-            rope.InsertRope(sphereRA.restPosition + 1e-4f, Time.deltaTime);
+            sphereRA.InsertRopeAbove(Time.deltaTime);
         }
     }
 }
