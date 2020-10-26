@@ -12,4 +12,6 @@ public abstract class RopeNode : MonoBehaviour
     public abstract void ApplyConstraint(RopeAttachment ra);
 
     public abstract void ApplyConstraint(VerletParticle vp);
+
+    public abstract Vector3 AttachmentPoint();
 }

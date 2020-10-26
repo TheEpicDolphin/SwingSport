@@ -44,4 +44,9 @@ public class VerletParticle : RopeNode
             transform.position += 1.0f * d1 * d3;
         }
     }
+
+    public override Vector3 AttachmentPoint()
+    {
+        return transform.position;
+    }
 }

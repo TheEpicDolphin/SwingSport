@@ -83,6 +83,11 @@ public class RopeAttachment : RopeNode
         }
     }
 
+    public override Vector3 AttachmentPoint()
+    {
+        return attachmentTransform.position;
+    }
+
     private void OnDestroy()
     {
         rope.Detach(this);

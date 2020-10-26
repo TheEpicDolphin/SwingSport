@@ -54,21 +54,10 @@ public class Rope : MonoBehaviour
     private void Draw()
     {
         ropeNodePositions = new List<Vector3>();
-        LinkedListNode<VerletParticle> currentVPNode = verletParticles.First;
-        LinkedListNode<RopeAttachment> currentRANode = ropeAttachments.First;
-        while (currentVPNode != null)
+        IEnumerator<RopeNode> ropeNodes = GetAllRopeNodes();
+        while (ropeNodes.MoveNext())
         {
-            if (currentRANode == null || 
-                currentVPNode.Value.restPosition < currentRANode.Value.restPosition)
-            {
-                ropeNodePositions.Add(currentVPNode.Value.transform.position);
-                currentVPNode = currentVPNode.Next;
-            }
-            else
-            {
-                ropeNodePositions.Add(currentRANode.Value.attachmentTransform.position);
-                currentRANode = currentRANode.Next;
-            }
+            ropeNodePositions.Add(ropeNodes.Current.AttachmentPoint());
         }
         ropeRenderer.positionCount = ropeNodePositions.Count;
         ropeRenderer.SetPositions(ropeNodePositions.ToArray());
@@ -305,6 +294,7 @@ public class Rope : MonoBehaviour
     public void Attach(RopeAttachment ra)
     {
         ra.rope = this;
+        ra.restPosition = ClampPositionToRopeExtents(ClosestRestPositionOnRope(ra.AttachmentPoint()));
         LinkedListNode<RopeAttachment> currentNode = ropeAttachments.First;
         while (currentNode != null)
         {
@@ -316,6 +306,56 @@ public class Rope : MonoBehaviour
             currentNode = currentNode.Next;
         }
         ropeAttachments.AddLast(ra);
+    }
+    
+    private float ClosestRestPositionOnRope(Vector3 point)
+    {
+        IEnumerator<RopeNode> ropeNodes = GetAllRopeNodes();
+        ropeNodes.MoveNext();
+        RopeNode previousNode = ropeNodes.Current;
+        float minSqrDist = Mathf.Infinity;
+        float closestRestPosition = 0.0f;
+        while (ropeNodes.MoveNext())
+        {
+            RopeNode currentNode = ropeNodes.Current;
+            Vector3 s = previousNode.AttachmentPoint();
+            Vector3 e = currentNode.AttachmentPoint();
+            Vector3 v = e - s;
+            float sqrMag = Vector3.SqrMagnitude(v);
+            if(sqrMag > Mathf.Epsilon)
+            {
+                float t = Vector3.Dot(point - s, v) / sqrMag;
+                t = Mathf.Clamp(t, 0, 1);
+                Vector3 closestPointOnRope = s + t * v;
+                float sqrDist = Vector3.SqrMagnitude(closestPointOnRope - point);
+                if (sqrDist < minSqrDist)
+                {
+                    minSqrDist = sqrDist;
+                    closestRestPosition = Mathf.Lerp(previousNode.restPosition, currentNode.restPosition, t);
+                }
+            }
+        }
+        return closestRestPosition;
+    }
+
+    private IEnumerator<RopeNode> GetAllRopeNodes()
+    {
+        LinkedListNode<VerletParticle> currentVPNode = verletParticles.First;
+        LinkedListNode<RopeAttachment> currentRANode = ropeAttachments.First;
+        while (currentVPNode != null)
+        {
+            if (currentRANode == null ||
+                currentVPNode.Value.restPosition < currentRANode.Value.restPosition)
+            {
+                yield return currentVPNode.Value;
+                currentVPNode = currentVPNode.Next;
+            }
+            else
+            {
+                yield return currentRANode.Value;
+                currentRANode = currentRANode.Next;
+            }
+        }
     }
 
 }
