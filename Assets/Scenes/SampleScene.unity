@@ -35545,7 +35545,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1959351904}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -3.2500005, y: -11.907, z: 8.330001}
+  m_LocalPosition: {x: -5.62, y: -11.907, z: 12.51}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 236676370}
@@ -38359,6 +38359,11 @@ PrefabInstance:
       propertyPath: ragdollHandL
       value: 
       objectReference: {fileID: 989021560}
+    - target: {fileID: 467323422525574463, guid: 9fe0d029eeaf02b4c825820ec8b82476,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1292888627932318794, guid: 9fe0d029eeaf02b4c825820ec8b82476,
         type: 3}
       propertyPath: m_IsKinematic

@@ -23,9 +23,7 @@ public class Player : MonoBehaviour
 
     public PlayerInputManager input;
 
-    PlayerState currentState;
-
-    CapsuleCollider bumper;
+    public Bumper bumper = new Bumper();
 
     public Animator animator;
 
@@ -41,6 +39,8 @@ public class Player : MonoBehaviour
 
     private Material animatedBonesMat;
 
+    private PlayerState currentState;
+
     public Vector3 Velocity
     {
         get
@@ -55,8 +55,6 @@ public class Player : MonoBehaviour
         animatedBonesMat.color = Color.cyan;
         input = gameObject.AddComponent<PlayerInputManager>();
 
-        bumper = GetComponent<CapsuleCollider>();
-        gameObject.layer = LayerMask.NameToLayer("Bumper");
         animator = GetComponentInChildren<Animator>();
         playerRb = GetComponent<Rigidbody>();
 
@@ -65,6 +63,7 @@ public class Player : MonoBehaviour
 
         if (ragdollHandR)
         {
+            /*
             GameObject hookGunGO = (GameObject)Instantiate(Resources.Load("Prefabs/HookGun"));
             HookGun hookGun = hookGunGO.GetComponent<HookGun>();
             hookGun.Equip(ragdollHandR, ragdollHandR.position + 0.25f * ragdollHandR.transform.forward,
@@ -72,6 +71,7 @@ public class Player : MonoBehaviour
             hookGun.setControls(1);
             hookGun.setColor(Color.red);
             hookGun.cursor.cursorImage = cursorImage;
+            */
         }
 
         if (ragdollHandL)
@@ -166,27 +166,14 @@ public class Player : MonoBehaviour
 
     private void OnCollisionStay(Collision collision)
     {
-        if(collision.gameObject.tag == "Hookable")
+        bumper.contactPoints.Clear();
+        foreach (ContactPoint contact in collision.contacts)
         {
-            Debug.Log("STAY");
-        }
-        
-    }
-
-    private void OnCollisionEnter(Collision collision)
-    {
-        if (collision.gameObject.tag == "Hookable")
-        {
-            Debug.Log("ENTERED");
-        }
-        
-    }
-
-    private void OnCollisionExit(Collision collision)
-    {
-        if (collision.gameObject.tag == "Hookable")
-        {
-            Debug.Log("EXIT");
+            if (contact.thisCollider.tag == "Bumper" && contact.otherCollider.tag == "Hookable")
+            {
+                bumper.contactPoints.Add(contact);
+                Debug.DrawRay(contact.point, contact.normal, Color.red);
+            }
         }
     }
 
