@@ -4,14 +4,9 @@ using UnityEngine;
 
 public class AerialState : PlayerState
 {
-    public AerialState(Player player)
-    {
-        player.animator.CrossFade("Falling", 0.1f);
-    }
-
     public override void OnEnter()
     {
-        throw new System.NotImplementedException();
+        player.animator.CrossFade("Falling", 0.1f);
     }
 
     public override PlayerState FixedUpdateStep(Player player)
@@ -20,7 +15,6 @@ public class AerialState : PlayerState
         bool willLand = Physics.Raycast(player.AnimatedRigHipPosition(), Vector3.down, 1.6f, ~LayerMask.GetMask("Player"));
         if (willLand)
         {
-            //return new LandingState(player, 0.15f);
             return new GroundedState(player);
         }
 

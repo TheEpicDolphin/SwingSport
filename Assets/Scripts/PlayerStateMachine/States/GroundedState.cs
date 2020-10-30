@@ -4,14 +4,10 @@ using UnityEngine;
 
 public class GroundedState : PlayerState
 {
-    public GroundedState(Player player)
-    {
-        player.animator.CrossFade("GroundedMovement", 0.1f);
-    }
 
     public override void OnEnter()
     {
-        throw new System.NotImplementedException();
+        player.animator.CrossFade("GroundedMovement", 0.1f);
     }
 
     public override PlayerState FixedUpdateStep(Player player)
@@ -35,6 +31,7 @@ public class GroundedState : PlayerState
         }
         else
         {
+            playerSM.TransitionToState();
             return new AerialState(player);
         }
     }
@@ -44,6 +41,7 @@ public class GroundedState : PlayerState
         /* This belongs here because FixedUpdate would sometimes miss the spacebarDown event */
         if (player.input.spacebarDown)
         {
+            playerSM.TransitionToState();
             return new JumpingState(0.1f);
         }
         float groundSpeed = Vector3.ProjectOnPlane(player.Velocity, Vector3.up).magnitude;

@@ -10,6 +10,7 @@ public class JumpingState : PlayerState
 
     public JumpingState(float jumpDuration)
     {
+        
         this.jumpDuration = jumpDuration;
         this.t = 0.0f;
         this.spacebarTime = 0.0f;

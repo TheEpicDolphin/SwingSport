@@ -5,14 +5,28 @@ using UnityEngine;
 public class WallRunningState : PlayerState
 {
     float maxWallrunningTime = 4.0f;
+    float wallrunningTime = 0.0f;
     public WallRunningState(Player player)
     {
         player.animator.CrossFade("Wallrunning", 0.1f);
     }
 
+    
+    public WallRunningState()
+    {
+
+    }
+
+    public override void OnEnter(Player player)
+    {
+        
+        
+    }
+
     public override void OnEnter()
     {
-        throw new System.NotImplementedException();
+        wallrunningTime = 0.0f;
+        player.animator.CrossFade("Wallrunning", 0.1f);
     }
 
     public override PlayerState FixedUpdateStep(Player player)
@@ -48,11 +62,13 @@ public class WallRunningState : PlayerState
 
     public override PlayerState UpdateStep(Player player)
     {
-        maxWallrunningTime -= Time.deltaTime;
-        if(maxWallrunningTime < 0)
+        if (wallrunningTime < maxWallrunningTime)
         {
-            return new AerialState(player);
+            wallrunningTime += Time.deltaTime;
         }
-        return this;
+        else
+        {
+            //TODO: Maybe animate player sliding down wall?
+        }
     }
 }
