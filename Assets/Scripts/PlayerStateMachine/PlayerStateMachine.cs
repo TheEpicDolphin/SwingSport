@@ -12,7 +12,7 @@ public class PlayerStateMachine
     {
         foreach (Type stateType in stateTypes)
         {
-            stateMap[stateType] = (PlayerState) Activator.CreateInstance(stateType, new object[]{ player });
+            stateMap[stateType] = (PlayerState) Activator.CreateInstance(stateType, new object[]{ this, player });
         }
     }
 

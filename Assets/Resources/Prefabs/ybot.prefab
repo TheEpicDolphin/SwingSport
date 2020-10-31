@@ -533,7 +533,6 @@ MonoBehaviour:
   ragdollHandR: {fileID: 0}
   ragdollHandL: {fileID: 0}
   input: {fileID: 0}
-  bumper: {fileID: 0}
   animator: {fileID: 0}
 --- !u!1 &747730984873276188
 GameObject:
@@ -2741,7 +2740,7 @@ GameObject:
   - component: {fileID: 5431632721902440565}
   m_Layer: 13
   m_Name: Bumper
-  m_TagString: Untagged
+  m_TagString: Bumper
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

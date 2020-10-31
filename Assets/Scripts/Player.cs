@@ -39,7 +39,7 @@ public class Player : MonoBehaviour
 
     private Material animatedBonesMat;
 
-    private PlayerState currentState;
+    private PlayerStateMachine playerSM;
 
     public Vector3 Velocity
     {
@@ -51,6 +51,8 @@ public class Player : MonoBehaviour
 
     private void Awake()
     {
+        bumper.contactPoints = new List<ContactPoint>();
+
         animatedBonesMat = new Material(Shader.Find("Unlit/Color"));
         animatedBonesMat.color = Color.cyan;
         input = gameObject.AddComponent<PlayerInputManager>();
@@ -89,17 +91,23 @@ public class Player : MonoBehaviour
             ballHookGun.cursor.cursorImage = cursorImage;
             */
         }
+        playerSM = new PlayerStateMachine(this, new List<System.Type>(){
+            typeof(GroundedState),
+            typeof(JumpingState),
+            typeof(AerialState),
+            typeof(WallRunningState),
+        });
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        currentState = new GroundedState(this);
+        playerSM.InitWithState<GroundedState>();
     }
 
     private void Update()
     {
-        currentState = currentState.UpdateStep(this);
+        playerSM.UpdateStep();
         followingCamera.UpdateCameraTargetRotation(input.mouseXDelta, input.mouseYDelta);
 
         /*
@@ -124,7 +132,7 @@ public class Player : MonoBehaviour
 
     private void FixedUpdate()
     {
-        currentState = currentState.FixedUpdateStep(this);
+        playerSM.FixedUpdateStep();
     }
 
     public Vector3 CameraRelativeInputDirection()

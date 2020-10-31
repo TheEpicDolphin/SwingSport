@@ -6,6 +6,12 @@ public class WallRunningState : PlayerState
 {
     float maxWallrunningTime = 4.0f;
     float wallrunningTime;
+
+    public WallRunningState(PlayerStateMachine playerSM, Player player) : base(playerSM, player)
+    {
+
+    }
+
     public override void OnEnter()
     {
         wallrunningTime = 0.0f;

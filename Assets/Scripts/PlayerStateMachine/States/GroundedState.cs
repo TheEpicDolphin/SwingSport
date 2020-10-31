@@ -4,6 +4,11 @@ using UnityEngine;
 
 public class GroundedState : PlayerState
 {
+    public GroundedState(PlayerStateMachine playerSM, Player player) : base(playerSM, player)
+    {
+
+    }
+
     public override void OnEnter()
     {
         player.animator.CrossFade("GroundedMovement", 0.1f);

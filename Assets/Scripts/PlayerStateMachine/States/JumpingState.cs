@@ -8,6 +8,11 @@ public class JumpingState : PlayerState
     float t;
     float spacebarTime;
 
+    public JumpingState(PlayerStateMachine playerSM, Player player) : base(playerSM, player)
+    {
+
+    }
+
     public override void OnEnter()
     {
         this.t = 0.0f;

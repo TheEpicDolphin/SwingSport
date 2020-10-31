@@ -4,6 +4,11 @@ using UnityEngine;
 
 public class AerialState : PlayerState
 {
+    public AerialState(PlayerStateMachine playerSM, Player player) : base(playerSM, player)
+    {
+
+    }
+
     public override void OnEnter()
     {
         player.animator.CrossFade("Falling", 0.1f);

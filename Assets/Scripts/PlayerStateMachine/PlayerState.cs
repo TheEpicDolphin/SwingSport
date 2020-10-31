@@ -8,8 +8,9 @@ public abstract class PlayerState
 
     protected PlayerStateMachine playerSM;
 
-    public PlayerState(Player player)
+    public PlayerState(PlayerStateMachine playerSM, Player player)
     {
+        this.playerSM = playerSM;
         this.player = player;
     }
 
