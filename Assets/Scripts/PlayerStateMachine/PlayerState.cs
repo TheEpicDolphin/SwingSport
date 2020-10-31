@@ -15,9 +15,9 @@ public abstract class PlayerState
 
     public abstract void OnEnter();
 
-    public abstract PlayerState UpdateStep(Player player);
+    public abstract void UpdateStep();
 
-    public abstract PlayerState FixedUpdateStep(Player player);
+    public abstract void FixedUpdateStep();
 
     public abstract void OnExit();
 }

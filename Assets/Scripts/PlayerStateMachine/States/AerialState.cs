@@ -9,13 +9,14 @@ public class AerialState : PlayerState
         player.animator.CrossFade("Falling", 0.1f);
     }
 
-    public override PlayerState FixedUpdateStep(Player player)
+    public override void FixedUpdateStep()
     {
         /* Checks if player is touching ground */
         bool willLand = Physics.Raycast(player.AnimatedRigHipPosition(), Vector3.down, 1.6f, ~LayerMask.GetMask("Player"));
         if (willLand)
         {
-            return new GroundedState(player);
+            playerSM.TransitionToState<GroundedState>();
+            return;
         }
 
         /* Player is in the air. Allow jetpack-like movement */
@@ -29,11 +30,15 @@ public class AerialState : PlayerState
         player.ApplyAirDrag();
 
         player.RotateCharacterToFace(player.followingCamera.transform.forward, Vector3.up);
-        return this;
     }
 
-    public override PlayerState UpdateStep(Player player)
+    public override void UpdateStep()
     {
-        return this;
+        
+    }
+
+    public override void OnExit()
+    {
+
     }
 }

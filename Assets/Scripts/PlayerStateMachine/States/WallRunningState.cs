@@ -5,43 +5,28 @@ using UnityEngine;
 public class WallRunningState : PlayerState
 {
     float maxWallrunningTime = 4.0f;
-    float wallrunningTime = 0.0f;
-    public WallRunningState(Player player)
-    {
-        player.animator.CrossFade("Wallrunning", 0.1f);
-    }
-
-    
-    public WallRunningState()
-    {
-
-    }
-
-    public override void OnEnter(Player player)
-    {
-        
-        
-    }
-
+    float wallrunningTime;
     public override void OnEnter()
     {
         wallrunningTime = 0.0f;
         player.animator.CrossFade("Wallrunning", 0.1f);
     }
 
-    public override PlayerState FixedUpdateStep(Player player)
+    public override void FixedUpdateStep()
     {
         /* Checks if player is touching ground */
         bool willLand = Physics.Raycast(player.AnimatedRigHipPosition(), Vector3.down, 1.6f, ~LayerMask.GetMask("Player"));
         if (willLand)
         {
             //return new LandingState(player, 0.15f);
-            return new GroundedState(player);
+            playerSM.TransitionToState<GroundedState>();
+            return;
         }
 
         if(player.bumper.contactPoints.Count == 0)
         {
-            return new AerialState(player);
+            playerSM.TransitionToState<AerialState>();
+            return;
         }
 
         Vector3 movementDir = player.CameraRelativeInputDirection();
@@ -57,10 +42,9 @@ public class WallRunningState : PlayerState
                 break;
             }
         }
-        return this;
     }
 
-    public override PlayerState UpdateStep(Player player)
+    public override void UpdateStep()
     {
         if (wallrunningTime < maxWallrunningTime)
         {
@@ -70,5 +54,10 @@ public class WallRunningState : PlayerState
         {
             //TODO: Maybe animate player sliding down wall?
         }
+    }
+
+    public override void OnExit()
+    {
+        
     }
 }

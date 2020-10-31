@@ -4,13 +4,12 @@ using UnityEngine;
 
 public class GroundedState : PlayerState
 {
-
     public override void OnEnter()
     {
         player.animator.CrossFade("GroundedMovement", 0.1f);
     }
 
-    public override PlayerState FixedUpdateStep(Player player)
+    public override void FixedUpdateStep()
     {
         RaycastHit hit;
         /* Checks if player is on the ground. Consider doing a spherecast for more accuracy */
@@ -21,35 +20,32 @@ public class GroundedState : PlayerState
             a = Vector3.ClampMagnitude(a, 100.0f);
             player.AddForce(a, ForceMode.Acceleration);
 
-
             Vector3 movementDir = player.CameraRelativeInputDirection();
             if(movementDir.magnitude > 1e-4f)
             {
                 player.RotateCharacterToFace(movementDir, Vector3.up);
             }
-            return this;
         }
         else
         {
-            playerSM.TransitionToState();
-            return new AerialState(player);
+            playerSM.TransitionToState<AerialState>();
         }
     }
 
-    public override PlayerState UpdateStep(Player player)
+    public override void UpdateStep()
     {
         /* This belongs here because FixedUpdate would sometimes miss the spacebarDown event */
         if (player.input.spacebarDown)
         {
-            playerSM.TransitionToState();
-            return new JumpingState(0.1f);
+            playerSM.TransitionToState<JumpingState>();
+            return;
         }
         float groundSpeed = Vector3.ProjectOnPlane(player.Velocity, Vector3.up).magnitude;
         player.animator.SetFloat("GroundSpeed", groundSpeed / player.groundMovementSpeed);
-        return this;
     }
 
-    
+    public override void OnExit()
+    {
 
-    
+    }
 }

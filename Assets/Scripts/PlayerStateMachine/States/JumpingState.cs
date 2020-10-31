@@ -4,36 +4,29 @@ using UnityEngine;
 
 public class JumpingState : PlayerState
 {
-    float jumpDuration;
+    float jumpDuration = 0.1f;
     float t;
     float spacebarTime;
 
-    public JumpingState(float jumpDuration)
+    public override void OnEnter()
     {
-        
-        this.jumpDuration = jumpDuration;
         this.t = 0.0f;
         this.spacebarTime = 0.0f;
     }
 
-    public override void OnEnter()
-    {
-        throw new System.NotImplementedException();
-    }
-
-    public override PlayerState FixedUpdateStep(Player player)
+    public override void FixedUpdateStep()
     {
         player.AddForce(20.0f * Vector3.up, ForceMode.Acceleration);
-        return this;
     }
 
-    public override PlayerState UpdateStep(Player player)
+    public override void UpdateStep()
     {
         if (t >= jumpDuration)
         {
             float jumpPower = Mathf.Lerp(5.0f, 15.0f, spacebarTime / jumpDuration);
             player.AddForce(jumpPower * Vector3.up, ForceMode.VelocityChange);
-            return new AerialState(player);
+            playerSM.TransitionToState<AerialState>();
+            return;
         }
         if (player.input.spacebar)
         {
@@ -41,6 +34,10 @@ public class JumpingState : PlayerState
             spacebarTime += Time.deltaTime;
         }
         t += Time.deltaTime;
-        return this;
+    }
+
+    public override void OnExit()
+    {
+
     }
 }

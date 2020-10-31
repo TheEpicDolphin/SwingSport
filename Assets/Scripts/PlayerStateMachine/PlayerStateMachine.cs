@@ -8,33 +8,39 @@ public class PlayerStateMachine
     PlayerState currentState;
     private Dictionary<Type, PlayerState> stateMap = new Dictionary<Type, PlayerState>();
 
-    public PlayerStateMachine(List<Type> stateTypes)
+    public PlayerStateMachine(Player player, List<Type> stateTypes)
     {
         foreach (Type stateType in stateTypes)
         {
-            stateMap[stateType] = (stateType) Activator.CreateInstance(stateType);
+            stateMap[stateType] = (PlayerState) Activator.CreateInstance(stateType, new object[]{ player });
         }
     }
 
-    public T GetState<T>() where T : PlayerState
+    public void InitWithState<T>() where T : PlayerState
+    {
+        currentState = GetState<T>();
+        currentState.OnEnter();
+    }
+
+    private PlayerState GetState<T>() where T : PlayerState
     {
         return stateMap[typeof(T)];
     }
 
-    public void TransitionToState(Type stateType)
+    public void TransitionToState<T>() where T : PlayerState
     {
         currentState.OnExit();
-        currentState = GetState<stateType>();
+        currentState = GetState<T>();
         currentState.OnEnter();
     }
 
-    public void UpdateStep(Player player)
+    public void UpdateStep()
     {
-        currentState = currentState.UpdateStep(player);
+        currentState.UpdateStep();
     }
 
-    public void FixedUpdateStep(Player player)
+    public void FixedUpdateStep()
     {
-        currentState = currentState.FixedUpdateStep(player);
+        currentState.FixedUpdateStep();
     }
 }
