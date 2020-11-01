@@ -23,7 +23,7 @@ public class Player : MonoBehaviour
 
     public PlayerInputManager input;
 
-    public Bumper bumper = new Bumper();
+    public List<ContactPoint> wallrunningSurfaceContacts;
 
     public Animator animator;
 
@@ -51,7 +51,7 @@ public class Player : MonoBehaviour
 
     private void Awake()
     {
-        bumper.contactPoints = new List<ContactPoint>();
+        wallrunningSurfaceContacts = new List<ContactPoint>();
 
         animatedBonesMat = new Material(Shader.Find("Unlit/Color"));
         animatedBonesMat.color = Color.cyan;
@@ -133,6 +133,9 @@ public class Player : MonoBehaviour
     private void FixedUpdate()
     {
         playerSM.FixedUpdateStep();
+
+        /* Clear wallrunning surface contacts from last OnCollisionStay */
+        wallrunningSurfaceContacts.Clear();
     }
 
     public Vector3 CameraRelativeInputDirection()
@@ -174,14 +177,22 @@ public class Player : MonoBehaviour
 
     private void OnCollisionStay(Collision collision)
     {
-        bumper.contactPoints.Clear();
         foreach (ContactPoint contact in collision.contacts)
         {
-            if (contact.thisCollider.tag == "Bumper" && contact.otherCollider.tag == "Hookable")
+            float normalAngle = Vector3.Angle(contact.normal, Vector3.up);
+            float angleFromYPlane = Mathf.Abs(normalAngle - 90.0f);
+            if (contact.thisCollider.tag == "Bumper" && angleFromYPlane < 30.0f)
             {
-                bumper.contactPoints.Add(contact);
+                wallrunningSurfaceContacts.Add(contact);
                 Debug.DrawRay(contact.point, contact.normal, Color.red);
             }
+            /*
+            if (contact.thisCollider.tag == "Bumper" && contact.otherCollider.tag == "Hookable")
+            {
+                wallrunningSurfaceContacts.Add(contact);
+                Debug.DrawRay(contact.point, contact.normal, Color.red);
+            }
+            */
         }
     }
 

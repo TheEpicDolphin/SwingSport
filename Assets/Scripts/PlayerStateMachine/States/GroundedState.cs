@@ -16,6 +16,12 @@ public class GroundedState : PlayerState
 
     public override void FixedUpdateStep()
     {
+        if(player.wallrunningSurfaceContacts.Count > 0)
+        {
+            playerSM.TransitionToState<WallRunningState>();
+            return;
+        }
+
         RaycastHit hit;
         /* Checks if player is on the ground. Consider doing a spherecast for more accuracy */
         if (Physics.Raycast(player.AnimatedRigHipPosition(), Vector3.down, out hit, 1.3f, ~LayerMask.GetMask("Player")))
