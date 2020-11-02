@@ -184,7 +184,7 @@ public class Player : MonoBehaviour
             if (contact.thisCollider.tag == "Bumper" && angleFromYPlane < 30.0f)
             {
                 wallrunningSurfaceContacts.Add(contact);
-                Debug.DrawRay(contact.point, contact.normal, Color.red);
+                //Debug.DrawRay(contact.point, contact.normal, Color.red);
             }
             /*
             if (contact.thisCollider.tag == "Bumper" && contact.otherCollider.tag == "Hookable")

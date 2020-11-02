@@ -46,16 +46,11 @@ public class WallRunningState : PlayerState
                 Vector3 planarMovementForce = Vector3.ProjectOnPlane(movementDir, wallNormal) * 10.0f;
                 player.AddForce(planarMovementForce + upMovementForce, ForceMode.Acceleration);
 
+                /* Unity cross product is left-handed */
                 Vector3 wallParallel = Vector3.Cross(wallNormal, Vector3.up).normalized;
-                if (Vector3.Dot(movementDir, wallParallel) > 0)
-                {
-                    player.RotateCharacterToFace(wallParallel, wallNormal);
-                }
-                else
-                {
-                    player.RotateCharacterToFace(-wallParallel, wallNormal);
-                }
-                
+                float wallrunningDot = Vector3.Dot(movementDir, wallParallel);
+                player.animator.SetFloat("WallrunningOrientation", (wallrunningDot + 1) / 2);
+                player.RotateCharacterToFace(-wallNormal, Vector3.up);
                 break;
             }
         }
