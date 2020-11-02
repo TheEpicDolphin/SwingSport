@@ -96,6 +96,7 @@ public class Player : MonoBehaviour
             typeof(JumpingState),
             typeof(AerialState),
             typeof(WallRunningState),
+            typeof(GroundedToWallrunningState),
         });
     }
 

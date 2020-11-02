@@ -18,7 +18,9 @@ public class GroundedState : PlayerState
     {
         if(player.wallrunningSurfaceContacts.Count > 0)
         {
-            playerSM.TransitionToState<WallRunningState>();
+            //playerSM.TransitionToState<WallRunningState>();
+            //playerSM.TransitionToState<JumpingState>();
+            playerSM.TransitionToState<GroundedToWallrunningState>();
             return;
         }
 

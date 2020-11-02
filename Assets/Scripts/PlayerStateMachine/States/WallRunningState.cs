@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class WallRunningState : PlayerState
 {
-    float maxWallrunningTime = 4.0f;
-    float minWallrunningTime = 2.0f;
+    float maxWallrunningTime = 1.5f;
+    float minWallrunningTime = 0.5f;
     float wallrunningTime;
 
     public WallRunningState(PlayerStateMachine playerSM, Player player) : base(playerSM, player)
@@ -29,7 +29,7 @@ public class WallRunningState : PlayerState
             return;
         }
 
-        if(player.wallrunningSurfaceContacts.Count == 0)
+        if(player.wallrunningSurfaceContacts.Count == 0 || wallrunningTime >= maxWallrunningTime)
         {
             playerSM.TransitionToState<AerialState>();
             return;
@@ -42,9 +42,11 @@ public class WallRunningState : PlayerState
             float dot = Vector3.Dot(movementDir, -wallNormal);
             if (dot > 0)
             {
-                Vector3 upMovementForce = -1.5f * Physics.gravity.y * dot * Vector3.up;
-                Vector3 planarMovementForce = Vector3.ProjectOnPlane(movementDir, wallNormal) * 10.0f;
-                player.AddForce(planarMovementForce + upMovementForce, ForceMode.Acceleration);
+                Vector3 upMovementAcceleration = -2.0f * Physics.gravity.y * (1.0f - wallrunningTime / maxWallrunningTime) * Vector3.up;
+                Vector3 vDesired = player.groundMovementSpeed * Vector3.ProjectOnPlane(movementDir, wallNormal);
+                Vector3 a = 10.0f * (vDesired - Vector3.ProjectOnPlane(player.Velocity, wallNormal));
+                Vector3 planarMovementAcceleration = Vector3.ClampMagnitude(a, 100.0f);
+                player.AddForce(planarMovementAcceleration + upMovementAcceleration, ForceMode.Acceleration);
 
                 /* Unity cross product is left-handed */
                 Vector3 wallParallel = Vector3.Cross(wallNormal, Vector3.up).normalized;

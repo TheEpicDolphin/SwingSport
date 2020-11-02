@@ -24,6 +24,11 @@ public class AerialState : PlayerState
             return;
         }
 
+        if (player.wallrunningSurfaceContacts.Count > 0)
+        {
+            playerSM.TransitionToState<WallRunningState>();
+        }
+
         /* Player is in the air. Allow jetpack-like movement */
         if (player.input.spacebar)
         {
