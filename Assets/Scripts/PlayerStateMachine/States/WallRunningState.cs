@@ -25,7 +25,6 @@ public class WallRunningState : PlayerState
         bool willLand = Physics.Raycast(player.AnimatedRigHipPosition(), Vector3.down, 1.6f, ~LayerMask.GetMask("Player"));
         if (willLand && wallrunningTime > minWallrunningTime)
         {
-            //return new LandingState(player, 0.15f);
             playerSM.TransitionToState<GroundedState>();
             return;
         }
