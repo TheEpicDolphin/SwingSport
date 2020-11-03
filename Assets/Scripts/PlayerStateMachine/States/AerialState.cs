@@ -16,15 +16,14 @@ public class AerialState : PlayerState
 
     public override void FixedUpdateStep()
     {
-        /* Checks if player is touching ground */
-        bool willLand = Physics.Raycast(player.AnimatedRigHipPosition(), Vector3.down, 1.6f, ~LayerMask.GetMask("Player"));
-        if (willLand)
+        if (player.IsGrounded())
         {
             playerSM.TransitionToState<GroundedState>();
             return;
         }
 
-        if (player.wallrunningSurfaceContacts.Count > 0)
+        if (player.wallrunningSurfaceContact != null &&
+            Vector3.Dot(player.CameraRelativeInputDirection(), -player.wallrunningSurfaceContact.Value.normal) > 1e-4f)
         {
             playerSM.TransitionToState<WallRunningState>();
         }

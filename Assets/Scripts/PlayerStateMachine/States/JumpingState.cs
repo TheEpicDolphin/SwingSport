@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class JumpingState : PlayerState
 {
-    float jumpDuration = 0.1f;
+    float maxJumpDuration = 0.1f;
     float t;
     float spacebarTime;
 
@@ -17,6 +17,7 @@ public class JumpingState : PlayerState
     {
         this.t = 0.0f;
         this.spacebarTime = 0.0f;
+        player.animator.CrossFade("Jump", 0.1f);
     }
 
     public override void FixedUpdateStep()
@@ -26,9 +27,9 @@ public class JumpingState : PlayerState
 
     public override void UpdateStep()
     {
-        if (t >= jumpDuration)
+        if (!player.IsGrounded() || t >= maxJumpDuration)
         {
-            float jumpPower = Mathf.Lerp(5.0f, 15.0f, spacebarTime / jumpDuration);
+            float jumpPower = Mathf.Lerp(5.0f, 15.0f, spacebarTime / maxJumpDuration);
             player.AddForce(jumpPower * Vector3.up, ForceMode.VelocityChange);
             playerSM.TransitionToState<AerialState>();
             return;

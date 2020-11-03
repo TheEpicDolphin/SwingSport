@@ -5,7 +5,6 @@ using UnityEngine;
 public class WallRunningState : PlayerState
 {
     float maxWallrunningTime = 1.5f;
-    float minWallrunningTime = 0.5f;
     float wallrunningTime;
 
     public WallRunningState(PlayerStateMachine playerSM, Player player) : base(playerSM, player)
@@ -21,40 +20,34 @@ public class WallRunningState : PlayerState
 
     public override void FixedUpdateStep()
     {
-        /* Checks if player is touching ground */
-        bool willLand = Physics.Raycast(player.AnimatedRigHipPosition(), Vector3.down, 1.6f, ~LayerMask.GetMask("Player"));
-        if (willLand && wallrunningTime > minWallrunningTime)
+        if (player.IsGrounded())
         {
             playerSM.TransitionToState<GroundedState>();
             return;
         }
 
-        if(player.wallrunningSurfaceContacts.Count == 0 || wallrunningTime >= maxWallrunningTime)
+        if(player.wallrunningSurfaceContact == null || wallrunningTime >= maxWallrunningTime)
         {
             playerSM.TransitionToState<AerialState>();
             return;
         }
 
         Vector3 movementDir = player.CameraRelativeInputDirection();
-        foreach(ContactPoint contact in player.wallrunningSurfaceContacts)
+        Vector3 wallNormal = player.wallrunningSurfaceContact.Value.normal;
+        float dot = Vector3.Dot(movementDir, -wallNormal);
+        if (dot > 0)
         {
-            Vector3 wallNormal = contact.normal;
-            float dot = Vector3.Dot(movementDir, -wallNormal);
-            if (dot > 0)
-            {
-                Vector3 upMovementAcceleration = -2.0f * Physics.gravity.y * (1.0f - wallrunningTime / maxWallrunningTime) * Vector3.up;
-                Vector3 vDesired = player.groundMovementSpeed * Vector3.ProjectOnPlane(movementDir, wallNormal);
-                Vector3 a = 10.0f * (vDesired - Vector3.ProjectOnPlane(player.Velocity, wallNormal));
-                Vector3 planarMovementAcceleration = Vector3.ClampMagnitude(a, 100.0f);
-                player.AddForce(planarMovementAcceleration + upMovementAcceleration, ForceMode.Acceleration);
+            Vector3 upMovementAcceleration = -2.0f * Physics.gravity.y * (1.0f - wallrunningTime / maxWallrunningTime) * Vector3.up;
+            Vector3 vDesired = player.groundMovementSpeed * Vector3.ProjectOnPlane(movementDir, wallNormal);
+            Vector3 a = 10.0f * (vDesired - Vector3.ProjectOnPlane(player.Velocity, wallNormal));
+            Vector3 planarMovementAcceleration = Vector3.ClampMagnitude(a, 100.0f);
+            player.AddForce(planarMovementAcceleration + upMovementAcceleration, ForceMode.Acceleration);
 
-                /* Unity cross product is left-handed */
-                Vector3 wallParallel = Vector3.Cross(wallNormal, Vector3.up).normalized;
-                float wallrunningDot = Vector3.Dot(movementDir, wallParallel);
-                player.animator.SetFloat("WallrunningOrientation", (wallrunningDot + 1) / 2);
-                player.RotateCharacterToFace(-wallNormal, Vector3.up);
-                break;
-            }
+            /* Unity cross product is left-handed */
+            Vector3 wallParallel = Vector3.Cross(wallNormal, Vector3.up).normalized;
+            float wallrunningDot = Vector3.Dot(movementDir, wallParallel);
+            player.animator.SetFloat("WallrunningOrientation", (wallrunningDot + 1) / 2);
+            player.RotateCharacterToFace(-wallNormal, Vector3.up);
         }
     }
 

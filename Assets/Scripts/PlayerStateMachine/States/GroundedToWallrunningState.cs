@@ -15,13 +15,13 @@ public class GroundedToWallrunningState : PlayerState
     public override void OnEnter()
     {
         this.t = 0.0f;
-        player.AddForce(5.0f * Vector3.up, ForceMode.VelocityChange);
+        player.animator.CrossFade("Jump", 0.1f);
+        player.AddForce(8.0f * Vector3.up, ForceMode.VelocityChange);
     }
 
     public override void FixedUpdateStep()
     {
-        bool onGround = Physics.Raycast(player.AnimatedRigHipPosition(), Vector3.down, 1.6f, ~LayerMask.GetMask("Player"));
-        if (!onGround)
+        if (!player.IsGrounded())
         {
             playerSM.TransitionToState<WallRunningState>();
         }

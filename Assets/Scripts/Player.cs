@@ -23,7 +23,7 @@ public class Player : MonoBehaviour
 
     public PlayerInputManager input;
 
-    public List<ContactPoint> wallrunningSurfaceContacts;
+    public ContactPoint? wallrunningSurfaceContact;
 
     public Animator animator;
 
@@ -51,7 +51,7 @@ public class Player : MonoBehaviour
 
     private void Awake()
     {
-        wallrunningSurfaceContacts = new List<ContactPoint>();
+        wallrunningSurfaceContact = null;
 
         animatedBonesMat = new Material(Shader.Find("Unlit/Color"));
         animatedBonesMat.color = Color.cyan;
@@ -136,7 +136,7 @@ public class Player : MonoBehaviour
         playerSM.FixedUpdateStep();
 
         /* Clear wallrunning surface contacts from last OnCollisionStay */
-        wallrunningSurfaceContacts.Clear();
+        wallrunningSurfaceContact = null;
     }
 
     public Vector3 CameraRelativeInputDirection()
@@ -176,6 +176,12 @@ public class Player : MonoBehaviour
         return animatedRigHip.position.y;
     }
 
+    public bool IsGrounded()
+    {
+        float raycastDistance = 1.25f + Mathf.Max(0.0f, -Velocity.y * Time.fixedDeltaTime); 
+        return Physics.Raycast(AnimatedRigHipPosition(), Vector3.down, raycastDistance, ~LayerMask.GetMask("Player"));
+    }
+
     private void OnCollisionStay(Collision collision)
     {
         foreach (ContactPoint contact in collision.contacts)
@@ -184,7 +190,7 @@ public class Player : MonoBehaviour
             float angleFromYPlane = Mathf.Abs(normalAngle - 90.0f);
             if (contact.thisCollider.tag == "Bumper" && angleFromYPlane < 30.0f)
             {
-                wallrunningSurfaceContacts.Add(contact);
+                wallrunningSurfaceContact = contact;
                 //Debug.DrawRay(contact.point, contact.normal, Color.red);
             }
             /*
