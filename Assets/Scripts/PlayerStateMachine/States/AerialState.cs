@@ -23,7 +23,8 @@ public class AerialState : PlayerState
         }
 
         if (player.wallrunningSurfaceContact != null &&
-            Vector3.Dot(player.CameraRelativeInputDirection(), -player.wallrunningSurfaceContact.Value.normal) > 1e-4f)
+            Vector3.Dot(player.CameraRelativeInputDirection(), -player.wallrunningSurfaceContact.Value.normal) > 1e-4f &&
+            player.Velocity.y >= 0.0f)
         {
             playerSM.TransitionToState<WallRunningState>();
         }

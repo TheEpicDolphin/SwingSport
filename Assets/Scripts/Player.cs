@@ -178,6 +178,8 @@ public class Player : MonoBehaviour
 
     public bool IsGrounded()
     {
+        /* Takes into account current player velocity to determine if player will be grounded 
+           within the next physics frame */
         float raycastDistance = 1.25f + Mathf.Max(0.0f, -Velocity.y * Time.fixedDeltaTime); 
         return Physics.Raycast(AnimatedRigHipPosition(), Vector3.down, raycastDistance, ~LayerMask.GetMask("Player"));
     }
@@ -193,13 +195,6 @@ public class Player : MonoBehaviour
                 wallrunningSurfaceContact = contact;
                 //Debug.DrawRay(contact.point, contact.normal, Color.red);
             }
-            /*
-            if (contact.thisCollider.tag == "Bumper" && contact.otherCollider.tag == "Hookable")
-            {
-                wallrunningSurfaceContacts.Add(contact);
-                Debug.DrawRay(contact.point, contact.normal, Color.red);
-            }
-            */
         }
     }
 

@@ -10,6 +10,20 @@ public class Muscle : MonoBehaviour
 
     public JointDrive positionMatchingSpring = new JointDrive();
 
+    private bool isPinned;
+    public bool IsPinned
+    {
+        get
+        {
+            return isPinned;
+        }
+        set
+        {
+            isPinned = value;
+            boneRb.isKinematic = value;
+        }
+    }
+
     Quaternion startLocalRotation;
 
     private void Awake()
@@ -103,8 +117,16 @@ public class Muscle : MonoBehaviour
 
     private void FixedUpdate()
     {
-        MatchAnimationTargetPosition();
-        MatchAnimationTargetRotation();
+        if (IsPinned)
+        {
+            boneRb.MovePosition(animTarget.position);
+            boneRb.MoveRotation(animTarget.rotation);
+        }
+        else
+        {
+            MatchAnimationTargetPosition();
+            MatchAnimationTargetRotation();
+        }
     }
 
 }

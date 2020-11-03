@@ -44,6 +44,7 @@ public class ActiveRagdoll : MonoBehaviour
             boneRb.useGravity = useGravity;
 
             Muscle muscle = ragdollBone.gameObject.AddComponent<Muscle>();
+            muscle.IsPinned = true;
             muscle.SetAnimationTarget(animBone);
             Muscle parentMuscle = ragdollBone.parent.GetComponent<Muscle>();
             if (parentMuscle)
