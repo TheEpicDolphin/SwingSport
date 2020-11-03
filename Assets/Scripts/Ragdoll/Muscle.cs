@@ -119,8 +119,8 @@ public class Muscle : MonoBehaviour
     {
         if (IsPinned)
         {
-            boneRb.MovePosition(animTarget.position);
-            boneRb.MoveRotation(animTarget.rotation);
+            boneRb.transform.position = animTarget.position;
+            boneRb.transform.rotation = animTarget.rotation;
         }
         else
         {

@@ -29,10 +29,6 @@ public class Player : MonoBehaviour
 
     private Rigidbody playerRb;
 
-    float airDrag = 0.5f;
-
-    float maxSpeed = 60.0f;
-
     private Transform animatedRigHip;
 
     private Quaternion characterRotation = Quaternion.identity;
@@ -40,6 +36,10 @@ public class Player : MonoBehaviour
     private Material animatedBonesMat;
 
     private PlayerStateMachine playerSM;
+
+    const float airDrag = 0.5f;
+
+    const float maxSpeed = 60.0f;
 
     public Vector3 Velocity
     {
@@ -174,6 +174,11 @@ public class Player : MonoBehaviour
     public float AnimatedHipTargetY()
     {
         return animatedRigHip.position.y;
+    }
+
+    public Vector3 AnimatedRigHipForward()
+    {
+        return animatedRigHip.forward;
     }
 
     public bool IsGrounded()

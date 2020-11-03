@@ -4,9 +4,11 @@ using UnityEngine;
 
 public class JumpingState : PlayerState
 {
-    float maxJumpDuration = 0.1f;
-    float t;
+    float maxJumpDuration = 0.15f;
+    float jumpEventTime = 0.1f;
+    float elapsedTime;
     float spacebarTime;
+    bool hasJumped;
 
     public JumpingState(PlayerStateMachine playerSM, Player player) : base(playerSM, player)
     {
@@ -15,23 +17,33 @@ public class JumpingState : PlayerState
 
     public override void OnEnter()
     {
-        this.t = 0.0f;
+        this.elapsedTime = 0.0f;
         this.spacebarTime = 0.0f;
+        hasJumped = false;
         player.animator.CrossFade("Jump", 0.1f);
     }
 
     public override void FixedUpdateStep()
     {
-        player.AddForce(20.0f * Vector3.up, ForceMode.Acceleration);
+        if (elapsedTime >= jumpEventTime && !hasJumped)
+        {
+            float jumpPower = Mathf.Lerp(5.0f, 15.0f, spacebarTime / elapsedTime);
+            player.AddForce(jumpPower * Vector3.up, ForceMode.VelocityChange);
+            hasJumped = true;
+        }
+
+        if (!player.IsGrounded())
+        {
+            playerSM.TransitionToState<AerialState>();
+            return;
+        }
     }
 
     public override void UpdateStep()
     {
-        if (!player.IsGrounded() || t >= maxJumpDuration)
+        if (elapsedTime >= maxJumpDuration)
         {
-            float jumpPower = Mathf.Lerp(5.0f, 15.0f, spacebarTime / maxJumpDuration);
-            player.AddForce(jumpPower * Vector3.up, ForceMode.VelocityChange);
-            playerSM.TransitionToState<AerialState>();
+            playerSM.TransitionToState<GroundedState>();
             return;
         }
         if (player.input.spacebar)
@@ -39,7 +51,7 @@ public class JumpingState : PlayerState
             /* If player is holding down spacebar while jumping, he/she will jump higher */
             spacebarTime += Time.deltaTime;
         }
-        t += Time.deltaTime;
+        elapsedTime += Time.deltaTime;
     }
 
     public override void OnExit()

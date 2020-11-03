@@ -16,7 +16,7 @@ public class GroundedToWallrunningState : PlayerState
     {
         this.t = 0.0f;
         player.animator.CrossFade("Jump", 0.1f);
-        player.AddForce(8.0f * Vector3.up, ForceMode.VelocityChange);
+        player.AddForce(10.0f * Vector3.up, ForceMode.VelocityChange);
     }
 
     public override void FixedUpdateStep()

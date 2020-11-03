@@ -23,23 +23,26 @@ public class GroundedState : PlayerState
             return;
         }
 
-        /* Checks if player is on the ground. Consider doing a spherecast for more accuracy */
-        if (player.IsGrounded())
+        if (!player.IsGrounded())
         {
-            Vector3 vDesired = player.groundMovementSpeed * player.CameraRelativeInputDirection();
-            Vector3 a = 10.0f * (vDesired - player.Velocity);
-            a = Vector3.ClampMagnitude(a, 100.0f);
-            player.AddForce(a, ForceMode.Acceleration);
+            playerSM.TransitionToState<AerialState>();
+            return;
+        }
 
-            Vector3 movementDir = player.CameraRelativeInputDirection();
-            if(movementDir.magnitude > 1e-4f)
-            {
-                player.RotateCharacterToFace(movementDir, Vector3.up);
-            }
+        Vector3 movementDir = player.CameraRelativeInputDirection();
+        Vector3 vDesired = player.groundMovementSpeed * movementDir;
+        Vector3 a = 10.0f * (vDesired - player.Velocity);
+        a = Vector3.ClampMagnitude(a, 100.0f);
+        player.AddForce(a, ForceMode.Acceleration);
+
+        if (movementDir.magnitude > 1e-4f)
+        {
+            player.RotateCharacterToFace(movementDir, Vector3.up);
         }
         else
         {
-            playerSM.TransitionToState<AerialState>();
+            //Vector3 forward = Vector3.ProjectOnPlane(player.AnimatedRigHipForward(), Vector3.up);
+            //player.RotateCharacterToFace(forward, Vector3.up);
         }
     }
 
