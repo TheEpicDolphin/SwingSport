@@ -2,17 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GrappleGunState : MonoBehaviour
+public abstract class GrappleGunState : GameObjectState
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    protected GrappleGun grappleGun;
+    protected GrappleGunStateMachine grappleGunSM;
 
-    // Update is called once per frame
-    void Update()
+    public GrappleGunState(GrappleGunStateMachine grappleGunSM, GrappleGun grappleGun) : base()
     {
-        
+        this.grappleGun = grappleGun;
+        this.grappleGunSM = grappleGunSM;
     }
 }

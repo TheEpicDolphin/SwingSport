@@ -4,16 +4,6 @@ using UnityEngine;
 
 public abstract class GameObjectState
 {
-    protected GameObject gameObject;
-
-    protected GameObjectStateMachine gameObjectSM;
-
-    public GameObjectState(GameObjectStateMachine gameObjectSM, GameObject gameObject)
-    {
-        this.gameObjectSM = gameObjectSM;
-        this.gameObject = gameObject;
-    }
-
     public abstract void OnEnter();
 
     public abstract void UpdateStep();

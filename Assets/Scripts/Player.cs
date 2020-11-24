@@ -91,6 +91,8 @@ public class Player : MonoBehaviour
             ballHookGun.cursor.cursorImage = cursorImage;
             */
         }
+
+        
         playerSM = new PlayerStateMachine(this, new List<System.Type>(){
             typeof(GroundedState),
             typeof(JumpingState),
@@ -98,6 +100,7 @@ public class Player : MonoBehaviour
             typeof(WallRunningState),
             typeof(GroundedToWallrunningState),
         });
+        
     }
 
     // Start is called before the first frame update

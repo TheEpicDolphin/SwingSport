@@ -5,18 +5,10 @@ using System;
 
 public abstract class GameObjectStateMachine
 {
-    GameObjectState currentState;
-    private Dictionary<Type, GameObjectState> stateMap = new Dictionary<Type, GameObjectState>();
+    protected GameObjectState currentState;
+    protected Dictionary<Type, GameObjectState> stateMap = new Dictionary<Type, GameObjectState>();
 
-    public GameObjectStateMachine(object context, List<Type> stateTypes)
-    {
-        foreach (Type stateType in stateTypes)
-        {
-            stateMap[stateType] = (GameObjectState)Activator.CreateInstance(stateType, new object[] { this, context });
-        }
-    }
-
-    public void InitWithState<T>() where T : GameObjectState
+    protected void InitWithState<T>() where T : GameObjectState
     {
         currentState = GetState<T>();
         currentState.OnEnter();
@@ -27,7 +19,7 @@ public abstract class GameObjectStateMachine
         return stateMap[typeof(T)];
     }
 
-    public void TransitionToState<T>() where T : GameObjectState
+    protected void TransitionToState<T>() where T : GameObjectState
     {
         currentState.OnExit();
         currentState = GetState<T>();
