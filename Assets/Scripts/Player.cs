@@ -21,8 +21,6 @@ public class Player : MonoBehaviour
 
     public Transform ragdollHandL;
 
-    public PlayerInputManager input;
-
     public ContactPoint? wallrunningSurfaceContact;
 
     public Animator animator;
@@ -36,6 +34,8 @@ public class Player : MonoBehaviour
     private Material animatedBonesMat;
 
     private PlayerStateMachine playerSM;
+
+    public PlayerInputManager input;
 
     const float airDrag = 0.5f;
 
@@ -55,10 +55,10 @@ public class Player : MonoBehaviour
 
         animatedBonesMat = new Material(Shader.Find("Unlit/Color"));
         animatedBonesMat.color = Color.cyan;
-        input = gameObject.AddComponent<PlayerInputManager>();
 
         animator = GetComponentInChildren<Animator>();
         playerRb = GetComponent<Rigidbody>();
+        input = gameObject.AddComponent<PlayerInputManager>();
 
         animatedRigHip = transform.GetChild(0).GetChild(0);
         activeRagdoll.CreateActiveRagdoll(animatedRigHip, playerRb.mass);

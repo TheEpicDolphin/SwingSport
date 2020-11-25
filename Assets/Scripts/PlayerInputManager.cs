@@ -3,9 +3,29 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-// Make this a singleton
 public class PlayerInputManager : MonoBehaviour
 {
+    /*
+    // Singleton Pattern
+    private static PlayerInputManager instance;
+
+    public static PlayerInputManager Instance
+    {
+        get
+        {
+            if (!instance)
+            {
+                instance = GameObject.FindObjectOfType(typeof(PlayerInputManager)) as PlayerInputManager;
+                if (!instance)
+                {
+                    Debug.LogError("No active PlayerInputManager script ony any GameObject.");
+                }
+            }
+            return instance;
+        }
+    }
+    */
+
     public float horizontal;
     public float vertical;
     public float mouseXDelta;
@@ -17,12 +37,11 @@ public class PlayerInputManager : MonoBehaviour
     public bool Q;
     public bool QDown;
 
-    public UnityEvent leftMouseEvent = new UnityEvent();
-    public UnityEvent leftMouseDownEvent = new UnityEvent();
+    public bool leftMouse;
+    public bool leftMouseDown;
 
-    public UnityEvent rightMouseEvent = new UnityEvent();
-    public UnityEvent rightMouseDownEvent = new UnityEvent();
-
+    public bool rightMouse;
+    public bool rightMouseDown;
 
     // Start is called before the first frame update
     void Start()
@@ -46,22 +65,10 @@ public class PlayerInputManager : MonoBehaviour
         capsLock = Input.GetKey(KeyCode.CapsLock);
         QDown = Input.GetKeyDown(KeyCode.Q);
 
-        if (Input.GetMouseButton(0))
-        {
-            leftMouseEvent.Invoke();
-        }
-        if (Input.GetMouseButtonDown(0))
-        {
-            leftMouseDownEvent.Invoke();
-        }
+        leftMouse = Input.GetMouseButton(0);
+        leftMouseDown = Input.GetMouseButtonDown(0);
 
-        if (Input.GetMouseButton(1))
-        {
-            rightMouseEvent.Invoke();
-        }
-        if (Input.GetMouseButtonDown(1))
-        {
-            rightMouseDownEvent.Invoke();
-        }
+        rightMouse = Input.GetMouseButton(1);
+        rightMouseDown = Input.GetMouseButtonDown(1);
     }
 }

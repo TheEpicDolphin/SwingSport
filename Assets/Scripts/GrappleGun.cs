@@ -4,19 +4,25 @@ using UnityEngine;
 
 public class GrappleGun : MonoBehaviour
 {
-    const float maxRopeLength = 150.0f;
+    public float maxRopeLength = 150.0f;
 
-    float hookLaunchForce = 200.0f;
+    public float hookLaunchForce = 200.0f;
 
     float hookZoomRateMultiplier = 20.0f;
 
     public HookGunCursor cursor;
 
-    private LineRenderer fakeRopeRenderer;
+    public LineRenderer fakeRopeRenderer;
 
-    private Rope rope;
+    public Rope rope;
+
+    public PlayerInputManager input;
+
+    public GrapplingHook hook;
 
     private GrappleGunStateMachine grappleGunSM;
+
+    Vector3 focusPoint;
 
     private void Awake()
     {
@@ -32,7 +38,7 @@ public class GrappleGun : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        grappleGunSM.InitWithState<GroundedState>();
+        grappleGunSM.InitWithState<LoadedState>();
     }
 
     // Update is called once per frame
@@ -45,4 +51,6 @@ public class GrappleGun : MonoBehaviour
     {
         grappleGunSM.FixedUpdateStep();
     }
+
+    
 }
