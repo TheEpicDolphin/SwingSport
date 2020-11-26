@@ -5,7 +5,7 @@ using UnityEngine;
 public class FiringState : GrappleGunState
 {
     
-    public FiringState(GrappleGunStateMachine grapplingGunSM, GrappleGun grappleGun) : base(grapplingGunSM, grappleGun)
+    public FiringState(GrappleGunStateMachine grappleGunSM, GrappleGun grappleGun) : base(grappleGunSM, grappleGun)
     {
 
     }
@@ -22,11 +22,7 @@ public class FiringState : GrappleGunState
     {
         if (Vector3.Distance(grappleGun.transform.position, grappleGun.hook.transform.position) > grappleGun.maxRopeLength)
         {
-            // Put this in the OnEnter for the next state
-            grappleGun.rope = Rope.CreateTautRope(grappleGun.transform.position, grappleGun.hook.transform.position);
-            grappleGun.rope.Attach(hangerRA);
-            grappleGun.rope.Attach(sphereRA);
-            grappleGunSM.TransitionToState<ExtendedState>();
+            grappleGunSM.TransitionToState<RetractingHookState>();
             return;
         }
 
@@ -39,12 +35,15 @@ public class FiringState : GrappleGunState
             {
                 grappleGun.hook.isKinematic = true;
                 grappleGun.hook.transform.parent = colliders[0].transform;
+                grappleGunSM.TransitionToState<HookedState>();
+                return;
             }
-            // Put this in the OnEnter for the next state
-            grappleGun.rope = Rope.CreateTautRope(grappleGun.transform.position, grappleGun.hook.transform.position);
-            grappleGun.rope.Attach(hangerRA);
-            grappleGun.rope.Attach(sphereRA);
-            grappleGunSM.TransitionToState<ExtendedState>();
+            else
+            {
+                grappleGunSM.TransitionToState<RetractingHookState>();
+                return;
+            }
+            
         }
     }
 

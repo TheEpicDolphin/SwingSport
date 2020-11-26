@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class LoadedState : GrappleGunState
 {
-    public LoadedState(GrappleGunStateMachine grapplingGunSM, GrappleGun grappleGun) : base(grapplingGunSM, grappleGun)
+    public LoadedState(GrappleGunStateMachine grappleGunSM, GrappleGun grappleGun) : base(grappleGunSM, grappleGun)
     {
 
     }
