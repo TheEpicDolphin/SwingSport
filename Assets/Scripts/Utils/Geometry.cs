@@ -6,8 +6,9 @@ namespace GeometryUtils
 {
     public class Geometry
     {
-        internal static bool LineSegmentCircleIntersection(Vector3 s, Vector3 e, Vector3 center, float r)
+        internal static int LineSegmentCircleIntersection(Vector3 s, Vector3 e, Vector3 center, float r, out Vector3[] intersections)
         {
+            intersections = new Vector3[2];
             /*
              * f(t) = s + t * (e - s) 
              * ||g(t) - center||^2 = r^2
@@ -27,8 +28,20 @@ namespace GeometryUtils
                 float t1 = (-b - discriminant) / (2 * a);
                 float t2 = (-b + discriminant) / (2 * a);
 
+                int count = 0;
+                if(t1 >= 0 && t1 <= 1)
+                {
+                    intersections[count] = s + t1 * d;
+                    count += 1;
+                }
+                if (t2 >= 0 && t2 <= 1)
+                {
+                    intersections[count] = s + t2 * d;
+                    count += 1;
+                }
+                return count;
             }
-            return false;
+            return 0;
         }
     }
 }
