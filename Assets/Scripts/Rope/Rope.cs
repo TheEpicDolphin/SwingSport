@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using GeometryUtils;
 
 public class Rope : MonoBehaviour
 {
@@ -253,41 +254,55 @@ public class Rope : MonoBehaviour
 
     public static Rope CreateInterpolatedRope(Vector3[] points)
     {
+        List<Vector3> interpolatedPoints = new List<Vector3>();
+        interpolatedPoints.Add(points[0]);
+        int idx = 1;
+        Vector3 rayOrigin = interpolatedPoints[interpolatedPoints.Count - 1];
+        while (idx < points.Length)
+        {
+            if (Vector3.Distance(interpolatedPoints[interpolatedPoints.Count - 1], points[idx])
+                >= verletParticleSpacing)
+            {
+                Vector3 intersection;
+                if (Geometry.RaySphereExitIntersection(
+                    new Ray(rayOrigin, (points[idx] - points[idx - 1]).normalized),
+                    interpolatedPoints[interpolatedPoints.Count - 1],
+                    verletParticleSpacing,
+                    out intersection))
+                {
+                    interpolatedPoints.Add(intersection);
+                    rayOrigin = interpolatedPoints[interpolatedPoints.Count - 1];
+                    continue;
+                }
+            }
+            rayOrigin = points[idx];
+            idx += 1;
+        }
+        if(interpolatedPoints[interpolatedPoints.Count - 1] != points[points.Length - 1])
+        {
+            interpolatedPoints.Add(points[points.Length - 1]);
+        }
+
         GameObject ropeGO = new GameObject();
         Rope rope = ropeGO.AddComponent<Rope>();
         float x = 0.0f;
-
-        GameObject startVPGO = new GameObject();
-        VerletParticle startVP = startVPGO.AddComponent<VerletParticle>();
-        startVP.transform.position = points[0];
-        startVP.previousPosition = startVP.transform.position;
-        startVP.restPosition = x;
-        rope.verletParticles.AddLast(startVP);
-
-        for(int i = 0; i < points.Length - 1; i++)
+        foreach(Vector3 interpolatedPoint in interpolatedPoints)
         {
-            x += verletParticleSpacing;
-            cumLength += Vector3.Distance(points[i], points[i + 1]);
-
             GameObject vpGO = new GameObject();
             VerletParticle vp = vpGO.AddComponent<VerletParticle>();
-            vp.transform.position = Vector3.Lerp(points[i], points[i + 1], );
+            vp.transform.position = interpolatedPoint;
             vp.previousPosition = vp.transform.position;
             vp.restPosition = x;
             rope.verletParticles.AddLast(vp);
+            x += verletParticleSpacing;
         }
-        
-        GameObject endVPGO = new GameObject();
-        VerletParticle endVP = endVPGO.AddComponent<VerletParticle>();
-        endVP.transform.position = points[points.Length - 1];
-        endVP.previousPosition = endVP.transform.position;
-        endVP.restPosition = x;
-        rope.verletParticles.AddLast(endVP);
         return rope;
     }
 
     public static Rope CreateTautRope(Vector3 startPos, Vector3 endPos)
     {
+        return CreateInterpolatedRope(new Vector3[] { startPos, endPos });
+        /*
         GameObject ropeGO = new GameObject();
         Rope rope = ropeGO.AddComponent<Rope>();
         float length = Vector3.Distance(startPos, endPos);
@@ -317,6 +332,7 @@ public class Rope : MonoBehaviour
         endVP.restPosition = length;
         rope.verletParticles.AddLast(endVP);
         return rope;
+        */
     }
 
     public float ClampPositionToRopeExtents(float position)
