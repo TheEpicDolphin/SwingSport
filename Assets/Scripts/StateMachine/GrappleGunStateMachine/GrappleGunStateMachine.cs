@@ -22,4 +22,6 @@ public class GrappleGunStateMachine : GameObjectStateMachine
     {
         base.TransitionToState<T>();
     }
+
+    // Create events here that states can add/remove themselves as listeners to
 }

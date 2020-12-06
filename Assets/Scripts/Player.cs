@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Player : MonoBehaviour
+public class Player : MonoBehaviour, IGrappleGunWielder, IFollowingCameraFollowee
 {
     public ActiveRagdoll activeRagdoll;
 
     /* Camera that is following player */
-    public PlayerCamera followingCamera;
+    public FollowingCamera followingCamera;
 
     /* how fast player can move */
     public float groundMovementSpeed = 12.0f;
@@ -51,6 +51,8 @@ public class Player : MonoBehaviour
 
     private void Awake()
     {
+        followingCamera.followee = this;
+
         wallrunningSurfaceContact = null;
 
         animatedBonesMat = new Material(Shader.Find("Unlit/Color"));
@@ -237,4 +239,18 @@ public class Player : MonoBehaviour
         }
     }
 
+    Ray IGrappleGunWielder.AimingLineOfSightRay()
+    {
+        return followingCamera.LineOfSightRay();
+    }
+
+    Vector3 IFollowingCameraFollowee.Position()
+    {
+        return transform.position;
+    }
+
+    void IFollowingCameraFollowee.Draw()
+    {
+        Draw();
+    }
 }

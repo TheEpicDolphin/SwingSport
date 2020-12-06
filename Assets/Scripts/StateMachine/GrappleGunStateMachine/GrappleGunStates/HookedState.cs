@@ -15,6 +15,7 @@ public class HookedState : GrappleGunState
         // TODO: make function in rope class that creates rope passing through several points
 
         grappleGunRA = grappleGun.gameObject.AddComponent<RopeAttachment>();
+        grappleGun.rope = Rope.CreateInterpolatedRope();
         grappleGun.rope = Rope.CreateTautRope(grappleGun.transform.position, grappleGun.hook.transform.position);
         grappleGun.rope.Attach(hangerRA);
         grappleGun.rope.Attach(grappleGunRA);

@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class FiringState : GrappleGunState
 {
-    
+    float firingTime;
+    const float maxFiringTime = 2.0f;
     public FiringState(GrappleGunStateMachine grappleGunSM, GrappleGun grappleGun) : base(grappleGunSM, grappleGun)
     {
 
@@ -12,20 +13,14 @@ public class FiringState : GrappleGunState
 
     public override void OnEnter()
     {
-        grappleGun.hook.isKinematic = false;
-        grappleGun.hook.AddForce(grappleGun.hookLaunchForce * launchDir, ForceMode.Impulse);
+        firingTime = 0.0f;
+        grappleGun.ShootHook();
         //grapplingGun.animator.CrossFade("Firing", 0.1f);
         grappleGun.fakeRopeRenderer.enabled = true;
     }
 
     public override void FixedUpdateStep()
     {
-        if (Vector3.Distance(grappleGun.transform.position, grappleGun.hook.transform.position) > grappleGun.maxRopeLength)
-        {
-            grappleGunSM.TransitionToState<RetractingHookState>();
-            return;
-        }
-
         Collider[] colliders = new Collider[1];
         LayerMask obstacleMask = LayerMask.GetMask("Obstacle");
         LayerMask ballLayerMask = LayerMask.GetMask("Ball");
@@ -49,7 +44,11 @@ public class FiringState : GrappleGunState
 
     public override void UpdateStep()
     {
-        
+        firingTime += Time.deltaTime;
+        if(firingTime > maxFiringTime)
+        {
+            grappleGunSM.TransitionToState<RetractingHookState>();
+        }
     }
 
     public override void OnExit()
