@@ -18,7 +18,7 @@ public class AerialState : PlayerState
     {
         if (player.IsGrounded())
         {
-            playerSM.TransitionToState<GroundedState>();
+            playerSM.TransitionToState(new GroundedState(playerSM, player));
             return;
         }
 
@@ -26,7 +26,7 @@ public class AerialState : PlayerState
             Vector3.Dot(player.CameraRelativeInputDirection(), -player.wallrunningSurfaceContact.Value.normal) > 1e-4f &&
             player.Velocity.y >= 0.0f)
         {
-            playerSM.TransitionToState<WallRunningState>();
+            playerSM.TransitionToState(new WallRunningState(playerSM, player));
         }
 
         /* Player is in the air. Allow jetpack-like movement */

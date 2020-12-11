@@ -95,20 +95,14 @@ public class Player : MonoBehaviour, IGrappleGunWielder, IFollowingCameraFollowe
         }
 
         
-        playerSM = new PlayerStateMachine(this, new List<System.Type>(){
-            typeof(GroundedState),
-            typeof(JumpingState),
-            typeof(AerialState),
-            typeof(WallRunningState),
-            typeof(GroundedToWallrunningState),
-        });
+        playerSM = new PlayerStateMachine(this);
         
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        playerSM.InitWithState<GroundedState>();
+        playerSM.InitWithState(new GroundedState(playerSM, this));
     }
 
     private void Update()

@@ -3,23 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-public class PlayerStateMachine : GameObjectStateMachine
+public class PlayerStateMachine : MonoBehaviourStateMachine
 {
-    public PlayerStateMachine(Player player, List<Type> stateTypes)
+    Player player;
+
+    public PlayerStateMachine(Player player)
     {
-        foreach (Type stateType in stateTypes)
-        {
-            stateMap[stateType] = (PlayerState)Activator.CreateInstance(stateType, new object[] { this, player });
-        }
+        this.player = player;
     }
 
-    public new void InitWithState<T>() where T : PlayerState
+    public void TransitionToState(PlayerState nextState)
     {
-        base.InitWithState<T>();
+        base.TransitionToState(nextState);
     }
 
-    public new void TransitionToState<T>() where T : PlayerState
-    {
-        base.TransitionToState<T>();
-    }
 }

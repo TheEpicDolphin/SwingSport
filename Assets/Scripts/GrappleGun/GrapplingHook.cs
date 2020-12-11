@@ -12,17 +12,29 @@ public class GrapplingHook : MonoBehaviour
     Rigidbody rb;
     bool isLaunching;
     public IGrapplingHookLauncher launcher;
-    // Start is called before the first frame update
-    void Start()
+
+    private void Awake()
     {
         rb = GetComponent<Rigidbody>();
         isLaunching = false;
     }
 
-    // Update is called once per frame
-    void Update()
+    private void FixedUpdate()
     {
-        
+        if (isLaunching)
+        {
+            Collider[] colliders = new Collider[1];
+            LayerMask obstacleMask = LayerMask.GetMask("Obstacle");
+            LayerMask ballLayerMask = LayerMask.GetMask("Ball");
+            if (Physics.OverlapSphereNonAlloc(transform.position, 0.15f, colliders, obstacleMask | ballLayerMask) > 0)
+            {
+                if (colliders[0].tag == "Hookable" || colliders[0].tag == "BounceBall")
+                {
+                    launcher.DidHitCollider(colliders[0]);
+                    isLaunching = false;
+                }
+            }
+        }
     }
 
     public void Launch(Vector3 force)
@@ -32,17 +44,9 @@ public class GrapplingHook : MonoBehaviour
         isLaunching = true;
     }
 
-    public void StickToTransformAtPositionWithOrientation(Transform trans, Vector3 position, Quaternion orientation)
+    public void AttachToTransformAtPositionWithOrientation(Transform trans, Vector3 position, Quaternion orientation)
     {
         rb.isKinematic = true;
         transform.position = position;
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        if (isLaunching)
-        {
-            launcher.DidHitCollider(other);
-        }
     }
 }

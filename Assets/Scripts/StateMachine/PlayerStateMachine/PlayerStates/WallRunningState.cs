@@ -22,13 +22,13 @@ public class WallRunningState : PlayerState
     {
         if (player.IsGrounded())
         {
-            playerSM.TransitionToState<GroundedState>();
+            playerSM.TransitionToState(new GroundedState(playerSM, player));
             return;
         }
 
         if(player.wallrunningSurfaceContact == null || wallrunningTime >= maxWallrunningTime)
         {
-            playerSM.TransitionToState<AerialState>();
+            playerSM.TransitionToState(new AerialState(playerSM, player));
             return;
         }
 

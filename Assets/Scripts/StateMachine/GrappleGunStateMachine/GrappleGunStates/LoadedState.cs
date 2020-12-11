@@ -23,7 +23,7 @@ public class LoadedState : GrappleGunState
     {
         if (grappleGun.input.leftMouse)
         {
-            grappleGunSM.TransitionToState<FiringState>();
+            grappleGunSM.TransitionToState(new FiringState(grappleGunSM, grappleGun));
         }
     }
 

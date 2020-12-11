@@ -34,7 +34,7 @@ public class JumpingState : PlayerState
 
         if (!player.IsGrounded())
         {
-            playerSM.TransitionToState<AerialState>();
+            playerSM.TransitionToState(new AerialState(playerSM, player));
             return;
         }
     }
@@ -43,7 +43,7 @@ public class JumpingState : PlayerState
     {
         if (elapsedTime >= maxJumpDuration)
         {
-            playerSM.TransitionToState<GroundedState>();
+            playerSM.TransitionToState(new GroundedState(playerSM, player));
             return;
         }
         if (player.input.spacebar)

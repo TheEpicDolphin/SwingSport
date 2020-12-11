@@ -33,19 +33,13 @@ public class GrappleGun : MonoBehaviour, IGrapplingHookLauncher
 
     private void Awake()
     {
-        grappleGunSM = new GrappleGunStateMachine(this, new List<System.Type>(){
-            typeof(GroundedState),
-            typeof(JumpingState),
-            typeof(AerialState),
-            typeof(WallRunningState),
-            typeof(GroundedToWallrunningState),
-        });
+        grappleGunSM = new GrappleGunStateMachine(this);
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        grappleGunSM.InitWithState<LoadedState>();
+        grappleGunSM.InitWithState(new LoadedState(grappleGunSM, this));
     }
 
     // Update is called once per frame
@@ -87,8 +81,13 @@ public class GrappleGun : MonoBehaviour, IGrapplingHookLauncher
         return aimingTarget;
     }
 
+    public void AttachHookToTransform(Transform trans)
+    {
+        hook.AttachToTransformAtPositionWithOrientation(trans, hook.transform.position, hook.transform.rotation);
+    }
+
     void IGrapplingHookLauncher.DidHitCollider(Collider collider)
     {
-
+        grappleGunSM.HookDidAttachEvent.Announce(collider);
     }
 }

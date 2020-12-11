@@ -5,14 +5,17 @@ using UnityEngine;
 public class HookedState : GrappleGunState
 {
     RopeAttachment grappleGunRA;
-    public HookedState(GrappleGunStateMachine grappleGunSM, GrappleGun grappleGun) : base(grappleGunSM, grappleGun)
+    Transform hookedTransform;
+
+    public HookedState(GrappleGunStateMachine grappleGunSM, GrappleGun grappleGun, Collider hookedCollider) : base(grappleGunSM, grappleGun)
     {
+        hookedTransform = hookedCollider.transform;
         
     }
 
     public override void OnEnter()
     {
-        // TODO: make function in rope class that creates rope passing through several points
+        grappleGun.AttachHookToTransform(hookedTransform);
 
         grappleGunRA = grappleGun.gameObject.AddComponent<RopeAttachment>();
         grappleGun.rope = Rope.CreateInterpolatedRope();
@@ -30,7 +33,7 @@ public class HookedState : GrappleGunState
     {
         if (!grappleGun.input.leftMouseDown)
         {
-            grappleGunSM.TransitionToState<RetractingHookState>();
+            grappleGunSM.TransitionToState(new RetractingHookState(grappleGunSM, grappleGun));
             return;
         }
         else if (Input.GetKey(KeyCode.CapsLock))

@@ -8,11 +8,12 @@ public class FiringState : GrappleGunState
     const float maxFiringTime = 2.0f;
     public FiringState(GrappleGunStateMachine grappleGunSM, GrappleGun grappleGun) : base(grappleGunSM, grappleGun)
     {
-
+        
     }
 
     public override void OnEnter()
     {
+        grappleGunSM.hookDidAttachEvent.AddListener(this);
         firingTime = 0.0f;
         grappleGun.ShootHook();
         //grapplingGun.animator.CrossFade("Firing", 0.1f);
@@ -21,25 +22,7 @@ public class FiringState : GrappleGunState
 
     public override void FixedUpdateStep()
     {
-        Collider[] colliders = new Collider[1];
-        LayerMask obstacleMask = LayerMask.GetMask("Obstacle");
-        LayerMask ballLayerMask = LayerMask.GetMask("Ball");
-        if (Physics.OverlapSphereNonAlloc(grappleGun.hook.transform.position, 0.15f, colliders, obstacleMask | ballLayerMask) > 0)
-        {
-            if (colliders[0].tag == "Hookable" || colliders[0].tag == "BounceBall")
-            {
-                grappleGun.hook.isKinematic = true;
-                grappleGun.hook.transform.parent = colliders[0].transform;
-                grappleGunSM.TransitionToState<HookedState>();
-                return;
-            }
-            else
-            {
-                grappleGunSM.TransitionToState<RetractingHookState>();
-                return;
-            }
-            
-        }
+        
     }
 
     public override void UpdateStep()
@@ -47,12 +30,13 @@ public class FiringState : GrappleGunState
         firingTime += Time.deltaTime;
         if(firingTime > maxFiringTime)
         {
-            grappleGunSM.TransitionToState<RetractingHookState>();
+            grappleGunSM.TransitionToState(new RetractingHookState(grappleGunSM, grappleGun));
         }
     }
 
     public override void OnExit()
     {
+        grappleGunSM.hookDidAttachEvent.RemoveListener(this);
         grappleGun.fakeRopeRenderer.enabled = false;
     }
 }

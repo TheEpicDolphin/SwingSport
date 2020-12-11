@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class GrappleGunState : GameObjectState
+public abstract class GrappleGunState : MonoBehaviourState
 {
     protected GrappleGun grappleGun;
     protected GrappleGunStateMachine grappleGunSM;

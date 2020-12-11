@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class GameObjectState
+public abstract class MonoBehaviourState
 {
     public abstract void OnEnter();
 
