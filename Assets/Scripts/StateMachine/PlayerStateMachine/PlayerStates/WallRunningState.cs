@@ -7,7 +7,7 @@ public class WallRunningState : PlayerState
     float maxWallrunningTime = 1.5f;
     float wallrunningTime;
 
-    public WallRunningState(PlayerStateMachine playerSM, Player player) : base(playerSM, player)
+    public WallRunningState(Player player) : base(player)
     {
 
     }
@@ -22,13 +22,13 @@ public class WallRunningState : PlayerState
     {
         if (player.IsGrounded())
         {
-            playerSM.TransitionToState(new GroundedState(playerSM, player));
+            player.stateMachine.TransitionToState(new GroundedState(player));
             return;
         }
 
         if(player.wallrunningSurfaceContact == null || wallrunningTime >= maxWallrunningTime)
         {
-            playerSM.TransitionToState(new AerialState(playerSM, player));
+            player.stateMachine.TransitionToState(new AerialState(player));
             return;
         }
 

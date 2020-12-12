@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class GroundedState : PlayerState
 {
-    public GroundedState(PlayerStateMachine playerSM, Player player) : base(playerSM, player)
+    public GroundedState(Player player) : base(player)
     {
 
     }
@@ -19,13 +19,13 @@ public class GroundedState : PlayerState
         if (player.wallrunningSurfaceContact != null && 
             Vector3.Dot(player.CameraRelativeInputDirection(), -player.wallrunningSurfaceContact.Value.normal) > 1e-4f)
         {
-            playerSM.TransitionToState(new GroundedToWallrunningState(playerSM, player));
+            player.stateMachine.TransitionToState(new GroundedToWallrunningState(player));
             return;
         }
 
         if (!player.IsGrounded())
         {
-            playerSM.TransitionToState(new AerialState(playerSM, player));
+            player.stateMachine.TransitionToState(new AerialState(player));
             return;
         }
 
@@ -51,7 +51,7 @@ public class GroundedState : PlayerState
         /* This belongs here because FixedUpdate would sometimes miss the spacebarDown event */
         if (player.input.spacebarDown)
         {
-            playerSM.TransitionToState(new JumpingState(playerSM, player));
+            player.stateMachine.TransitionToState(new JumpingState(player));
             return;
         }
         float groundSpeed = Vector3.ProjectOnPlane(player.Velocity, Vector3.up).magnitude;

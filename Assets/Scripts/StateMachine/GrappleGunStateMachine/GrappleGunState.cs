@@ -2,14 +2,21 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class GrappleGunState : MonoBehaviourState
+public abstract class GrappleGunState : IMonoBehaviourState
 {
-    protected GrappleGun grappleGun;
-    protected GrappleGunStateMachine grappleGunSM;
+    protected readonly GrappleGun grappleGun;
 
-    public GrappleGunState(GrappleGunStateMachine grappleGunSM, GrappleGun grappleGun) : base()
+    public GrappleGunState(GrappleGun grappleGun) : base()
     {
         this.grappleGun = grappleGun;
-        this.grappleGunSM = grappleGunSM;
     }
+
+    public abstract void OnEnter();
+
+    public abstract void FixedUpdateStep();
+
+    public abstract void UpdateStep();
+
+    public abstract void OnExit();
+    
 }

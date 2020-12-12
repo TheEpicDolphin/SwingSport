@@ -25,7 +25,7 @@ public class GrappleGun : MonoBehaviour, IGrapplingHookLauncher
 
     public GrapplingHook hook;
 
-    private GrappleGunStateMachine grappleGunSM;
+    public MonoBehaviourStateMachine stateMachine;
 
     Vector3 focusPoint;
 
@@ -33,24 +33,24 @@ public class GrappleGun : MonoBehaviour, IGrapplingHookLauncher
 
     private void Awake()
     {
-        grappleGunSM = new GrappleGunStateMachine(this);
+        stateMachine = new MonoBehaviourStateMachine();
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        grappleGunSM.InitWithState(new LoadedState(grappleGunSM, this));
+        stateMachine.InitWithState(new LoadedState(this));
     }
 
     // Update is called once per frame
     void Update()
     {
-        grappleGunSM.UpdateStep();
+        stateMachine.UpdateStep();
     }
 
     private void FixedUpdate()
     {
-        grappleGunSM.FixedUpdateStep();
+        stateMachine.FixedUpdateStep();
     }
 
     public void ShootHook()
@@ -81,13 +81,23 @@ public class GrappleGun : MonoBehaviour, IGrapplingHookLauncher
         return aimingTarget;
     }
 
+    public void RetractHook()
+    {
+        hook.Retract();
+    }
+
     public void AttachHookToTransform(Transform trans)
     {
-        hook.AttachToTransformAtPositionWithOrientation(trans, hook.transform.position, hook.transform.rotation);
+        hook.Attach(trans, hook.transform.position, hook.transform.rotation);
     }
 
     void IGrapplingHookLauncher.DidHitCollider(Collider collider)
     {
-        grappleGunSM.HookDidAttachEvent.Announce(collider);
+        stateMachine.HookDidAttachEvent.Announce(collider);
+    }
+
+    void IGrapplingHookLauncher.DidFinishRetracting()
+    {
+        stateMachine.HookDidFinishRetracting.Announce();
     }
 }

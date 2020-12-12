@@ -3,18 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-public abstract class MonoBehaviourStateMachine
+public class MonoBehaviourStateMachine
 {
-    protected MonoBehaviourState currentState;
+    protected IMonoBehaviourState currentState;
     protected HashSet<Type> allowedStates = new HashSet<Type>();
 
-    public void InitWithState(MonoBehaviourState state)
+    public void InitWithState(IMonoBehaviourState state)
     {
         currentState = state;
         currentState.OnEnter();
     }
 
-    public void TransitionToState(MonoBehaviourState nextState)
+    public void TransitionToState(IMonoBehaviourState nextState)
     {
         currentState.OnExit();
         currentState = nextState;

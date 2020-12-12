@@ -7,7 +7,7 @@ public class GroundedToWallrunningState : PlayerState
     float maxJumpDuration = 0.1f;
     float t;
 
-    public GroundedToWallrunningState(PlayerStateMachine playerSM, Player player) : base(playerSM, player)
+    public GroundedToWallrunningState(Player player) : base(player)
     {
 
     }
@@ -23,7 +23,7 @@ public class GroundedToWallrunningState : PlayerState
     {
         if (!player.IsGrounded())
         {
-            playerSM.TransitionToState(new GroundedState(playerSM, player));
+            player.stateMachine.TransitionToState(new GroundedState(player));
         }
     }
 
@@ -32,7 +32,7 @@ public class GroundedToWallrunningState : PlayerState
         if (t >= maxJumpDuration)
         {
             Debug.Log("FAILED");
-            playerSM.TransitionToState(new AerialState(playerSM, player));
+            player.stateMachine.TransitionToState(new AerialState(player));
             return;
         }
         t += Time.deltaTime;

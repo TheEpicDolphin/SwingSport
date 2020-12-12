@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class MonoBehaviourState
+public interface IMonoBehaviourState
 {
-    public abstract void OnEnter();
+    void OnEnter();
 
-    public abstract void UpdateStep();
+    void UpdateStep();
 
-    public abstract void FixedUpdateStep();
+    void FixedUpdateStep();
 
-    public abstract void OnExit();
+    void OnExit();
 }

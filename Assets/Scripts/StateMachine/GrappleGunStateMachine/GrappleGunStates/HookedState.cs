@@ -7,7 +7,7 @@ public class HookedState : GrappleGunState
     RopeAttachment grappleGunRA;
     Transform hookedTransform;
 
-    public HookedState(GrappleGunStateMachine grappleGunSM, GrappleGun grappleGun, Collider hookedCollider) : base(grappleGunSM, grappleGun)
+    public HookedState(GrappleGun grappleGun, Collider hookedCollider) : base(grappleGun)
     {
         hookedTransform = hookedCollider.transform;
         
@@ -33,7 +33,7 @@ public class HookedState : GrappleGunState
     {
         if (!grappleGun.input.leftMouseDown)
         {
-            grappleGunSM.TransitionToState(new RetractingHookState(grappleGunSM, grappleGun));
+            grappleGun.stateMachine.TransitionToState(new RetractingHookState(grappleGun));
             return;
         }
         else if (Input.GetKey(KeyCode.CapsLock))

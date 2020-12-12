@@ -25,6 +25,8 @@ public class Player : MonoBehaviour, IGrappleGunWielder, IFollowingCameraFollowe
 
     public Animator animator;
 
+    public MonoBehaviourStateMachine stateMachine;
+
     private Rigidbody playerRb;
 
     private Transform animatedRigHip;
@@ -32,8 +34,6 @@ public class Player : MonoBehaviour, IGrappleGunWielder, IFollowingCameraFollowe
     private Quaternion characterRotation = Quaternion.identity;
 
     private Material animatedBonesMat;
-
-    private PlayerStateMachine playerSM;
 
     public PlayerInputManager input;
 
@@ -94,20 +94,20 @@ public class Player : MonoBehaviour, IGrappleGunWielder, IFollowingCameraFollowe
             */
         }
 
-        
-        playerSM = new PlayerStateMachine(this);
+
+        stateMachine = new MonoBehaviourStateMachine();
         
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        playerSM.InitWithState(new GroundedState(playerSM, this));
+        stateMachine.InitWithState(new GroundedState(this));
     }
 
     private void Update()
     {
-        playerSM.UpdateStep();
+        stateMachine.UpdateStep();
         followingCamera.UpdateCameraTargetRotation(input.mouseXDelta, input.mouseYDelta);
 
         /*
@@ -132,7 +132,7 @@ public class Player : MonoBehaviour, IGrappleGunWielder, IFollowingCameraFollowe
 
     private void FixedUpdate()
     {
-        playerSM.FixedUpdateStep();
+        stateMachine.FixedUpdateStep();
 
         /* Clear wallrunning surface contacts from last OnCollisionStay */
         wallrunningSurfaceContact = null;

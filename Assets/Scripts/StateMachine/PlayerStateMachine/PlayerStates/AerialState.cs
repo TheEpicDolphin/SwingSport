@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class AerialState : PlayerState
 {
-    public AerialState(PlayerStateMachine playerSM, Player player) : base(playerSM, player)
+    public AerialState(Player player) : base(player)
     {
 
     }
@@ -18,7 +18,7 @@ public class AerialState : PlayerState
     {
         if (player.IsGrounded())
         {
-            playerSM.TransitionToState(new GroundedState(playerSM, player));
+            player.stateMachine.TransitionToState(new GroundedState(player));
             return;
         }
 
@@ -26,7 +26,7 @@ public class AerialState : PlayerState
             Vector3.Dot(player.CameraRelativeInputDirection(), -player.wallrunningSurfaceContact.Value.normal) > 1e-4f &&
             player.Velocity.y >= 0.0f)
         {
-            playerSM.TransitionToState(new WallRunningState(playerSM, player));
+            player.stateMachine.TransitionToState(new WallRunningState(player));
         }
 
         /* Player is in the air. Allow jetpack-like movement */

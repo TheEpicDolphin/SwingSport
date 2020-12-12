@@ -2,14 +2,20 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class PlayerState : MonoBehaviourState
+public abstract class PlayerState : IMonoBehaviourState
 {
-    protected Player player;
-    protected PlayerStateMachine playerSM;
+    protected readonly Player player;
 
-    public PlayerState(PlayerStateMachine playerSM, Player player) : base()
+    public PlayerState(Player player) : base()
     {
         this.player = player;
-        this.playerSM = playerSM;
     }
+
+    public abstract void OnEnter();
+
+    public abstract void FixedUpdateStep();
+
+    public abstract void UpdateStep();
+
+    public abstract void OnExit();
 }

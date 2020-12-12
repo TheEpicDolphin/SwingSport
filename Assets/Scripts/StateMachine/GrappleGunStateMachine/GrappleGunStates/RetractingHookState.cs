@@ -4,14 +4,14 @@ using UnityEngine;
 
 public class RetractingHookState : GrappleGunState
 {
-    public RetractingHookState(GrappleGunStateMachine grappleGunSM, GrappleGun grappleGun) : base(grappleGunSM, grappleGun)
+    public RetractingHookState(GrappleGun grappleGun) : base(grappleGun)
     {
 
     }
 
     public override void OnEnter()
     {
-        grappleGun.hook.isKinematic = true;
+        grappleGun.RetractHook();
         //grapplingGun.animator.CrossFade("Retracting", 0.1f);
         grappleGun.fakeRopeRenderer.enabled = true;
     }
@@ -25,7 +25,7 @@ public class RetractingHookState : GrappleGunState
     {
         if ()
         {
-            grappleGunSM.TransitionToState<LoadedState>();
+            grappleGun.stateMachine.TransitionToState(new LoadedState(grappleGun));
             return;
         }
     }

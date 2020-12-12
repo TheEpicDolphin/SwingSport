@@ -6,14 +6,14 @@ public class FiringState : GrappleGunState
 {
     float firingTime;
     const float maxFiringTime = 2.0f;
-    public FiringState(GrappleGunStateMachine grappleGunSM, GrappleGun grappleGun) : base(grappleGunSM, grappleGun)
+    public FiringState(GrappleGun grappleGun) : base(grappleGun)
     {
         
     }
 
     public override void OnEnter()
     {
-        grappleGunSM.hookDidAttachEvent.AddListener(this);
+        grappleGun.stateMachine.hookDidAttachEvent.AddListener(this);
         firingTime = 0.0f;
         grappleGun.ShootHook();
         //grapplingGun.animator.CrossFade("Firing", 0.1f);
@@ -30,13 +30,13 @@ public class FiringState : GrappleGunState
         firingTime += Time.deltaTime;
         if(firingTime > maxFiringTime)
         {
-            grappleGunSM.TransitionToState(new RetractingHookState(grappleGunSM, grappleGun));
+            grappleGun.stateMachine.TransitionToState(new RetractingHookState(grappleGun));
         }
     }
 
     public override void OnExit()
     {
-        grappleGunSM.hookDidAttachEvent.RemoveListener(this);
+        grappleGun.stateMachine.hookDidAttachEvent.RemoveListener(this);
         grappleGun.fakeRopeRenderer.enabled = false;
     }
 }

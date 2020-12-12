@@ -5,6 +5,8 @@ using UnityEngine;
 public interface IGrapplingHookLauncher
 {
     void DidHitCollider(Collider collider);
+
+    void DidFinishRetracting();
 }
 
 public class GrapplingHook : MonoBehaviour
@@ -12,10 +14,14 @@ public class GrapplingHook : MonoBehaviour
     Rigidbody rb;
     bool isLaunching;
     public IGrapplingHookLauncher launcher;
+    MonoBehaviour activeMonoBehaviour;
+    //GrapplingHookMonoBehaviour activeMonoBehaviour;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
+        gameObject.AddComponent<Launching>();
+        gameObject.AddComponent<Retracting>();
         isLaunching = false;
     }
 
@@ -42,11 +48,28 @@ public class GrapplingHook : MonoBehaviour
         rb.isKinematic = false;
         rb.AddForce(force, ForceMode.Impulse);
         isLaunching = true;
+        SetActiveMonoBehaviour<Launching>();
     }
 
-    public void AttachToTransformAtPositionWithOrientation(Transform trans, Vector3 position, Quaternion orientation)
+    public void Attach(Transform trans, Vector3 position, Quaternion orientation)
     {
         rb.isKinematic = true;
-        transform.position = position;
+        transform.parent = trans;
+    }
+
+    public void Retract()
+    {
+        rb.isKinematic = false;
+        SetActiveMonoBehaviour<Retracting>();
+    }
+
+    private void SetActiveMonoBehaviour<T>() where T : MonoBehaviour
+    {
+        if (activeMonoBehaviour)
+        {
+            activeMonoBehaviour.enabled = false;
+        }
+        activeMonoBehaviour = gameObject.GetComponent<T>();
+        activeMonoBehaviour.enabled = true;
     }
 }

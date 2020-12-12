@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class LoadedState : GrappleGunState
 {
-    public LoadedState(GrappleGunStateMachine grappleGunSM, GrappleGun grappleGun) : base(grappleGunSM, grappleGun)
+    public LoadedState(GrappleGun grappleGun) : base(grappleGun)
     {
 
     }
@@ -23,7 +23,7 @@ public class LoadedState : GrappleGunState
     {
         if (grappleGun.input.leftMouse)
         {
-            grappleGunSM.TransitionToState(new FiringState(grappleGunSM, grappleGun));
+            grappleGun.stateMachine.TransitionToState(new FiringState(grappleGun));
         }
     }
 
