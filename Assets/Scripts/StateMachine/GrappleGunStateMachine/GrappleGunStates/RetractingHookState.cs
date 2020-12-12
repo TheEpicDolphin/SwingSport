@@ -11,6 +11,7 @@ public class RetractingHookState : GrappleGunState
 
     public override void OnEnter()
     {
+        grappleGun.hookDidFinishRetractingAnnouncer.AddListener(HookDidFinishRetracting);
         grappleGun.RetractHook();
         //grapplingGun.animator.CrossFade("Retracting", 0.1f);
         grappleGun.fakeRopeRenderer.enabled = true;
@@ -23,15 +24,17 @@ public class RetractingHookState : GrappleGunState
 
     public override void UpdateStep()
     {
-        if ()
-        {
-            grappleGun.stateMachine.TransitionToState(new LoadedState(grappleGun));
-            return;
-        }
+        
     }
 
     public override void OnExit()
     {
+        grappleGun.hookDidFinishRetractingAnnouncer.RemoveListener(HookDidFinishRetracting);
         grappleGun.fakeRopeRenderer.enabled = false;
+    }
+
+    private void HookDidFinishRetracting()
+    {
+        grappleGun.stateMachine.TransitionToState(new LoadedState(grappleGun));
     }
 }

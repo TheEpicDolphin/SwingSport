@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public interface IGrappleGunWielder
 {
@@ -31,8 +32,14 @@ public class GrappleGun : MonoBehaviour, IGrapplingHookLauncher
 
     public IGrappleGunWielder wielder;
 
+    public UnityEvent<Collider> hookDidHitColliderAnnouncer;
+
+    public UnityEvent hookDidFinishRetractingAnnouncer;
+
     private void Awake()
     {
+        hookDidHitColliderAnnouncer = new UnityEvent<Collider>();
+        hookDidFinishRetractingAnnouncer = new UnityEvent();
         stateMachine = new MonoBehaviourStateMachine();
     }
 
@@ -88,16 +95,16 @@ public class GrappleGun : MonoBehaviour, IGrapplingHookLauncher
 
     public void AttachHookToTransform(Transform trans)
     {
-        hook.Attach(trans, hook.transform.position, hook.transform.rotation);
+        hook.Attach(trans);
     }
 
     void IGrapplingHookLauncher.DidHitCollider(Collider collider)
     {
-        stateMachine.HookDidAttachEvent.Announce(collider);
+        hookDidHitColliderAnnouncer.Invoke(collider);
     }
 
     void IGrapplingHookLauncher.DidFinishRetracting()
     {
-        stateMachine.HookDidFinishRetracting.Announce();
+        hookDidFinishRetractingAnnouncer.Invoke();
     }
 }

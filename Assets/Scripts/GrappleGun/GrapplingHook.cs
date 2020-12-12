@@ -51,7 +51,7 @@ public class GrapplingHook : MonoBehaviour
         SetActiveMonoBehaviour<Launching>();
     }
 
-    public void Attach(Transform trans, Vector3 position, Quaternion orientation)
+    public void Attach(Transform trans)
     {
         rb.isKinematic = true;
         transform.parent = trans;

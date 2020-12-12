@@ -10,7 +10,6 @@ public class HookedState : GrappleGunState
     public HookedState(GrappleGun grappleGun, Collider hookedCollider) : base(grappleGun)
     {
         hookedTransform = hookedCollider.transform;
-        
     }
 
     public override void OnEnter()

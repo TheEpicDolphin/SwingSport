@@ -13,7 +13,7 @@ public class FiringState : GrappleGunState
 
     public override void OnEnter()
     {
-        grappleGun.stateMachine.hookDidAttachEvent.AddListener(this);
+        grappleGun.hookDidHitColliderAnnouncer.AddListener(HookDidHitCollider);
         firingTime = 0.0f;
         grappleGun.ShootHook();
         //grapplingGun.animator.CrossFade("Firing", 0.1f);
@@ -36,7 +36,12 @@ public class FiringState : GrappleGunState
 
     public override void OnExit()
     {
-        grappleGun.stateMachine.hookDidAttachEvent.RemoveListener(this);
+        grappleGun.hookDidHitColliderAnnouncer.RemoveListener(HookDidHitCollider);
         grappleGun.fakeRopeRenderer.enabled = false;
+    }
+
+    private void HookDidHitCollider(Collider collider)
+    {
+        grappleGun.stateMachine.TransitionToState(new HookedState(grappleGun, collider));
     }
 }
