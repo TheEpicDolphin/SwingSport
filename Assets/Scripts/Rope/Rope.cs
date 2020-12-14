@@ -12,7 +12,8 @@ public class Rope : MonoBehaviour
     private List<Vector3> ropeNodePositions;
 
     /* Any objects that are attached to this rope */
-    private LinkedList<RopeAttachment> ropeAttachments = new LinkedList<RopeAttachment>();
+    //private LinkedList<RopeAttachment> ropeAttachments = new LinkedList<RopeAttachment>();
+    private LinkedList<IRopeAttachment> ropeAttachments = new LinkedList<IRopeAttachment>();
 
     /* The verlet particles that make up the rope structure */
     private LinkedList<VerletParticle> verletParticles = new LinkedList<VerletParticle>();
@@ -22,6 +23,8 @@ public class Rope : MonoBehaviour
 
     /* Small float value */
     private const float delta = 1e-4f;
+
+    private Dictionary<IRopeNode, float> restPositionMap;
 
     /* The length of the rope when not stretched */
     public float RestLength
@@ -86,7 +89,7 @@ public class Rope : MonoBehaviour
         }
 
         /* Apply ra--ra forces */
-        LinkedListNode<RopeAttachment> currentNode = ropeAttachments.First;
+        LinkedListNode<IRopeAttachment> currentNode = ropeAttachments.First;
         while (currentNode != null && currentNode.Next != null)
         {
             RopeAttachment.ApplyTension(currentNode.Value, currentNode.Next.Value);
@@ -410,6 +413,56 @@ public class Rope : MonoBehaviour
                 yield return currentRANode.Value;
                 currentRANode = currentRANode.Next;
             }
+        }
+    }
+
+    public float RestPosition(IRopeNode ropeNode)
+    {
+        return restPositionMap[ropeNode];
+    }
+
+    public void SetRestPosition(IRopeAttachment ropeNode, float restPosition)
+    {
+        restPositionMap[ropeNode] = ClampPositionToRopeExtents(restPosition);
+    }
+
+    private void ApplyConstraint(VerletParticle vp1, VerletParticle vp2)
+    {
+        float constraintLength = RestPosition(vp2) - RestPosition(vp1);
+        Vector3 x1 = vp1.AttachmentPoint();
+        Vector3 x2 = vp2.AttachmentPoint();
+        Vector3 d1 = x2 - x1;
+        float d2 = d1.magnitude;
+        if (d2 > Mathf.Epsilon)
+        {
+            float d3 = (d2 - constraintLength) / d2;
+            Vector3 displacement = 0.5f * d1 * d3;
+            vp1.ApplyDisplacement(displacement);
+            vp2.ApplyDisplacement(-displacement);
+            //vp1.transform.position = x1 + 0.5f * d1 * d3;
+            //vp2.transform.position = x2 - 0.5f * d1 * d3;
+        }
+    }
+
+    private void ApplyTension(IRopeAttachment ra1, IRopeAttachment ra2)
+    {
+        const float Ck = 0.1f;
+        const float Cd = 0.1f;
+
+        Vector3 x = ra2.AttachmentPoint() - ra1.AttachmentPoint();
+        Vector3 direction = x.normalized;
+        Vector3 x0 = (RestPosition(ra2) - RestPosition(ra1)) * direction;
+        if (x.sqrMagnitude > x0.sqrMagnitude)
+        {
+            float m_red = 1.0f / (1 / ra1.Mass() + 1 / ra2.Mass());
+            Vector3 v_rel = Vector3.Project(ra1.Velocity() - ra2.Velocity(), direction);
+            float dt = Time.fixedDeltaTime;
+            float k = m_red * Ck / (dt * dt);
+            float b = m_red * Cd / dt;
+            Vector3 f1 = k * (x - x0) - b * v_rel;
+            Vector3 f2 = -k * (x - x0) + b * v_rel;
+            ra1.ApplyForce(f1);
+            ra2.ApplyForce(f2);
         }
     }
 

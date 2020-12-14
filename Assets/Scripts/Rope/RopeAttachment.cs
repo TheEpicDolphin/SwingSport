@@ -2,6 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public interface IRopeAttachment : IRopeNode
+{
+    float Mass();
+
+    Vector3 Velocity();
+
+    void ApplyForce(Vector3 force);
+}
+
 public class RopeAttachment : RopeNode
 {
     public Transform attachmentTransform;
@@ -33,8 +42,8 @@ public class RopeAttachment : RopeNode
 
     public static void ApplyTension(RopeAttachment ra1, RopeAttachment ra2)
     {
-        float Ck = 0.1f;
-        float Cd = 0.1f;
+        const float Ck = 0.1f;
+        const float Cd = 0.1f;
 
         Vector3 x = ra2.attachmentTransform.position - ra1.attachmentTransform.position;
         Vector3 direction = x.normalized;

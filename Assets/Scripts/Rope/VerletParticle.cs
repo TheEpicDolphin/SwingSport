@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class VerletParticle : RopeNode
+public class VerletParticle : MonoBehaviour, IRopeNode
 {
     public Vector3 previousPosition;
 
@@ -18,6 +18,17 @@ public class VerletParticle : RopeNode
         transform.position = newPos;
     }
 
+    public Vector3 AttachmentPoint()
+    {
+        return transform.position;
+    }
+
+    public void ApplyDisplacement(Vector3 displacement)
+    {
+        transform.position += displacement;
+    }
+
+    /*
     public override void ApplyConstraint(VerletParticle vp)
     {
         float constraintLength = vp.restPosition - restPosition;
@@ -49,4 +60,5 @@ public class VerletParticle : RopeNode
     {
         return transform.position;
     }
+    */
 }
